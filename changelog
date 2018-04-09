@@ -1,0 +1,59 @@
+#Changelog
+  Changelog for Quantum Espresso Post Porcessing Library
+
+## 2018-03-30
+### Added
+-MACRO alloc1		(qepp_mem.h)
+-MACRO alloc2		(qepp_mem.h)
+-MACRO alloc3		(qepp_mem.h)
+-MACRO alloc4		(qepp_mem.h)
+-MACRO duplicate1	(qepp_mem.h)
+-MACRO duplicate2	(qepp_mem.h)
+-MACRO duplicate3	(qepp_mem.h)
+-MACRO duplicate4	(qepp_mem.h)
+-MACRO free1		(qepp_mem.h)
+-MACRO free2		(qepp_mem.h)
+-MACRO free3		(qepp_mem.h)
+-MACRO free4		(qepp_mem.h)
+
+### Bugfix
+-Launching with no input would cause a crash due to attempted mp_bcast on NULL string.
+ New variable added to tell all processors if ionode did find an input.
+
+
+
+## 2018-03-23
+### Added
+-WRAPPER MACRO mp_bcast	(qepp_mpi.h)
+-mp_bcast_char		(qepp_mpi.h,qepp_mpi.c)
+-mp_bcast_i		(qepp_mpi.h,qepp_mpi.c)
+-mp_bcast_iv1		(qepp_mpi.h,qepp_mpi.c)
+-mp_bcast_iv2		(qepp_mpi.h,qepp_mpi.c)
+-mp_bcast_iv3		(qepp_mpi.h,qepp_mpi.c)
+-mp_bcast_iv4		(qepp_mpi.h,qepp_mpi.c)
+-mp_bcast_li		(qepp_mpi.h,qepp_mpi.c)
+-mp_bcast_liv1		(qepp_mpi.h,qepp_mpi.c)
+-mp_bcast_liv2		(qepp_mpi.h,qepp_mpi.c)
+-mp_bcast_liv3		(qepp_mpi.h,qepp_mpi.c)
+-mp_bcast_liv4		(qepp_mpi.h,qepp_mpi.c)
+-mp_bcast_d		(qepp_mpi.h,qepp_mpi.c)
+-mp_bcast_dv1		(qepp_mpi.h,qepp_mpi.c)
+-mp_bcast_dv2		(qepp_mpi.h,qepp_mpi.c)
+-mp_bcast_dv3		(qepp_mpi.h,qepp_mpi.c)
+-mp_bcast_dv4		(qepp_mpi.h,qepp_mpi.c)
+-mp_bcast_c		(qepp_mpi.h,qepp_mpi.c)
+-mp_bcast_cv1		(qepp_mpi.h,qepp_mpi.c)
+-mp_bcast_cv2		(qepp_mpi.h,qepp_mpi.c)
+-mp_bcast_cv3		(qepp_mpi.h,qepp_mpi.c)
+-mp_bcast_cv4		(qepp_mpi.h,qepp_mpi.c)
+-bcast_base_char	(mpi_base.h,mpi_base.c)
+-bcast_base_int		(mpi_base.h,mpi_base.c)
+-bcast_base_long	(mpi_base.h,mpi_base.c)
+-bcast_base_double	(mpi_base.h,mpi_base.c)
+-bcast_base_complex	(mpi_base.h,mpi_base.c)
+
+### Changed
+-open_io_env()		(qepp_io.c)
+  Implemented parallelization for reading input file using mp_bcast
+
+
