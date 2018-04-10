@@ -14,22 +14,22 @@
 #include <stdlib.h>
 #include <complex.h>
 #include <stdbool.h>
-#include <qepp/qepp_err.h>	//errh, SET_ERRH(), MSG(), WARN()
+//#include <qepp/qepp_err.h>	//errh, SET_ERRH(), WARN(), FAIL()
 #include <qepp/qepp_struct.h>	//structs, initialize_...(), print_...(), duplicate_...(), free_...()
-#include <qepp/qepp_file.h>
+#include <qepp/qepp_file.h>	//
 #include <qepp/functions.h>
 #include <qepp/my_lapack.h>
 #include <qepp/other.h>
 #include <qepp/qepp_constants.h>
 //#include <qepp/qepp_read.h>
-#include <qepp/qepp_mem.h>
-#include <qepp/qepp_io.h>
+#include <qepp/qepp_mem.h>	//AllocateLinearMem1/2/3/4(), DuplicateLinearMem1/2/3/4(), FreeLinearMem1/2/3/4()
+#include <qepp/qepp_io.h>	//OPEN_IO_ENV(), CLOSE_IO_ENV(), QEPP_PRINT(), QEPP_ALL_PRINT(), QEPP_OUT()
 
 #ifdef __GSL
 #include <gsl/gsl_integration.h>
 #endif //__GSL
 
-#include <qepp/qepp_mpi.h>
+#include <qepp/qepp_mpi.h>	//mb_bcast(), mp_sum(), SET_PW_MPI()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //extern defined variables

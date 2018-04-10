@@ -11,18 +11,25 @@ extern char workdir[1024];
 extern char datafile_path[1024];
 extern data_file * df;
 
+#define TEST_ARGS \
+	if( out_ptr == NULL) \
+		FAIL( NULL_OUT, " "); \
+	*out_ptr = NULL; \
+	if( filename == NULL) \
+		FAIL( NULL_IN, " "); \
+	if( ! is_file( filename)) \
+		FAIL( OPEN_IN_FAIL, "%s is not a file.", filename); \
+	FILE * read = fopen( filename, "r"); \
+	if( read == NULL) \
+		FAIL( OPEN_IN_FAIL, "%s", filename);
+	
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //READ
 errh * read_nscf_md( char * filename, nscf_md ** out_ptr)
 {
-	if( out_ptr == NULL)
-		FAIL( NULL_OUT, " ");
-	*out_ptr = NULL;
-	if( filename == NULL)
-		FAIL( NULL_IN, " ");
-	FILE * read = open_qe_in( filename);
-	if( read == NULL)
-		FAIL( OPEN_IN_FAIL, " ");
+	TEST_ARGS;
+
 	QEPP_PRINT( "Reading nscf metadata from \"%s\"\n", filename);
 
 	long int lines = GET_FILE_LINES( read);
@@ -92,16 +99,10 @@ errh * read_nscf_md( char * filename, nscf_md ** out_ptr)
 
 errh * read_nscf_data( char * filename, nscf_data ** out_ptr)
 {
+	TEST_ARGS;
+
 	int bands=0;
 	char buffer[256];
-	if( out_ptr == NULL)
-		FAIL( NULL_OUT, " ");
-	*out_ptr = NULL;
-	if( filename == NULL)
-		FAIL( NULL_IN, " ");
-	FILE * read = fopen(filename,"r");
-	if( read == NULL)
-		FAIL( OPEN_IN_FAIL, "%s", filename);
 	QEPP_PRINT("Reading nscf data from \"%s\"\n", filename);
 
 	if(strstr(filename,"bands") != NULL)
@@ -201,15 +202,9 @@ errh * read_nscf_data( char * filename, nscf_data ** out_ptr)
 
 errh * read_band_data( char * filename, band_data ** out_ptr)
 {
+	TEST_ARGS;
+
 	band_data * data;
-	if( out_ptr == NULL)
-		FAIL( NULL_OUT, " ");
-	*out_ptr = NULL;
-	if( filename == NULL)
-		FAIL( NULL_IN, " ");
-	FILE * read = fopen(filename,"r");
-	if( read == NULL)
-		FAIL( OPEN_IN_FAIL, "%s", filename);
 	QEPP_PRINT("Reading band data from \"%s\"\n", filename);
 
 	double app = 0;
@@ -241,13 +236,8 @@ errh * read_band_data( char * filename, band_data ** out_ptr)
 
 errh * read_band_pp( char * filename, band_pp ** out_ptr)
 {
-	if( out_ptr == NULL)
-		FAIL( NULL_OUT, " ");
-	if( filename == NULL)
-		FAIL( NULL_IN, " ");
-	FILE * read = fopen(filename,"r");
-	if( read == NULL)
-		FAIL( OPEN_IN_FAIL, "%s", filename);
+	TEST_ARGS;
+
 	QEPP_PRINT("Reading band pp from \"%s\"\n", filename);
 
 	double app;
@@ -283,14 +273,9 @@ errh * read_band_pp( char * filename, band_pp ** out_ptr)
 
 errh * read_spin_data( char * filename, spin_data ** out_ptr)
 {
+	TEST_ARGS;
+
 	spin_data * data;
-	if( out_ptr == NULL)
-		FAIL( NULL_OUT, " ");
-	if( filename == NULL)
-		FAIL( NULL_IN, " ");
-	FILE * read = fopen( filename, "r");
-	if( read == NULL)
-		FAIL( OPEN_IN_FAIL, "%s", filename);
 	FILE * md = fopen( "spinore.out", "r");
 	if( md == NULL)
 		FAIL( FAIL, "Cannot open file spinore.out");
@@ -345,14 +330,9 @@ errh * read_spin_data( char * filename, spin_data ** out_ptr)
 
 errh * read_opt_data( char * filename, opt_data ** out_ptr, char * comments)
 {
+	TEST_ARGS;
+
 	opt_data * data;
-	if( out_ptr == NULL)
-		FAIL( NULL_OUT, " ");
-	if( filename == NULL)
-		FAIL( NULL_IN, " ");
-	FILE * read = fopen(filename,"r");
-	if( read == NULL)
-		FAIL( OPEN_IN_FAIL, "%s", filename);
 	QEPP_PRINT("Reading opt data from \"%s\"\n", filename);
 
 	long int lines = GET_FILE_LINES(read,comments);
@@ -394,14 +374,9 @@ errh * read_opt_data( char * filename, opt_data ** out_ptr, char * comments)
 
 errh * read_m_elem(char * filename, m_elem ** out_ptr, char * comments)
 {
+	TEST_ARGS;
+
 	m_elem * data;
-	if( out_ptr == NULL)
-		FAIL( NULL_OUT, " ");
-	if( filename == NULL)
-		FAIL( NULL_IN, " ");
-	FILE * read = fopen(filename,"r");
-	if( read == NULL)
-		FAIL( OPEN_IN_FAIL, "%s", filename);
 	char fname_app[128];
 	char * fname;
 	if( !is_file( "nscf_1.out"))
@@ -474,18 +449,12 @@ errh * read_data_set(char * filename, data_set ** out_ptr) { SUCCESS();}
 
 errh * read_pdos_data(char * filename, pdos_data ** out_ptr, char * comments)
 {
-	pdos_data * data = NULL;
+	TEST_ARGS;
 
+	pdos_data * data = NULL;
 	char buffer[256];
 	int n_states=0;
 
-	if( out_ptr == NULL)
-		FAIL( NULL_OUT, " ");
-	if( filename == NULL)
-		FAIL( NULL_IN, " ");
-	FILE * read = fopen(filename,"r");
-	if( read == NULL)
-		FAIL( OPEN_IN_FAIL, "%s", filename);
 	char * nscf_f = get_file( "nscf_1.out", ".out");
 	QEPP_PRINT("Acquiring nscf output file data from: %s...\n", nscf_f);
 	nscf_data * nscf;

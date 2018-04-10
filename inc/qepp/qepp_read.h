@@ -3,14 +3,14 @@
 
 #define _GNU_SOURCE
 
-#include <stdio.h>	//fopen(), fprintf(), printf(), scanf()
-#include <stdlib.h>	//malloc(), realloc()
-#include <string.h>	//strstr(), strcpy(), strlen()
+#include <stdio.h>		//fopen(), fprintf(), printf(), scanf()
+#include <stdlib.h>		//malloc(), realloc()
+#include <string.h>		//strstr(), strcpy(), strlen()
 #include <stdbool.h>
 
-#include <qepp/my_lapack.h>
-#include <qepp/qepp_err.h>
-#include <qepp/qepp_io.h>
+#include <qepp/my_lapack.h>	//delta_k(),
+#include <qepp/qepp_err.h>	//errh, SET_ERRH(), WARN(), FAIL()
+#include <qepp/qepp_io.h>	//QEPP_PRINT(), QEPP_ALL_PRINT(), QEPP_OUT()
 #include <qepp/qepp_file.h>
 #include <qepp/qepp_struct.h>
 
