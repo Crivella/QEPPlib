@@ -23,26 +23,10 @@ qepp_struct.h
 DEPS = $(patsubst %,$(INC)/$(ITARGET)/%,$(_DEPS))
 
 _OBJ = \
-band_data.o \
-bands_pp.o \
-cd.o \
-data_file.o \
-data_set.o \
-evc.o \
-egv.o \
-fit_params.o \
 functions.o \
-gkv.o \
-m_elem.o \
 mpi_base.o \
-mpi_data.o \
 my_lapack.o \
-nscf_data.o \
-nscf_md.o \
-opt_data.o \
 other.o \
-pdos_data.o \
-pdos_state.o \
 qepp_err.o \
 qepp_io.o \
 qepp_file.o \
@@ -51,8 +35,24 @@ qepp_mem.o \
 qepp_mpi.o \
 qepp_read.o \
 qepp_struct.o \
-spin_data.o \
-wfc.o
+struct_band_data.o \
+struct_bands_pp.o \
+struct_cd.o \
+struct_data_file.o \
+struct_data_set.o \
+struct_evc.o \
+struct_egv.o \
+struct_fit_params.o \
+struct_gkv.o \
+struct_m_elem.o \
+struct_mpi_data.o \
+struct_nscf_data.o \
+struct_nscf_md.o \
+struct_opt_data.o \
+struct_pdos_data.o \
+struct_pdos_state.o \
+struct_spin_data.o \
+struct_wfc.o
   
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
