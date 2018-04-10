@@ -36,14 +36,14 @@ typedef struct error_handle errh;
 //#define WARN( a) parse_errh( set_errh( WARNING, __func__, a))
 #define WARN( a, ...) \
 	do { \
-		char buff[256]; \
+		char buff[512]; \
 		sprintf( buff, a, ##__VA_ARGS__); \
 		parse_errh( set_errh( WARNING, __func__, buff)); \
 	} while(0)
 
 #define FAIL( a, b, ...) \
 	do { \
-		char buff[256]; \
+		char buff[512]; \
 		if( b != NULL) \
 			sprintf( buff, b, ##__VA_ARGS__); \
 		return set_errh( a, __func__, buff); \
