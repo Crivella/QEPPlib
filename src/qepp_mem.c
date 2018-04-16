@@ -2,20 +2,20 @@
 
 extern unsigned long int TOT_MEM;
 
-long int get_size( void * a)
+long int qepp_mem_get_size( void * a)
 {
 	long int res=1;
-	a = get_base( a);
+	a = qepp_mem_get_base( a);
 	int dim = BASE_DIM(a);
 	long int * ptr = *((long int **)BASE_ADDR(a));
 
 	for( int i=0; i<dim; i++)
 		res *= *(ptr+3+i);
-	res *= BASE_SIZE( a);
+	//res *= BASE_SIZE( a);
 	return res;
 }
 
-void * get_base( void * a)
+void * qepp_mem_get_base( void * a)
 {
 	if( a == NULL)
 		return NULL;

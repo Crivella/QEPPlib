@@ -9,7 +9,7 @@
 #ifndef ARRAY_SIZE_MACRO
 #define ARRAY_SIZE_MACRO
 #define BASE_ADDR(a) (long int *)a - 1
-#define BASE_NUM(a) get_size( a)
+#define BASE_NUM(a) qepp_mem_get_size( a)
 #define BASE_DIM(a) (*((long int **)a - 1))[0]
 #define BASE_SIZE(a) (*((long int **)a - 1))[1]
 #define BASE_CHECK(a) (*((long int **)a - 1))[2]
@@ -53,8 +53,8 @@
 */
 #endif //MEM_WRAP
 
-long int get_size( void * a);
-void * get_base( void * a);
+long int qepp_mem_get_size( void * a);
+void * qepp_mem_get_base( void * a);
 
 void * AllocateLinearMem1( unsigned long int, long int);
 void * AllocateLinearMem2( unsigned long int, long int, long int);
