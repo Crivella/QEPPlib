@@ -1222,6 +1222,12 @@ errh * read_egv_xml( const char * filename, egv ** out_ptr)
 	*out_ptr = res;
 	SUCCESS();
 }
+#else //__LIBXML
+errh * read_data_file( const char * filename, data_file **); {FAIL( FAIL, "Only available with libxml2 compilation\n");}
+errh * read_wfc_xml( ); {FAIL( FAIL, "Only available with libxml2 compilation\n");}
+evc  * read_evc_xml( ); {FAIL( FAIL, "Only available with libxml2 compilation\n");}
+errh * read_gkv_xml( ); {FAIL( FAIL, "Only available with libxml2 compilation\n");}
+errh * read_egv_xml( ); {FAIL( FAIL, "Only available with libxml2 compilation\n");}
 #endif //__LIBXML
 
 

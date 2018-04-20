@@ -16,7 +16,7 @@
 
 #ifdef __LIBXML2
 #include <libxml/parser.h>
-#endif
+#endif // __LIBXML2
 
 
 
@@ -77,13 +77,19 @@ errh * read_pdos_state(char *, pdos_state **);
 errh * read_wfc( const char * filename, wfc **);
 errh * read_gkv( const char * filename, gkv **);
 errh * read_egv( const char * filename, egv **);
-#ifdef __LIBXML2
 errh * read_data_file( const char * filename, data_file **);
+#ifdef __LIBXML2
 errh * read_wfc_xml( const char * filename, wfc **);
 evc  * read_evc_xml( xmlDoc * document, xmlNode * root, xmlNode * node);
 errh * read_gkv_xml( const char * filename, gkv **);
 errh * read_egv_xml( const char * filename, egv **);
+#else //__LIBXML2
+errh * read_wfc_xml( );
+evc  * read_evc_xml( );
+errh * read_gkv_xml( );
+errh * read_egv_xml( );
 #endif //__LIBXML2
+
 errh * read_wfc_dat( const char * filename, wfc **);
 evc  * read_evc_dat( FILE *, int);
 errh * read_gkv_dat( const char * filename, gkv **);
