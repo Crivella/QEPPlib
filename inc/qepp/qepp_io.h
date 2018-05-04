@@ -11,6 +11,10 @@
 #include <qepp/qepp_file.h>
 //#include <qepp/qepp_struct.h>
 
+extern char outdir[1024];
+extern char prefix[128];
+extern char workdir[1024];
+extern char datafile_path[1024];
 extern FILE * in_f;
 extern FILE * errf;
 extern FILE * outf;

@@ -1,11 +1,5 @@
 #include <qepp/qepp_read.h>
 
-extern char outdir[1024];
-extern char prefix[128];
-extern char workdir[1024];
-extern char datafile_path[1024];
-extern data_file * df;
-
 #define TEST_ARGS \
 	if( out_ptr == NULL) \
 		FAIL( NULL_OUT, " "); \

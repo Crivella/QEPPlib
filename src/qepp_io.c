@@ -1,11 +1,5 @@
 #include <qepp/qepp_io.h>
 
-extern char outdir[1024];
-extern char prefix[128];
-extern char workdir[1024];
-extern char datafile_path[1024];
-//extern data_file * df;
-
 void open_io_env( int node, int mode, int verb)
 {
 	struct pollfd fds[1];

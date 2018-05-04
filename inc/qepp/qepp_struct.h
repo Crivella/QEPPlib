@@ -68,6 +68,7 @@ typedef struct egv egv;
 
 typedef struct cd cd;
 
+extern data_file * df;
 #include <qepp/qepp_read.h>	//READ()
 
 
