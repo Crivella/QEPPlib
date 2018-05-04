@@ -9,7 +9,6 @@ _DEPS = \
 functions.h \
 mpi_base.h \
 my_lapack.h \
-other.h \
 qepp_constants.h \
 qepp_err.h \
 qepp_io.h \
@@ -26,7 +25,6 @@ _OBJ = \
 functions.o \
 mpi_base.o \
 my_lapack.o \
-other.o \
 qepp_err.o \
 qepp_io.o \
 qepp_file.o \
