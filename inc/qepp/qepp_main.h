@@ -19,7 +19,6 @@
 #include <qepp/qepp_file.h>	//
 #include <qepp/functions.h>
 #include <qepp/my_lapack.h>
-#include <qepp/other.h>
 #include <qepp/qepp_constants.h>
 //#include <qepp/qepp_read.h>
 #include <qepp/qepp_mem.h>	//AllocateLinearMem1/2/3/4(), DuplicateLinearMem1/2/3/4(), FreeLinearMem1/2/3/4()
