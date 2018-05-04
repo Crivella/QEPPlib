@@ -1,5 +1,12 @@
 #include <qepp/qepp_file.h>
 
+static void free_str_array( char ** ptr);
+static char ** get_dir_content( char * dirpath);
+static void * print_str_array( char ** ptr, char * outname);
+static long int print_str_array_num( char ** ptr, char * outname);
+static void sort_str_array( char ** ptr);
+static void switch_val(void * a, void * b, size_t size);
+
 char * get_file( char * filename, char * id)
 {
 	char * endres=NULL;
@@ -254,7 +261,7 @@ bool qepp_strcmp_WC( char * pattern, char * candidate, int p, int c)
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void free_str_array( char ** ptr)
+static void free_str_array( char ** ptr)
 {
 	if(ptr == NULL)
 		return ;
@@ -264,7 +271,7 @@ void free_str_array( char ** ptr)
 	return ;
 }
 
-char ** get_dir_content( char * dirpath)
+static char ** get_dir_content( char * dirpath)
 {
 	char ** obj = NULL;
 	if( dirpath == NULL)
@@ -312,7 +319,7 @@ bool qepp_is_dir( char * dirpath)
 	return false;
 }
 
-void * print_str_array( char ** string, char * outname)
+static void * print_str_array( char ** string, char * outname)
 {
 	if( string == NULL)
 		return NULL;
@@ -333,7 +340,7 @@ void * print_str_array( char ** string, char * outname)
 	return NULL;
 }
 
-long int print_str_array_num( char ** string, char * outname)
+static long int print_str_array_num( char ** string, char * outname)
 {
 	if( string == NULL)
 		return -1;
@@ -355,7 +362,7 @@ long int print_str_array_num( char ** string, char * outname)
 	return i;
 }
 
-void sort_str_array( char ** ptr)
+static void sort_str_array( char ** ptr)
 {
 	for( int i=0; ptr[i] != NULL; i++)
 		for( int n=i+1; ptr[n] != NULL; n++)
@@ -651,7 +658,7 @@ int qepp_sscanf_double2(char * str, double * res , char ** endptr)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Switch values of 2 variables
-void switch_val(void * a, void * b, size_t size)
+static void switch_val(void * a, void * b, size_t size)
 {
 	if(a == NULL || b == NULL)
 		return ;
