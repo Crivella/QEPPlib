@@ -8,6 +8,7 @@ typedef struct mpi_data mpi_data;
 #include <stdlib.h>	//malloc(), calloc()
 #include <assert.h>	//assert()
 #include <complex.h>
+#include <qepp/qepp_mem.h>
 
 #ifdef __MPI
 #include <mpi.h>	//MPI_Comm_size(), MPI_Comm_rank(), MPI_Get_processor_name()
@@ -32,52 +33,44 @@ long int mpi_get_size( void * a);
 
 #define mp_sum(a,b, ...) \
 	_Generic((a), \
-		int:			mp_sum_i((int *)a, b), \
-		int *:			mp_sum_iv1((int *)a, b, SECOND(0, ##__VA_ARGS__, 0)), \
-		int **:			mp_sum_iv2((int **)a, b), \
-		int ***:		mp_sum_iv3((int ***)a, b), \
-		int ****:		mp_sum_iv4((int ****)a, b), \
-		long int:		mp_sum_li((long int *)a, b), \
-		long int *:		mp_sum_liv1((long int *)a, b, SECOND(0, ##__VA_ARGS__, 0)), \
-		long int **:		mp_sum_liv2((long int **)a, b), \
-		long int ***:		mp_sum_liv3((long int ***)a, b), \
-		long int ****:		mp_sum_liv4((long int ****)a, b), \
-		double:			mp_sum_d((double *)a, b), \
-		double *:		mp_sum_dv1((double *)a, b, SECOND(0, ##__VA_ARGS__, 0)), \
-		double **:		mp_sum_dv2((double **)a, b), \
-		double ***:		mp_sum_dv3((double ***)a, b), \
-		double ****:		mp_sum_dv4((double ****)a, b), \
-		double complex:		mp_sum_c((double complex *)a, b), \
-		double complex *:	mp_sum_cv1((double complex *)a, b, SECOND(0, ##__VA_ARGS__, 0)), \
-		double complex **:	mp_sum_cv2((double complex **)a, b), \
-		double complex ***:	mp_sum_cv3((double complex ***)a, b), \
-		double complex ****:	mp_sum_cv4((double complex ****)a, b), \
+		int *:			mp_sum_iv((int *)a, b, SECOND(0, ##__VA_ARGS__, 0)), \
+		int **:			mp_sum_iv((int *)a, b, SECOND(0, ##__VA_ARGS__, 0)), \
+		int ***:		mp_sum_iv((int *)a, b, SECOND(0, ##__VA_ARGS__, 0)), \
+		int ****:		mp_sum_iv((int *)a, b, SECOND(0, ##__VA_ARGS__, 0)), \
+		long int *:		mp_sum_liv((long int *)a, b, SECOND(0, ##__VA_ARGS__, 0)), \
+		long int **:		mp_sum_liv((long int *)a, b, SECOND(0, ##__VA_ARGS__, 0)), \
+		long int ***:		mp_sum_liv((long int *)a, b, SECOND(0, ##__VA_ARGS__, 0)), \
+		long int ****:		mp_sum_liv((long int *)a, b, SECOND(0, ##__VA_ARGS__, 0)), \
+		double *:		mp_sum_dv((double *)a, b, SECOND(0, ##__VA_ARGS__, 0)), \
+		double **:		mp_sum_dv((double *)a, b, SECOND(0, ##__VA_ARGS__, 0)), \
+		double ***:		mp_sum_dv((double *)a, b, SECOND(0, ##__VA_ARGS__, 0)), \
+		double ****:		mp_sum_dv((double *)a, b, SECOND(0, ##__VA_ARGS__, 0)), \
+		double complex *:	mp_sum_cv((double complex *)a, b, SECOND(0, ##__VA_ARGS__, 0)), \
+		double complex **:	mp_sum_cv((double complex *)a, b, SECOND(0, ##__VA_ARGS__, 0)), \
+		double complex ***:	mp_sum_cv((double complex *)a, b, SECOND(0, ##__VA_ARGS__, 0)), \
+		double complex ****:	mp_sum_cv((double complex *)a, b, SECOND(0, ##__VA_ARGS__, 0)), \
 		default:		fprintf(stderr, "mp_sum: Type not defined\n") \
 	)
 
 #define mp_bcast(a,b, ...) \
 	_Generic((a), \
 		char *:			mp_bcast_char((char *)a, b, SECOND(0, ##__VA_ARGS__, 0)), \
-		int:			mp_bcast_i((int *)a, b), \
-		int *:			mp_bcast_iv1((int *)a, b, SECOND(0, ##__VA_ARGS__, 0)), \
-		int **:			mp_bcast_iv2((int **)a, b), \
-		int ***:		mp_bcast_iv3((int ***)a, b), \
-		int ****:		mp_bcast_iv4((int ****)a, b), \
-		long int:		mp_bcast_li((long int *)a, b), \
-		long int *:		mp_bcast_liv1((long int *)a, b, SECOND(0, ##__VA_ARGS__, 0)), \
-		long int **:		mp_bcast_liv2((long int **)a, b), \
-		long int ***:		mp_bcast_liv3((long int ***)a, b), \
-		long int ****:		mp_bcast_liv4((long int ****)a, b), \
-		double:			mp_bcast_d((double *)a, b), \
-		double *:		mp_bcast_dv1((double *)a, b, SECOND(0, ##__VA_ARGS__, 0)), \
-		double **:		mp_bcast_dv2((double **)a, b), \
-		double ***:		mp_bcast_dv3((double ***)a, b), \
-		double ****:		mp_bcast_dv4((double ****)a, b), \
-		double complex:		mp_bcast_c((double complex *)a, b), \
-		double complex *:	mp_bcast_cv1((double complex *)a, b, SECOND(0, ##__VA_ARGS__, 0)), \
-		double complex **:	mp_bcast_cv2((double complex **)a, b), \
-		double complex ***:	mp_bcast_cv3((double complex ***)a, b), \
-		double complex ****:	mp_bcast_cv4((double complex ****)a, b), \
+		int *:			mp_bcast_iv((int *)a, b, SECOND(0, ##__VA_ARGS__, 0)), \
+		int **:			mp_bcast_iv((int *)a, b, SECOND(0, ##__VA_ARGS__, 0)), \
+		int ***:		mp_bcast_iv((int *)a, b, SECOND(0, ##__VA_ARGS__, 0)), \
+		int ****:		mp_bcast_iv((int *)a, b, SECOND(0, ##__VA_ARGS__, 0)), \
+		long int *:		mp_bcast_liv((long int *)a, b, SECOND(0, ##__VA_ARGS__, 0)), \
+		long int **:		mp_bcast_liv((long int *)a, b, SECOND(0, ##__VA_ARGS__, 0)), \
+		long int ***:		mp_bcast_liv((long int *)a, b, SECOND(0, ##__VA_ARGS__, 0)), \
+		long int ****:		mp_bcast_liv((long int *)a, b, SECOND(0, ##__VA_ARGS__, 0)), \
+		double *:		mp_bcast_dv((double *)a, b, SECOND(0, ##__VA_ARGS__, 0)), \
+		double **:		mp_bcast_dv((double *)a, b, SECOND(0, ##__VA_ARGS__, 0)), \
+		double ***:		mp_bcast_dv((double *)a, b, SECOND(0, ##__VA_ARGS__, 0)), \
+		double ****:		mp_bcast_dv((double *)a, b, SECOND(0, ##__VA_ARGS__, 0)), \
+		double complex *:	mp_bcast_cv((double complex *)a, b, SECOND(0, ##__VA_ARGS__, 0)), \
+		double complex **:	mp_bcast_cv((double complex *)a, b, SECOND(0, ##__VA_ARGS__, 0)), \
+		double complex ***:	mp_bcast_cv((double complex *)a, b, SECOND(0, ##__VA_ARGS__, 0)), \
+		double complex ****:	mp_bcast_cv((double complex *)a, b, SECOND(0, ##__VA_ARGS__, 0)), \
 		default:		fprintf(stderr, "mp_bcast: Type not defined\n") \
 	)
 
@@ -99,56 +92,17 @@ long int mpi_get_size( void * a);
 
 //SECOND(0, ##__VA_ARGS__, MPI_COMM_WORLD)
 
-int mp_sum_i( int * a, MPI_Comm comm);
-int mp_sum_iv1( int * a, MPI_Comm comm, int);
-int mp_sum_iv2( int ** a, MPI_Comm comm);
-int mp_sum_iv3( int *** a, MPI_Comm comm);
-int mp_sum_iv4( int **** a, MPI_Comm comm);
-
-int mp_sum_li( long int * a, MPI_Comm comm);
-int mp_sum_liv1( long int * a, MPI_Comm comm, int);
-int mp_sum_liv2( long int ** a, MPI_Comm comm);
-int mp_sum_liv3( long int *** a, MPI_Comm comm);
-int mp_sum_liv4( long int **** a, MPI_Comm comm);
-
-int mp_sum_d( double * a, MPI_Comm comm);
-int mp_sum_dv1( double * a, MPI_Comm comm, int);
-int mp_sum_dv2( double ** a, MPI_Comm comm);
-int mp_sum_dv3( double *** a, MPI_Comm comm);
-int mp_sum_dv4( double **** a, MPI_Comm comm);
-
-int mp_sum_c( double complex * a, MPI_Comm comm);
-int mp_sum_cv1( double complex * a, MPI_Comm comm, int);
-int mp_sum_cv2( double complex ** a, MPI_Comm comm);
-int mp_sum_cv3( double complex *** a, MPI_Comm comm);
-int mp_sum_cv4( double complex **** a, MPI_Comm comm);
+int mp_sum_iv( int * a, MPI_Comm comm, int);
+int mp_sum_liv( long int * a, MPI_Comm comm, int);
+int mp_sum_dv( double * a, MPI_Comm comm, int);
+int mp_sum_cv( double complex * a, MPI_Comm comm, int);
 
 
 int mp_bcast_char( char *a, MPI_Comm comm, int);
-
-int mp_bcast_i( int * a, MPI_Comm comm);
-int mp_bcast_iv1( int * a, MPI_Comm comm, int);
-int mp_bcast_iv2( int ** a, MPI_Comm comm);
-int mp_bcast_iv3( int *** a, MPI_Comm comm);
-int mp_bcast_iv4( int **** a, MPI_Comm comm);
-
-int mp_bcast_li( long int * a, MPI_Comm comm);
-int mp_bcast_liv1( long int * a, MPI_Comm comm, int);
-int mp_bcast_liv2( long int ** a, MPI_Comm comm);
-int mp_bcast_liv3( long int *** a, MPI_Comm comm);
-int mp_bcast_liv4( long int **** a, MPI_Comm comm);
-
-int mp_bcast_d( double * a, MPI_Comm comm);
-int mp_bcast_dv1( double * a, MPI_Comm comm, int);
-int mp_bcast_dv2( double ** a, MPI_Comm comm);
-int mp_bcast_dv3( double *** a, MPI_Comm comm);
-int mp_bcast_dv4( double **** a, MPI_Comm comm);
-
-int mp_bcast_c( double complex * a, MPI_Comm comm);
-int mp_bcast_cv1( double complex * a, MPI_Comm comm, int);
-int mp_bcast_cv2( double complex ** a, MPI_Comm comm);
-int mp_bcast_cv3( double complex *** a, MPI_Comm comm);
-int mp_bcast_cv4( double complex **** a, MPI_Comm comm);
+int mp_bcast_iv( int * a, MPI_Comm comm, int);
+int mp_bcast_liv( long int * a, MPI_Comm comm, int);
+int mp_bcast_dv( double * a, MPI_Comm comm, int);
+int mp_bcast_cv( double complex * a, MPI_Comm comm, int);
 
 
 struct mpi_data

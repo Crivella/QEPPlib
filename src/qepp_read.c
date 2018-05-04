@@ -17,7 +17,7 @@ extern data_file * df;
 	*out_ptr = NULL; \
 	if( filename == NULL) \
 		FAIL( NULL_IN, " "); \
-	if( ! is_file( filename)) \
+	if( ! qepp_is_file( filename)) \
 		FAIL( OPEN_IN_FAIL, "%s is not a file.", filename); \
 	FILE * read = fopen( filename, "r"); \
 	if( read == NULL) \
@@ -32,7 +32,7 @@ errh * read_nscf_md( char * filename, nscf_md ** out_ptr)
 
 	QEPP_PRINT( "Reading nscf metadata from \"%s\"\n", filename);
 
-	long int lines = GET_FILE_LINES( read);
+	long int lines = QEPP_GET_FILE_LINES( read);
 	bool spin_orbit=false;
 	long int n_kpt;
 	int n_bnd;
@@ -41,23 +41,23 @@ errh * read_nscf_md( char * filename, nscf_md ** out_ptr)
 	double vc;
 	double n_el;	
 
-	if( find_string( "spin", read, 0) > 0)
+	if( qepp_find_string( "spin", read, 0) > 0)
 		spin_orbit = true;
-	if( get_value( "number of k points", read, "=", 0, R_LNT, &n_kpt))
+	if( qepp_get_value( "number of k points", read, "=", 0, R_LNT, &n_kpt))
 		FAIL( FAIL, "Cannot read n_kpt");
-	if( get_value( "number of Kohn-Sham states", read, "=", 0, R_INT, &n_bnd))
+	if( qepp_get_value( "number of Kohn-Sham states", read, "=", 0, R_INT, &n_bnd))
 		FAIL( FAIL, "Cannot read n_bnd");
-	if( get_value( "Fermi energy", read, 0 , /*md->lines_pos[md->lines-200]*/0, R_FLT, &e_fermi))
+	if( qepp_get_value( "Fermi energy", read, 0 , /*md->lines_pos[md->lines-200]*/0, R_FLT, &e_fermi))
 	{
 		int check = 1;
-		char * buffer = change_file( filename, "scf_1.out");
+		char * buffer = qepp_change_file( filename, "scf_1.out");
 		FILE * app_f = NULL;
-		if( is_file( buffer))
-			app_f = open_qe_out( buffer);
+		if( qepp_is_file( buffer))
+			app_f = fopen( buffer, "r");
 		free( buffer);
 		if( app_f != NULL)
 		{
-			if( !get_value( "Fermi energy", app_f, 0, 0, R_FLT, &e_fermi))
+			if( !qepp_get_value( "Fermi energy", app_f, 0, 0, R_FLT, &e_fermi))
 				check = 0;
 			fclose( app_f);
 		}
@@ -67,14 +67,14 @@ errh * read_nscf_md( char * filename, nscf_md ** out_ptr)
 			WARN( "Cannot read e_fermi");
 		}
 	}
-	if( get_value( ".save", read, "/", 0, R_STR, formula))
+	if( qepp_get_value( ".save", read, "/", 0, R_STR, formula))
 		WARN( "Cannot read material name");
-	if( get_value( "unit-cell volume", read, "=", 0, R_FLT, &vc))
+	if( qepp_get_value( "unit-cell volume", read, "=", 0, R_FLT, &vc))
 	{
 		vc = 0;
 		WARN( "Cannot read v_cell");
 	}
-	if( get_value( "number of electrons", read, "=", 0, R_FLT, &n_el))
+	if( qepp_get_value( "number of electrons", read, "=", 0, R_FLT, &n_el))
 	{
 		n_el = NAN;
 		WARN( "Cannot read n_el");
@@ -118,37 +118,37 @@ errh * read_nscf_data( char * filename, nscf_data ** out_ptr)
 	
 	long int count=0;
 	//double trash;
-	long int pos = find_string("End of band structure calculation",read,0);
+	long int pos = qepp_find_string("End of band structure calculation",read,0);
 	if(pos == -1)
 	{
-		pos = find_string("End of self-consistent calculation",read,0);
+		pos = qepp_find_string("End of self-consistent calculation",read,0);
 		if(pos == -1)
 			FAIL( FAIL, "Can't identify start of band data in file");
 	}
 	fseek(read,pos,SEEK_SET);
-	my_getline(buffer,256,read);
+	qepp_getline(buffer,256,read);
 	while(!feof(read) && count < data->n_kpt)
 	{
 		for (int i=0; i<3; i++)
-			my_fscanf_double(read,&data->kpt[count][i]);
+			qepp_fscanf_double(read,&data->kpt[count][i]);
 		//if(!bands)
-			//my_fscanf_double(read,&trash);
+			//qepp_fscanf_double(read,&trash);
 		for (int i=0; i< data->n_bnd; i++)
 		{
-			my_fscanf_double(read,&data->energies[count][i]);
+			qepp_fscanf_double(read,&data->energies[count][i]);
 			if( i==0 && data->energies[count][i] > 100)
 				i--;
 		}
 		if(!bands)
 			for (int i=0; i< data->n_bnd; i++)
-				my_fscanf_double(read,&data->occup[count][i]);
+				qepp_fscanf_double(read,&data->occup[count][i]);
 		count++;
 	}
-	pos = find_string("number of k points",read,0);
+	pos = qepp_find_string("number of k points",read,0);
 	if(pos == -1)
 		FAIL( FAIL, " ");
 	fseek(read,pos,SEEK_SET);
-	my_getline(buffer,256,read);
+	qepp_getline(buffer,256,read);
 	count=0;
 	int count_2=0;
 	char c;
@@ -163,7 +163,7 @@ errh * read_nscf_data( char * filename, nscf_data ** out_ptr)
 		
 /*
 #ifdef __LIBXML2
-	if( is_file( "data-file.xml"))
+	if( qepp_is_file( "data-file.xml"))
 	{
 		QEPP_PRINT("Reading weights from data-file.xml\n");
 		data_file * df;
@@ -188,8 +188,8 @@ errh * read_nscf_data( char * filename, nscf_data ** out_ptr)
 		}
 		count_2=0;
 		for( int i=0; i<3; i++)
-			my_fscanf_double( read, &data->kpt[count][i]);
-		my_fscanf_double(read,&data->weight[count]);
+			qepp_fscanf_double( read, &data->kpt[count][i]);
+		qepp_fscanf_double(read,&data->weight[count]);
 		data->tot_weight+=data->weight[count++];
 	}
 	fclose(read);
@@ -210,10 +210,10 @@ errh * read_band_data( char * filename, band_data ** out_ptr)
 	double app = 0;
 	int n_bnd = 0;
 	long int n_kpt = 0;
-	if( my_fscanf_double( read, &app) == EOF)
+	if( qepp_fscanf_double( read, &app) == EOF)
 		FAIL( FAIL, "Empty or unreadable file");
 	n_bnd = floor( app);
-	if( my_fscanf_double( read, &app) == EOF)
+	if( qepp_fscanf_double( read, &app) == EOF)
 		FAIL( FAIL, "Empty or unreadable file");
 	n_kpt = floor( app);
 	
@@ -225,9 +225,9 @@ errh * read_band_data( char * filename, band_data ** out_ptr)
 	for( long int i=0; i<n_kpt; i++)
 	{
 		for( int j=0; j<3; j++)
-			my_fscanf_double( read, &data->kpt[i][j]);
+			qepp_fscanf_double( read, &data->kpt[i][j]);
 		for( int j=0; j<n_bnd; j++)
-			my_fscanf_double( read, &data->bands[i][j]);
+			qepp_fscanf_double( read, &data->bands[i][j]);
 	}
 
 	*out_ptr = data;
@@ -241,9 +241,9 @@ errh * read_band_pp( char * filename, band_pp ** out_ptr)
 	QEPP_PRINT("Reading band pp from \"%s\"\n", filename);
 
 	double app;
-	my_fscanf_double( read, &app);
+	qepp_fscanf_double( read, &app);
 	int n_bnd = (int)floor(app);
-	my_fscanf_double( read, &app);
+	qepp_fscanf_double( read, &app);
 	long int n_kpt = (long int)floor(app);
 
 	band_pp * data = initialize_band_pp( n_kpt, n_bnd);
@@ -252,17 +252,17 @@ errh * read_band_pp( char * filename, band_pp ** out_ptr)
 	for( long int i=0; i<n_kpt; i++)
 	{
 		for( int j=0; j<3; j++)
-			my_fscanf_double( read, &data->kpt[i][j]);
-		my_fscanf_double( read, &app);
+			qepp_fscanf_double( read, &data->kpt[i][j]);
+		qepp_fscanf_double( read, &app);
 		n_bnd_occ = (int)floor(app);
 		data->n_bnd_occ[i] = n_bnd_occ;
 		int lim = n_bnd - n_bnd_occ;
 		for( int j=0; j<3; j++)
 		{
-			my_fscanf_double( read, &app); //Trash
+			qepp_fscanf_double( read, &app); //Trash
 			for( int k=0; k<lim; k++)
 				for( int n=0; n<n_bnd_occ; n++)
-					my_fscanf_double( read, &data->pp[i][n][k][j]);
+					qepp_fscanf_double( read, &data->pp[i][n][k][j]);
 		}
 	}
 	QEPP_PRINT("Read %li kpt with %d bands\n", n_kpt,n_bnd);
@@ -283,9 +283,9 @@ errh * read_spin_data( char * filename, spin_data ** out_ptr)
 
 	int n_bnd = 0;
 	long int n_kpt = 0;
-	if( get_value( "nks", md, "s", 0, R_LNT, &n_kpt))
+	if( qepp_get_value( "nks", md, "s", 0, R_LNT, &n_kpt))
 		FAIL( FAIL , "Cannot read nks");
-	if( get_value( "nbndsi", md, "=", 0, R_INT, &n_bnd))
+	if( qepp_get_value( "nbndsi", md, "=", 0, R_INT, &n_bnd))
 		FAIL( FAIL, "Cannot read nbndsi");
 	QEPP_PRINT("nks=\t%li\nnbnd=\t%d\n",n_kpt,n_bnd);
 
@@ -299,9 +299,9 @@ errh * read_spin_data( char * filename, spin_data ** out_ptr)
 			long int app1=0;
 			int app2=0;
 			/*double app3=0;
-			my_fscanf_double( read, &app3);
+			qepp_fscanf_double( read, &app3);
 			app1 = floor(app3+0.5);
-			my_fscanf_double( read, &app3);
+			qepp_fscanf_double( read, &app3);
 			app2 = floor(app3+0.5);*/
 			if( fscanf( read, "%li", &app1)) {}
 			if( fscanf( read, "%d", &app2)) {}
@@ -309,18 +309,18 @@ errh * read_spin_data( char * filename, spin_data ** out_ptr)
 			if(app1 != i || app2 != j) {
 				WARN( "Warning fileenum not matching cycle %li <> %li   %d <> %d",app1,i,app2,j); getchar();}
 			for( int k=0; k<2; k++)
-				my_fscanf_double( read, &data->cd[i][j][k]);
+				qepp_fscanf_double( read, &data->cd[i][j][k]);
 			for( int k=0; k<6; k++)
-				my_fscanf_double( read, &data->m[i][j][k/2][k%2]);
-			//my_fscanf_double( read, &data->m[i][j][3][0]);
+				qepp_fscanf_double( read, &data->m[i][j][k/2][k%2]);
+			//qepp_fscanf_double( read, &data->m[i][j][3][0]);
 			for( int k=0; k<2; k++)
-				my_fscanf_double( read, &data->m_tot[i][j][k]);
+				qepp_fscanf_double( read, &data->m_tot[i][j][k]);
 			for( int k=0; k<2; k++)
-				my_fscanf_double( read, &data->elicity[i][j][k]);
+				qepp_fscanf_double( read, &data->elicity[i][j][k]);
 			for( int k=0; k<2; k++)
-				my_fscanf_double( read, &data->chirality[i][j][k]);
+				qepp_fscanf_double( read, &data->chirality[i][j][k]);
 			//for( int k=0; k<2; k++)
-			//	my_fscanf_double( read, &dump/*&data->chir2[i][j][k]*/);
+			//	qepp_fscanf_double( read, &dump/*&data->chir2[i][j][k]*/);
 		}
 	}
 
@@ -335,9 +335,9 @@ errh * read_opt_data( char * filename, opt_data ** out_ptr, char * comments)
 	opt_data * data;
 	QEPP_PRINT("Reading opt data from \"%s\"\n", filename);
 
-	long int lines = GET_FILE_LINES(read,comments);
+	long int lines = QEPP_GET_FILE_LINES(read,comments);
 	long int count=0;
-	int col = GET_FILE_COL(read,comments)-1;
+	int col = QEPP_GET_FILE_COL(read,comments)-1;
 	char c;
 	QEPP_PRINT("Reading %li lines with %d columns\n",lines,col+1);
 
@@ -357,9 +357,9 @@ errh * read_opt_data( char * filename, opt_data ** out_ptr, char * comments)
 		if(!feof(read))
 			fseek( read, -1 , SEEK_CUR);
 
-		my_fscanf_double(read,&data->x[count]);
+		qepp_fscanf_double(read,&data->x[count]);
 		for( int i=0; i<col; i++)
-			my_fscanf_double(read,&data->values[count][i]);
+			qepp_fscanf_double(read,&data->values[count][i]);
 		count++;
 		if( count % 500000 == 0)
 			QEPP_PRINT("Read %li lines...\n",count);
@@ -379,9 +379,9 @@ errh * read_m_elem(char * filename, m_elem ** out_ptr, char * comments)
 	m_elem * data;
 	char fname_app[128];
 	char * fname;
-	if( !is_file( "nscf_1.out"))
+	if( !qepp_is_file( "nscf_1.out"))
 	{
-		if( !is_file( "bands_1.out"))
+		if( !qepp_is_file( "bands_1.out"))
 			fname = get_file( "nscf_1.out", ".out");
 		else
 		{
@@ -403,7 +403,7 @@ errh * read_m_elem(char * filename, m_elem ** out_ptr, char * comments)
 	int n_bnd = app->md->n_bnd;
 	QEPP_PRINT("Reading matrixelements from \"%s\"\n", filename);
 
-	long int lines = GET_FILE_LINES(read,comments);
+	long int lines = QEPP_GET_FILE_LINES(read,comments);
 	long int count=0;
 	char c;
 
@@ -461,13 +461,13 @@ errh * read_pdos_data(char * filename, pdos_data ** out_ptr, char * comments)
 	READ( nscf_f, &nscf);
 	QEPP_PRINT("...done\n");
 
-	long int pos = find_string("state #",read,0);
+	long int pos = qepp_find_string("state #",read,0);
 	fseek( read, pos, SEEK_SET);
-	my_getline(buffer,256,read);
+	qepp_getline(buffer,256,read);
 	while( strstr( buffer, "state #") != NULL)
 	{
 		n_states++;
-		my_getline(buffer,256,read);
+		qepp_getline(buffer,256,read);
 	}
 	printf("%li kpt, %d bands, %d states found\n",nscf->n_kpt,nscf->n_bnd,n_states);
 
@@ -517,7 +517,7 @@ errh * read_pdos_data(char * filename, pdos_data ** out_ptr, char * comments)
 	{
 		while( fgetc(read) != 'k' && !feof(read)) {}
 		for( int i=0; i<3; i++)
-			my_fscanf_double( read, &v_app[i]);
+			qepp_fscanf_double( read, &v_app[i]);
 		if( delta_k( nscf->kpt[k_app],v_app) > 0.001)
 		{
 			FREE( data);
@@ -528,8 +528,8 @@ errh * read_pdos_data(char * filename, pdos_data ** out_ptr, char * comments)
 		{
 			while( fgetc(read) != '(' && !feof(read)) {}
 			app *= fscanf( read, "%d", &b_app_r); b_app_r--;
-			my_fscanf_double( read, &en_app);
-			my_getline(buffer,256,read);
+			qepp_fscanf_double( read, &en_app);
+			qepp_getline(buffer,256,read);
 			if( fabs( en_app - nscf->energies[k_app][b_app]) > 0.005)
 			{
 				FREE( data);
@@ -546,9 +546,9 @@ errh * read_pdos_data(char * filename, pdos_data ** out_ptr, char * comments)
 			{
 				while( ( c = fgetc(read)) != '=' && c != '+') {}
 				double r_app;
-				my_fscanf_double( read, &r_app);
+				qepp_fscanf_double( read, &r_app);
 				double n_app;
-				my_fscanf_double( read, &n_app);
+				qepp_fscanf_double( read, &n_app);
 				int n = n_app-1;
 				data->pdos[k_app][b_app][n] = r_app;
 				c_app++;
@@ -631,7 +631,7 @@ errh * read_data_file( const char * filename, data_file ** out_ptr)
 						xmlFree( key);
 
 						key = xmlNodeListGetString( document, node->xmlChildrenNode, 1);
-						my_sscanf_double2( (char *)key, &res->lp, NULL);
+						qepp_sscanf_double( (char *)key, &res->lp, NULL);
 						xmlFree( key);
 					}
 					if( !xmlStrcmp( node->name, (const xmlChar *)"CELL_DIMENSIONS"))
@@ -639,7 +639,7 @@ errh * read_data_file( const char * filename, data_file ** out_ptr)
 						key = xmlNodeListGetString( document, node->xmlChildrenNode, 1);
 						endptr = (char *)key;
 						for( int n=0; n<6; n++)
-							my_sscanf_double2( endptr, &res->c_dim[n], &endptr);
+							qepp_sscanf_double( endptr, &res->c_dim[n], &endptr);
 						xmlFree( key);
 					}
 					if( !xmlStrcmp( node->name, (const xmlChar *)"DIRECT_LATTICE_VECTORS"))
@@ -668,7 +668,7 @@ errh * read_data_file( const char * filename, data_file ** out_ptr)
 							key = xmlNodeListGetString( document, node->xmlChildrenNode, 1);
 							endptr = (char *)key;
 							for( int j=0; j<3; j++)
-								my_sscanf_double2( endptr, &res->a[i][j], &endptr);
+								qepp_sscanf_double( endptr, &res->a[i][j], &endptr);
 							xmlFree( key);
 						}
 
@@ -702,7 +702,7 @@ errh * read_data_file( const char * filename, data_file ** out_ptr)
 							key = xmlNodeListGetString( document, node->xmlChildrenNode, 1);
 							endptr = (char *)key;
 							for( int j=0; j<3; j++)
-								my_sscanf_double2( endptr, &res->b[i][j], &endptr);
+								qepp_sscanf_double( endptr, &res->b[i][j], &endptr);
 							xmlFree( key);
 						}
 
@@ -741,11 +741,11 @@ errh * read_data_file( const char * filename, data_file ** out_ptr)
 						key = xmlGetProp( node, (const xmlChar *)"XYZ");
 						endptr = (char *)key;
 						for( int n=0; n<3; n++)
-							my_sscanf_double2( endptr, &res->kpt[app_n-1][n], &endptr);
+							qepp_sscanf_double( endptr, &res->kpt[app_n-1][n], &endptr);
 						xmlFree( key);
 
 						key = xmlGetProp( node, (const xmlChar *)"WEIGHT");
-						my_sscanf_double2( (char *)key, &res->weight[app_n-1], 0);
+						qepp_sscanf_double( (char *)key, &res->weight[app_n-1], 0);
 						xmlFree( key);
 
 						app_n++;
@@ -773,7 +773,7 @@ errh * read_data_file( const char * filename, data_file ** out_ptr)
 								double a;
 								for( int n=0; n<3; n++)
 								{
-									my_sscanf_double2( endptr, &a, &endptr);
+									qepp_sscanf_double( endptr, &a, &endptr);
 									if( a != res->kpt[app_n-1][n])
 										WARN( "kpt coordinates in eigenvalue list differ from BZ list");
 								}
@@ -972,7 +972,7 @@ errh * read_wfc_xml( const char * filename, wfc ** out_ptr)
 	if( !xmlStrcmp( root->name, (const xmlChar *)"WFC"))
 	{
 		for( node = root->children; node; node=node->next)
-			if( strcmp_wc( "evc.*", (char *)node->name))
+			if( qepp_strcmp_wc( "evc.*", (char *)node->name))
 				n_evc++;
 		res = initialize_wfc( n_evc);
  
@@ -1024,7 +1024,7 @@ errh * read_wfc_xml( const char * filename, wfc ** out_ptr)
 		int i=0;
 		for( node = root->children; node; node=node->next)
 		{
-			if( strcmp_wc( "evc.*", (char *)node->name))
+			if( qepp_strcmp_wc( "evc.*", (char *)node->name))
 				res->evc_vect[i++] = read_evc_xml( document, root, node);
 		}
 	}
@@ -1053,8 +1053,8 @@ evc * read_evc_xml( xmlDoc * document, xmlNode * root, xmlNode * node)
 	char * endptr = (char *)key;
 	for( long int i=0; i<size; i++)
 	{
-		my_sscanf_double2( endptr, &r, &endptr);
-		my_sscanf_double2( endptr, &c, &endptr);
+		qepp_sscanf_double( endptr, &r, &endptr);
+		qepp_sscanf_double( endptr, &c, &endptr);
 		res->val[i] = r + c * I;
 	}
 	xmlFree( key);
@@ -1116,7 +1116,7 @@ errh * read_gkv_xml( const char * filename, gkv ** out_ptr)
 				key = xmlNodeListGetString( document, node->xmlChildrenNode, 1);
 				char * endptr = (char *)key;
 				for( int i=0; i<3; i++)
-					my_sscanf_double2( endptr, &res->kpt[i], &endptr);
+					qepp_sscanf_double( endptr, &res->kpt[i], &endptr);
 				xmlFree( key);
 			}
 			if( !xmlStrcmp( node->name, (const xmlChar *)"INDEX"))
@@ -1197,7 +1197,7 @@ errh * read_egv_xml( const char * filename, egv ** out_ptr)
 				
 				char * endptr = (char *)key;
 				for( int i=0; i<n_bnd; i++)
-					my_sscanf_double2( endptr, &res->val[i], &endptr);
+					qepp_sscanf_double( endptr, &res->val[i], &endptr);
 
 				xmlFree( key);
 			}
@@ -1207,7 +1207,7 @@ errh * read_egv_xml( const char * filename, egv ** out_ptr)
 				
 				char * endptr = (char *)key;
 				for( int i=0; i<n_bnd; i++)
-					my_sscanf_double2( endptr, &res->occ[i], &endptr);
+					qepp_sscanf_double( endptr, &res->occ[i], &endptr);
 
 				xmlFree( key);
 			}
@@ -1246,28 +1246,28 @@ errh * read_wfc_dat( const char * filename, wfc ** out_ptr)
 
 	long int pos = ftell( read);
 
-	if( get_xml_param( &app, read, pos, "INFO", "nbnd"))		FAIL( FAIL, "Can't read nbnd");	n_bnd = app;
+	if( qepp_get_xml_param( &app, read, pos, "INFO", "nbnd"))		FAIL( FAIL, "Can't read nbnd");	n_bnd = app;
 	res = initialize_wfc( n_bnd);
 //QEPP_PRINT( "%li\n", n_bnd);
-	if( get_xml_param( &app, read, pos, "INFO", "ngw"))
+	if( qepp_get_xml_param( &app, read, pos, "INFO", "ngw"))
 		FAIL( FAIL, "Can't read ngw");
 	res->ngw = app;
-	if( get_xml_param( &app, read, pos, "INFO", "igwx"))
+	if( qepp_get_xml_param( &app, read, pos, "INFO", "igwx"))
 		FAIL( FAIL, "Can't read igwx");
 	res->igwx = app;
-	if( get_xml_param( &app, read, pos, "INFO", "ik"))
+	if( qepp_get_xml_param( &app, read, pos, "INFO", "ik"))
 		FAIL( FAIL, "Can't read ik");
 	res->ik = app;
-	if( get_xml_param( &app, read, pos, "INFO", "nk"))
+	if( qepp_get_xml_param( &app, read, pos, "INFO", "nk"))
 		FAIL( FAIL, "Can't read nk");
 	res->nk = app;
-	if( get_xml_param( &app, read, pos, "INFO", "ispin"))
+	if( qepp_get_xml_param( &app, read, pos, "INFO", "ispin"))
 		FAIL( FAIL, "Can't read ispin");
 	res->ispin = app;
-	if( get_xml_param( &app, read, pos, "INFO", "nspin"))
+	if( qepp_get_xml_param( &app, read, pos, "INFO", "nspin"))
 		FAIL( FAIL, "Can't read nspin");
 	res->nspin = app;
-	if( get_xml_param( &app, read, pos, "INFO", "scale_factor"))
+	if( qepp_get_xml_param( &app, read, pos, "INFO", "scale_factor"))
 	FAIL( FAIL, "Can't read scale");
 	res->scale_factor = app;
 		
@@ -1299,11 +1299,11 @@ evc * read_evc_dat( FILE * read, int n)
 
 	long int pos = ftell( read);
 	sprintf( needle, "evc.%d", n);
-	if( get_xml_param( &app1, read, ftell( read), needle, "size")) return NULL;	size = app1;
+	if( qepp_get_xml_param( &app1, read, ftell( read), needle, "size")) return NULL;	size = app1;
 
 	res = initialize_evc( size);
 
-	if( get_xml_value( (void **)&app, read, pos, needle, size, sizeof( double complex), dump_size))
+	if( qepp_get_xml_value( (void **)&app, read, pos, needle, size, sizeof( double complex), dump_size))
 	{
 		FREE( res);
 		return NULL;
@@ -1335,19 +1335,19 @@ errh * read_gkv_dat( const char * filename, gkv ** out_ptr)
 
 	//read ngkw
 	pos = ftell( read);
-	if( get_xml_param( &app, read, pos, "NUMBER_OF_GK-VECTORS", "kind"))
+	if( qepp_get_xml_param( &app, read, pos, "NUMBER_OF_GK-VECTORS", "kind"))
 		FAIL( FAIL, " ");
 	kind = app;
 	switch( kind)
 	{
 	case 4:
-		if( get_xml_value( (void **)&app_i, read, pos, "NUMBER_OF_GK-VECTORS", 1, kind, dump_size)) 
+		if( qepp_get_xml_value( (void **)&app_i, read, pos, "NUMBER_OF_GK-VECTORS", 1, kind, dump_size)) 
 			FAIL( FAIL, "Can't read ngkv");
 		ngkv = *app_i;
 		free( app_i);
 		break;
 	case 8:
-		if( get_xml_value( (void **)&app_i, read, pos, "NUMBER_OF_GK-VECTORS", 1, kind, dump_size)) 
+		if( qepp_get_xml_value( (void **)&app_i, read, pos, "NUMBER_OF_GK-VECTORS", 1, kind, dump_size)) 
 			FAIL( FAIL, "Can't read ngkv");
 		ngkv = *app_l;
 		free( app_l);
@@ -1361,19 +1361,19 @@ errh * read_gkv_dat( const char * filename, gkv ** out_ptr)
 
 	//read max_ngkv
 	pos = ftell( read);
-	if( get_xml_param( &app, read, pos, "MAX_NUMBER_OF_GK-VECTORS", "kind"))
+	if( qepp_get_xml_param( &app, read, pos, "MAX_NUMBER_OF_GK-VECTORS", "kind"))
 		FAIL( FAIL, " ");
 	kind = app;
 	switch( kind)
 	{
 	case 4:
-		if( get_xml_value( (void **)&app_i, read, pos, "MAX_NUMBER_OF_GK-VECTORS", 1, kind, dump_size)) 
+		if( qepp_get_xml_value( (void **)&app_i, read, pos, "MAX_NUMBER_OF_GK-VECTORS", 1, kind, dump_size)) 
 			FAIL( FAIL, "Can't read ngkv");
 		res->max_ngkv = *app_i;
 		free( app_i);
 		break;
 	case 8:
-		if( get_xml_value( (void **)&app_i, read, pos, "MAX_NUMBER_OF_GK-VECTORS", 1, kind, dump_size)) 
+		if( qepp_get_xml_value( (void **)&app_i, read, pos, "MAX_NUMBER_OF_GK-VECTORS", 1, kind, dump_size)) 
 			FAIL( FAIL, "Can't read ngkv");
 		res->max_ngkv = *app_l;
 		free( app_l);
@@ -1384,27 +1384,27 @@ errh * read_gkv_dat( const char * filename, gkv ** out_ptr)
 
 	//read kpt coord
 	double * kpt = NULL;
-	if( get_xml_value( (void **)&kpt, read, pos, "K-POINT_COORDS", 3, sizeof( double), dump_size)) 
+	if( qepp_get_xml_value( (void **)&kpt, read, pos, "K-POINT_COORDS", 3, sizeof( double), dump_size)) 
 		FAIL( FAIL, "Can't read ngkv");
 	memcpy( res->kpt, kpt, 3 * sizeof( double));
 	free( kpt);
 
 	//read index
 	pos = ftell( read);
-	if( get_xml_param( &app, read, pos, "INDEX", "size"))
+	if( qepp_get_xml_param( &app, read, pos, "INDEX", "size"))
 		FAIL( FAIL, " ");
 	size = app;
-	if( get_xml_value( (void **)&app_i, read, pos, "INDEX", size, sizeof( int), dump_size)) 
+	if( qepp_get_xml_value( (void **)&app_i, read, pos, "INDEX", size, sizeof( int), dump_size)) 
 		FAIL( FAIL, "Can't read index");
 	memcpy( res->index, app_i, size * sizeof( int));
 	free( app_i);
 
 	//read grid
 	pos = ftell( read);
-	if( get_xml_param( &app, read, pos, "GRID", "size"))
+	if( qepp_get_xml_param( &app, read, pos, "GRID", "size"))
 		FAIL( FAIL, " ");
 	size = app;
-	if( get_xml_value( (void **)&app_i, read, pos, "GRID", size, sizeof( int), dump_size)) 
+	if( qepp_get_xml_value( (void **)&app_i, read, pos, "GRID", size, sizeof( int), dump_size)) 
 		FAIL( FAIL, "Can't read grid");
 	memcpy( &res->grid[0][0], app_i, size * sizeof( int));
 	free( app_i);

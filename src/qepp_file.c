@@ -1,9 +1,14 @@
 #include <qepp/qepp_file.h>
 
+static void free_str_array( char ** ptr);
+static char ** get_dir_content( char * dirpath);
+static long int print_str_array_num( char ** ptr, char * outname);
+static char	* get_path( char *);
+
 char * get_file( char * filename, char * id)
 {
 	char * endres=NULL;
-	if( is_file( filename))
+	if( qepp_is_file( filename))
 	{
 		endres = malloc( (strlen( filename)+1) * sizeof( char));
 		strcpy( endres, filename);
@@ -60,7 +65,7 @@ char * get_file( char * filename, char * id)
 	return endres;
 }
 
-char	* get_path( char * str)
+static char	* get_path( char * str)
 {
 	char * res = NULL;
 	if( str == NULL)
@@ -76,13 +81,13 @@ char	* get_path( char * str)
 	return res;
 }
 
-char 	* change_file( char * old, char * new)
+char 	* qepp_change_file( char * old, char * new)
 {
 	char * res = NULL;
 	if( old == NULL)
-		fprintf( stderr, "change_file:\tPassing null pointer\n");
+		fprintf( stderr, "qepp_change_file:\tPassing null pointer\n");
 	else if( new == NULL)
-		fprintf( stderr, "change_file:\tPassing null pointer\n");
+		fprintf( stderr, "qepp_change_file:\tPassing null pointer\n");
 	else
 	{
 		char * app = get_path( old);
@@ -97,43 +102,9 @@ char 	* change_file( char * old, char * new)
 	return res;
 }
 
-FILE * open_qe_in( char * filename)
-{
-	FILE * read = NULL;
-	if( filename == NULL)
-		fprintf( stderr, "open_qe_in:\tPassing null pointer\n");
-	else if( !is_file( filename))
-	{
-		fprintf( stderr, "open_qe_in:\t%s is not a file\n",filename);
-		
-	}
-	else
-		read = fopen( filename, "r");
-
-	return read;
-}
-
-FILE * open_qe_out( char * filename)
-{
-	FILE * read = NULL;
-	if( filename == NULL)
-	{
-		WARN( "Passing null pointer");
-	}
-	else if( !is_file( filename))
-	{
-		//char buff[256]; sprintf( buff, "%s is not a file", filename);
-		WARN( "%s is not a file", filename);
-	}
-	else
-		read = fopen( filename, "r");
-
-	return read;
-}
-
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Read a line from file into the buffer (NULL terminated, include the \n)
-size_t my_getline(char buffer[], int max_size, FILE * read)
+size_t qepp_getline(char buffer[], int max_size, FILE * read)
 {
 	size_t numchars=0;
 	char c;
@@ -153,18 +124,7 @@ size_t my_getline(char buffer[], int max_size, FILE * read)
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//Get num of chars in file
-long int get_file_size(FILE * pFile)
-{
-	long int pos = ftell(pFile);
-	long int size;
-	fseek(pFile, 0, SEEK_END);
-	size=ftell(pFile);
-	fseek(pFile, pos , SEEK_SET);
-	return size;
-}
-
-long int skip_comments( FILE * read, char * comments)
+long int qepp_skip_comments( FILE * read, char * comments)
 {
 	long int nl=0;
 	long int pos=0;
@@ -172,7 +132,7 @@ long int skip_comments( FILE * read, char * comments)
 	char buffer[256];
 	do {
 		pos = ftell( read);
-		my_getline( buffer, 256, read);
+		qepp_getline( buffer, 256, read);
 		nl++;
 	} while( !feof( read) && strchr( comments, buffer[0]) != NULL);
 	fseek( read, pos, SEEK_SET);
@@ -182,7 +142,7 @@ long int skip_comments( FILE * read, char * comments)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Get numb of lines in file (exclude comments)
-long int get_file_lines_comm(FILE * read, char * comments)
+long int qepp_get_file_lines_comm(FILE * read, char * comments)
 {
 	long int pos = ftell(read);
 	long int lines=0;
@@ -190,7 +150,7 @@ long int get_file_lines_comm(FILE * read, char * comments)
 	rewind(read);
 	while(!feof(read))
 	{
-		my_getline(buffer,256,read);
+		qepp_getline(buffer,256,read);
 		if(comments != NULL)
 		{
 			if(strchr(comments,buffer[0]) == NULL) //If line is not a comment
@@ -206,7 +166,7 @@ long int get_file_lines_comm(FILE * read, char * comments)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Get numb of columns in file
-int get_file_columns_comm(FILE * read, char * comments, char * delimiters)
+int qepp_get_file_columns_comm(FILE * read, char * comments, char * delimiters)
 {
 	int col=0;
 	char buffer[256];
@@ -220,11 +180,11 @@ int get_file_columns_comm(FILE * read, char * comments, char * delimiters)
 		strcpy(delim,delimiters);
 
 	rewind(read);
-	my_getline(buffer,256,read);
+	qepp_getline(buffer,256,read);
 	if(comments != NULL)
 	{
 		while( strchr(comments,buffer[0]) != NULL && !feof(read))
-			my_getline(buffer,256,read);
+			qepp_getline(buffer,256,read);
 	}
 	for( int i=0; buffer[i] != 0; i++)
 	{
@@ -245,26 +205,7 @@ int get_file_columns_comm(FILE * read, char * comments, char * delimiters)
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//Get position of all new lines in file
-long int * get_file_lines_pos(FILE * pFile)
-{
-	long int * lines_pos;
-
-	long int pos = ftell(pFile);
-	int lines=GET_FILE_LINES(pFile);
-	lines_pos=malloc( lines * sizeof(long int));
-	long int count=0;
-	rewind(pFile);
-	while(!feof(pFile))
-		if(fgetc(pFile) == '\n')
-			lines_pos[count++]=ftell(pFile);
-
-	fseek(pFile, pos, SEEK_SET); 
-	return lines_pos;
-}
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool strcmp_WC( char * pattern, char * candidate, int p, int c)
+bool qepp_strcmp_WC( char * pattern, char * candidate, int p, int c)
 {
 	if(pattern == NULL || candidate == NULL)
 		return false;
@@ -273,18 +214,18 @@ bool strcmp_WC( char * pattern, char * candidate, int p, int c)
 	else if (pattern[p] == '*')
 	{
 		for (; candidate[c] != '\0'; c++)
-			if (strcmp_WC(pattern, candidate, p+1, c))
+			if (qepp_strcmp_WC(pattern, candidate, p+1, c))
 				return true;
-   		return strcmp_WC(pattern, candidate, p+1, c);
+   		return qepp_strcmp_WC(pattern, candidate, p+1, c);
 	}
 	else if ((pattern[p] != '?' && pattern[p] != candidate[c]) || candidate[c] == '\0')
     		return false;
 	else
-    		return strcmp_WC(pattern, candidate, p+1, c+1);
+    		return qepp_strcmp_WC(pattern, candidate, p+1, c+1);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void free_str_array( char ** ptr)
+static void free_str_array( char ** ptr)
 {
 	if(ptr == NULL)
 		return ;
@@ -294,29 +235,7 @@ void free_str_array( char ** ptr)
 	return ;
 }
 
-char ** get_all_match( char ** haystack, char * pattern, char * exclude)
-{
-	char ** res = NULL;
-	int objects=0;
-	if( haystack == NULL)
-		return NULL;
-	for( int i=0; haystack[i] != NULL; i++)
-		if(strcmp_wc( pattern, haystack[i]) || pattern == NULL)
-			if(!strcmp_wc( exclude, haystack[i]))
-			{
-				int len = strlen( haystack[i]);
-				res = realloc( res, (objects+1) * sizeof( char *));
-				res[objects] = calloc( len, sizeof( char));
-				strcpy( res[objects], haystack[i]);
-				objects++;
-			}
-	res = realloc( res, (objects+1) * sizeof( char *));
-	res[objects] = NULL;
-
-	return res;
-}
-
-char ** get_dir_content( char * dirpath)
+static char ** get_dir_content( char * dirpath)
 {
 	char ** obj = NULL;
 	if( dirpath == NULL)
@@ -346,18 +265,7 @@ char ** get_dir_content( char * dirpath)
 	return obj;
 }
 
-char * get_one_match( char ** haystack, char * pattern)
-{
-	if( haystack == NULL || pattern == NULL)
-		return NULL;
-	for( int i=0; haystack[i] != NULL; i++)
-		if(strcmp_wc( pattern, haystack[i]))
-			return haystack[i];
-
-	return NULL;
-}
-
-bool is_file( char * filpath)
+bool qepp_is_file( char * filpath)
 {
 	struct stat path_stat;
 	stat( filpath, &path_stat);
@@ -366,7 +274,7 @@ bool is_file( char * filpath)
 	return false;
 }
 
-bool is_dir( char * dirpath)
+bool qepp_is_dir( char * dirpath)
 {
 	struct stat path_stat;
 	stat( dirpath, &path_stat);
@@ -375,60 +283,7 @@ bool is_dir( char * dirpath)
 	return false;
 }
 
-
-char ** load_file( char * filpath)
-{
-	char buffer[256];
-	char ** res = NULL;
-
-	FILE * read = fopen( filpath,"r");
-	if( read == NULL)
-	{
-		fprintf( stderr, "ERROR FUNCTION load_file:\tCannot open file \"%s\"\n",filpath);
-		return NULL;
-	}
-	int line=0;
-	while(!feof(read))
-	{
-		int size = my_getline(buffer,256,read);
-		if(size == 0)
-			break;
-		res = realloc( res, (line+1) * sizeof( char *));
-		res[line] = malloc( size * sizeof( char));
-		int i;
-		for( i=0; buffer[i] != '\n' && buffer[i] != '\0'; i++)
-			res[line][i] = buffer[i];
-		res[line][i] = '\0';
-		line++;
-	}
-	res = realloc( res, (line+1) * sizeof( char *));
-	res[line] = NULL;
-	fclose( read);
-	return res;
-}
-
-void * print_str_array( char ** string, char * outname)
-{
-	if( string == NULL)
-		return NULL;
-	FILE * write = NULL;
-	if( outname != NULL)
-		write = fopen( outname, "w");
-	if( write == NULL)
-		write = stdout;
-
-	for( long int i=0; string[i] != NULL; i++)
-		//if( string[i][0] != '\0')
-			//fprintf(write,"%p[%d] -> %p -> %s\n",string,i,string[i], string[i]);
-			fprintf(write,"%s\n", string[i]);
-
-	if( write != stdout)
-		fclose(write);
-
-	return NULL;
-}
-
-long int print_str_array_num( char ** string, char * outname)
+static long int print_str_array_num( char ** string, char * outname)
 {
 	if( string == NULL)
 		return -1;
@@ -450,18 +305,9 @@ long int print_str_array_num( char ** string, char * outname)
 	return i;
 }
 
-void sort_str_array( char ** ptr)
-{
-	for( int i=0; ptr[i] != NULL; i++)
-		for( int n=i+1; ptr[n] != NULL; n++)
-			if( strcasecmp(ptr[i], ptr[n]) > 0)
-				switch_val( ptr+i, ptr+n, sizeof( char *));
-				
-}
-
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Find substring in file and return number(in ftell) of first line where it was found (start from start_pos)
-long int find_string(char * pattern, FILE * read, long int start_pos)
+long int qepp_find_string(char * pattern, FILE * read, long int start_pos)
 {
 	if( read == NULL)
 		return -1;
@@ -474,7 +320,7 @@ long int find_string(char * pattern, FILE * read, long int start_pos)
 	while(!feof(read))
 	{
 		line=ftell(read);
-		my_getline(buffer,256,read);
+		qepp_getline(buffer,256,read);
 		if( strstr(buffer,pattern) != NULL)
 			break;
 	}
@@ -487,16 +333,16 @@ long int find_string(char * pattern, FILE * read, long int start_pos)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Get associated value
-int get_value( char * pattern, FILE * read, char * delim, long int start_pos, enum gvk gvk_e, void * res)
+int qepp_get_value( char * pattern, FILE * read, char * delim, long int start_pos, enum gvk gvk_e, void * res)
 {
 	long int pos = ftell(read);
 
 	char buffer_1[256];
-	long int app = find_string( pattern, read, start_pos);
+	long int app = qepp_find_string( pattern, read, start_pos);
 	if(app == -1)
 		return 1;
 	fseek(read,app,SEEK_SET);
-	my_getline(buffer_1,256,read);
+	qepp_getline(buffer_1,256,read);
 //printf( "%s\n",buffer_1);
 
 	int check = 0;
@@ -541,11 +387,11 @@ int get_value( char * pattern, FILE * read, char * delim, long int start_pos, en
 
 	switch(gvk_e)
 	{
-	case R_INT: result = sscanf( ptr, "%d", (int *)res);		break;
-	case R_FLT: result = my_sscanf_double( ptr, (double *)res);	break;
-	case R_STR: result_str = strcpy( res, ptr);			break;
-	case R_LNT: result = sscanf( ptr, "%li", (long int *)res);	break;
-	case R_LNF: result = sscanf( ptr, "%lf", (double *)res);	break;
+	case R_INT: result = sscanf( ptr, "%d", (int *)res);			break;
+	case R_FLT: result = qepp_sscanf_double( ptr, (double *)res, NULL);	break;
+	case R_STR: result_str = strcpy( res, ptr);				break;
+	case R_LNT: result = sscanf( ptr, "%li", (long int *)res);		break;
+	case R_LNF: result = sscanf( ptr, "%lf", (double *)res);		break;
 	}
 
 //printf("%d  %li  %lf\n",*(int *)res,*(long int *)res,*(double *)res); 
@@ -557,7 +403,7 @@ int get_value( char * pattern, FILE * read, char * delim, long int start_pos, en
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Get double from file without using fscanf
-int my_fscanf_double(FILE * read, double * res)
+int qepp_fscanf_double(FILE * read, double * res)
 {
 	if( read == NULL)
 	{
@@ -591,7 +437,6 @@ int my_fscanf_double(FILE * read, double * res)
 	int forcequit=0;
 	while( c != ' ' && c != '\t' && c != '\n' && c != EOF && !forcequit)
 	{
-//printf("%c :%lf",c,*res);
 		switch(c)
 		{
 		case '-':
@@ -645,113 +490,23 @@ int my_fscanf_double(FILE * read, double * res)
 			}
 			break;
 		}
-//printf(" -> %lf\n",*res);
 		c=getc(read);
 	}
 	if(negative == 1)
 		*res*=(double)(-1);
 	*res*=pow( 10, exponent);
-//fprintf(stderr,"%.8lf\n",*res); getchar();
 	if(!feof(read))
 		fseek(read,-1,SEEK_CUR);
 
 	return 0;
 }
 
-int my_sscanf_double(char * str, double * res)
+int qepp_sscanf_double2(char * str, double * res , char ** endptr)
 {
 	if( str == NULL)
 	{
 		fprintf(stderr,"ERROR FUNCTION my_scanf_double:\tPassing NULL char * pointer.\n");
 		return EOF;
-
-	}
-	int count = -1;
-	char c=(char)1;
-	while( (c < '0' || c > '9') && c != '\0' )
-	{
-		c=str[++count];
-		if( (c == '.' || c == '-') && ( '0' <= str[count+1] && str[count+1] <= '9'))
-			break;
-	}
-	if( c == '\0')
-		return EOF;
-
-	*res = 0;
-	int negative=0, fase=0;
-	int decimal=1, exponent=0;
-	int forcequit=0;
-	while( c != ' ' && c != '\t' && c != '\n' && c != '\0' && !forcequit)
-	{
-		switch(c)
-		{
-		case '-':
-			if(fase==0 && *res==0)
-				negative=1;
-			else 
-				if(fase == 2 && exponent==0)
-					fase=3;
-				else
-				{
-					count--;
-					forcequit=1;
-				}
-			
-			break;
-		case '.':
-			fase=1;
-			break;
-		case 'e':
-		case 'd':
-		case 'E':
-			fase=2;
-			break;
-
-		default:
-			if( (c < '0' || c > '9') && c != '+')
-			{
-				forcequit = 1;
-				break;
-			}
-			switch(fase)
-			{
-			case 0:	//integer part
-				*res *= 10;
-				*res += (c-'0');
-				break;
-			case 1:	//decimal part
-				*res += (double)((c-'0')*pow(10,-decimal));
-				decimal++;
-				break;
-			case 2:	//positive exponent
-				if( c == '+')
-					break;
-				exponent *= 10;
-				exponent += (int)(c-'0');
-				break;
-			case 3:	//negative exponent
-				exponent *= 10;
-				exponent -= (int)(c-'0');
-				break;
-			}
-			break;
-		}
-		c=str[++count];
-	}
-	if(negative == 1)
-		*res*=(double)(-1);
-	*res*=pow( 10, exponent);
-
-	return 0;
-}
-
-int my_sscanf_double2(char * str, double * res , char ** endptr)
-{
-	if( str == NULL)
-	{
-		fprintf(stderr,"ERROR FUNCTION my_scanf_double:\tPassing NULL char * pointer.\n");
-		return EOF;
-
 	}
 	int count = -1;
 	char c=(char)1;
@@ -835,47 +590,7 @@ int my_sscanf_double2(char * str, double * res , char ** endptr)
 	return 0;
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//Switch values of 2 variables
-void switch_val(void * a, void * b, size_t size)
-{
-	if(a == NULL || b == NULL)
-		return ;
-	void * app = malloc( size);
-	memcpy( app, a, size);
-	memcpy( a, b, size);
-	memcpy( b, app, size);
-	free(app);
-
-	return ;
-}
-
-void strip_esc_seq( char * string)
-{
-	int n = 0;
-	char c=string[0];
-	for( int i=0; c != '\0'; c=string[++i])
-	{
-		if( c == '\x1B')
-			for( ; c != 'A' && c != 'm'; c=string[++i]) {}
-		else
-			string[n++] = c;
-	}
-	string[n] = '\0';
-	return ;
-}
-
-void strip_esc_seq_lvl( void ** ptr, int lvl)
-{
-	if( lvl > 0)
-		for( int i=0; ptr[i] != NULL; i++)
-			return strip_esc_seq_lvl( (void **)ptr[i], lvl-1);
-	else
-		return strip_esc_seq( (char *)ptr);
-	return ;
-}
-
-int get_xml_param( double * out_ptr, FILE * read, long int pos, char * name, char * key)
+int qepp_get_xml_param( double * out_ptr, FILE * read, long int pos, char * name, char * key)
 {
 	if( out_ptr == NULL)
 		return 1;
@@ -888,19 +603,19 @@ int get_xml_param( double * out_ptr, FILE * read, long int pos, char * name, cha
 
 	fseek( read, pos, SEEK_SET);
 	while( strstr( buffer, needle)==NULL && !feof( read))
-		my_getline( buffer, 1024, read);
+		qepp_getline( buffer, 1024, read);
 	if( feof( read))
 		return 1;
 
 	ptr = strstr( buffer, key);
 	if( ptr != NULL)
-		my_sscanf_double2( ptr, &res, &ptr);
+		qepp_sscanf_double( ptr, &res, &ptr);
 
 	*out_ptr = res;
 	return 0;
 }
 
-int get_xml_value( void ** out_ptr, FILE * read, long int pos, char * name, long int num, int size, int dump_s)
+int qepp_get_xml_value( void ** out_ptr, FILE * read, long int pos, char * name, long int num, int size, int dump_s)
 {
 	if( out_ptr == NULL)
 		return 1;
@@ -912,7 +627,7 @@ int get_xml_value( void ** out_ptr, FILE * read, long int pos, char * name, long
 
 	fseek( read, pos, SEEK_SET);
 	while( strstr( buffer, needle)==NULL && !feof( read))
-		my_getline( buffer, 1024, read);
+		qepp_getline( buffer, 1024, read);
 	if( feof( read))
 		return 1;
 
@@ -947,7 +662,7 @@ char * get_tmp_path()
 			app2 = get_dir_content( app1[i]);
 			for( int j=0; app2[j]!=NULL; j++)
 			{
-				if( strcmp_wc( "*.save", app2[j]))
+				if( qepp_strcmp_wc( "*.save", app2[j]))
 				{
 					res = malloc( 1024);
 					sprintf( res, "./%s/%s", app1[i], app2[j]);
@@ -967,7 +682,7 @@ char * get_tmp_path()
 }
 
 
-int get_str( char * ptr, char *res)
+int qepp_get_str( char * ptr, char *res)
 {
 	if( ptr == NULL)
 		return 1;
@@ -1000,7 +715,7 @@ int get_str( char * ptr, char *res)
 	return 0;
 }
 
-void trim_ws( char * ptr)
+void qepp_trim_ws( char * ptr)
 {
 	if( ptr == NULL)
 		return;
