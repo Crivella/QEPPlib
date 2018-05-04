@@ -2,10 +2,7 @@
 
 static void free_str_array( char ** ptr);
 static char ** get_dir_content( char * dirpath);
-static void * print_str_array( char ** ptr, char * outname);
 static long int print_str_array_num( char ** ptr, char * outname);
-static void sort_str_array( char ** ptr);
-static void switch_val(void * a, void * b, size_t size);
 
 char * get_file( char * filename, char * id)
 {
@@ -319,27 +316,6 @@ bool qepp_is_dir( char * dirpath)
 	return false;
 }
 
-static void * print_str_array( char ** string, char * outname)
-{
-	if( string == NULL)
-		return NULL;
-	FILE * write = NULL;
-	if( outname != NULL)
-		write = fopen( outname, "w");
-	if( write == NULL)
-		write = stdout;
-
-	for( long int i=0; string[i] != NULL; i++)
-		//if( string[i][0] != '\0')
-			//fprintf(write,"%p[%d] -> %p -> %s\n",string,i,string[i], string[i]);
-			fprintf(write,"%s\n", string[i]);
-
-	if( write != stdout)
-		fclose(write);
-
-	return NULL;
-}
-
 static long int print_str_array_num( char ** string, char * outname)
 {
 	if( string == NULL)
@@ -360,15 +336,6 @@ static long int print_str_array_num( char ** string, char * outname)
 		fclose(write);
 
 	return i;
-}
-
-static void sort_str_array( char ** ptr)
-{
-	for( int i=0; ptr[i] != NULL; i++)
-		for( int n=i+1; ptr[n] != NULL; n++)
-			if( strcasecmp(ptr[i], ptr[n]) > 0)
-				switch_val( ptr+i, ptr+n, sizeof( char *));
-				
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -655,48 +622,6 @@ int qepp_sscanf_double2(char * str, double * res , char ** endptr)
 
 	return 0;
 }
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//Switch values of 2 variables
-static void switch_val(void * a, void * b, size_t size)
-{
-	if(a == NULL || b == NULL)
-		return ;
-	void * app = malloc( size);
-	memcpy( app, a, size);
-	memcpy( a, b, size);
-	memcpy( b, app, size);
-	free(app);
-
-	return ;
-}
-
-/*
-void strip_esc_seq( char * string)
-{
-	int n = 0;
-	char c=string[0];
-	for( int i=0; c != '\0'; c=string[++i])
-	{
-		if( c == '\x1B')
-			for( ; c != 'A' && c != 'm'; c=string[++i]) {}
-		else
-			string[n++] = c;
-	}
-	string[n] = '\0';
-	return ;
-}
-
-void strip_esc_seq_lvl( void ** ptr, int lvl)
-{
-	if( lvl > 0)
-		for( int i=0; ptr[i] != NULL; i++)
-			return strip_esc_seq_lvl( (void **)ptr[i], lvl-1);
-	else
-		return strip_esc_seq( (char *)ptr);
-	return ;
-}
-*/
 
 int qepp_get_xml_param( double * out_ptr, FILE * read, long int pos, char * name, char * key)
 {
