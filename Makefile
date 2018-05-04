@@ -24,13 +24,16 @@ DEPS = $(patsubst %,$(INC)/$(ITARGET)/%,$(_DEPS))
 
 _OBJ = \
 functions.o \
+function_eps_calc.o \
+function_eps_kk.o \
 function_nscf_data.o \
+function_opt_data.o \
+function_wf_pp.o \
 mpi_base.o \
 my_lapack.o \
 qepp_err.o \
 qepp_io.o \
 qepp_file.o \
-qepp_main.o \
 qepp_mem.o \
 qepp_mpi.o \
 qepp_read.o \

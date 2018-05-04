@@ -9,12 +9,8 @@ void open_io_env( int node, int mode, int verb)
 	initialize_mpi_data();
 
 	ionode = node;
-	int max;
-#ifdef __MPI
-	max = mpi->world_size;
-#else
-	max = 1;
-#endif
+	int max = mpi->world_size;
+
 	if( ionode >= max)
 	{
 		fprintf( stderr, "Ionode number exceed max number of proc\n");
@@ -56,61 +52,57 @@ void open_io_env( int node, int mode, int verb)
 
 
 	int check=0;
-#ifdef __MPI
 	if( mpi->world_rank == ionode)
 	{
-#endif
-	if( poll( fds, 1, 0) == 0)	//stdin is empty
-	{
-		printf( "stdin is empty\n");
-	}
-	else //stdin contains data
-	{
-		check=1;
-		char buff[4096];
-		char * ptr;
-		if( fread( buff, 1, sizeof( buff), stdin) ) {}
-		qepp_trim_ws( buff);
-		ptr = strstr( buff, "outdir=");
-		if( qepp_get_str( ptr, outdir))
+		if( poll( fds, 1, 0) == 0)	//stdin is empty
 		{
-			fprintf( stderr, "Error reading tmp from file\n");
-			exit(1);
+			printf( "stdin is empty\n");
 		}
-		ptr = strstr( buff, "prefix=");
-		if( qepp_get_str( ptr, prefix))
+		else //stdin contains data
 		{
-			fprintf( stderr, "Error reading prefix from file\n");
-			exit(1);
-		}
-		ptr = strstr( buff, "workdir=");
-		if( qepp_get_str( ptr, workdir))
-		{
-			if( getcwd( workdir, sizeof( workdir))) {};
-			fprintf( stderr, "Error reading workdir from file. Using current dir '%s'\n",workdir);
-			//exit(1);
-		}
-		printf( "tmp = %s\n", outdir);
-		printf( "prefix = %s\n", prefix);
-		printf( "workdir = %s\n", workdir);
-		sprintf( datafile_path, "%s/%s.save/data-file.xml", outdir, prefix);
-		if( !qepp_is_file( datafile_path))
-			sprintf( datafile_path, "%s/%s.save/data-file-schema.xml", outdir, prefix);
-		if( !qepp_is_file( datafile_path))
-		{
-			fprintf( stderr, "Can't find any datafile correspondig to version of espresso > 5.0\n");
-			exit(1);
-		}
-		printf( "df = %s\n", datafile_path);
+			check=1;
+			char buff[4096];
+			char * ptr;
+			if( fread( buff, 1, sizeof( buff), stdin) ) {}
+			qepp_trim_ws( buff);
+			ptr = strstr( buff, "outdir=");
+			if( qepp_get_str( ptr, outdir))
+			{
+				fprintf( stderr, "Error reading tmp from file\n");
+				exit(1);
+			}
+			ptr = strstr( buff, "prefix=");
+			if( qepp_get_str( ptr, prefix))
+			{
+				fprintf( stderr, "Error reading prefix from file\n");
+				exit(1);
+			}
+			ptr = strstr( buff, "workdir=");
+			if( qepp_get_str( ptr, workdir))
+			{
+				if( getcwd( workdir, sizeof( workdir))) {};
+				fprintf( stderr, "Error reading workdir from file. Using current dir '%s'\n",workdir);
+				//exit(1);
+			}
+			printf( "tmp = %s\n", outdir);
+			printf( "prefix = %s\n", prefix);
+			printf( "workdir = %s\n", workdir);
+			sprintf( datafile_path, "%s/%s.save/data-file.xml", outdir, prefix);
+			if( !qepp_is_file( datafile_path))
+				sprintf( datafile_path, "%s/%s.save/data-file-schema.xml", outdir, prefix);
+			if( !qepp_is_file( datafile_path))
+			{
+				fprintf( stderr, "Can't find any datafile correspondig to version of espresso > 5.0\n");
+				exit(1);
+			}
+			printf( "df = %s\n", datafile_path);
 
-		//QEPP_ALL_PRINT("sono %d\n", mpi->world_rank);
+			//QEPP_ALL_PRINT("sono %d\n", mpi->world_rank);
 
-		//READ( &df, datafile_path);
-		//df->print(df,stdout);//PRINT_DATA( df, stdout);	
-	}	
-#ifdef __MPI
+			//READ( &df, datafile_path);
+			//df->print(df,stdout);//PRINT_DATA( df, stdout);	
+		}	
 	}
-#endif
 
 	mp_bcast( &check, MPI_COMM_WORLD, 1);
 	if( check)

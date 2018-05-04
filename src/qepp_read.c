@@ -574,6 +574,7 @@ errh * read_data_file( const char * filename, data_file ** out_ptr)
 		path = malloc( 1024 * sizeof( char));
 		sprintf( path, "%s/%s.save/", outdir, prefix);
 	}
+	//QEPP_PRINT("path = %s\n", path);
 	//if( path == NULL)
 	//	FAIL( FAIL, "Can't find tmp directory");
 	//sprintf( fname, "%s/%s", path, filename);
@@ -772,7 +773,10 @@ errh * read_data_file( const char * filename, data_file ** out_ptr)
 							{
 								key = xmlGetProp( node, (const xmlChar *)"iotk_link");
 //QEPP_PRINT("%s\n", key);
-								sprintf( res->egval_link[app_n-1], "%s/%s", path, (char *)key);
+								if( path != NULL)
+									sprintf( res->egval_link[app_n-1], "%s/%s", path, (char *)key);
+								else
+									sprintf( res->egval_link[app_n-1], "%s", (char *)key);
 //QEPP_PRINT("%s\n", res->egval_link[app_n-1]);
 //printf("%s\n", res->egval_link[app_n-1]); 
 								//strcpy( res->egval_link[app_n-1], (char *)key);
@@ -802,7 +806,10 @@ errh * read_data_file( const char * filename, data_file ** out_ptr)
 							if( !xmlStrcmp( node->name, (const xmlChar *)"GK-VECTORS"))
 							{
 								key = xmlGetProp( node, (const xmlChar *)"iotk_link");
-								sprintf( res->egvec_link[app_n-1], "%s/%s", path, (char *)key);
+								if( path != NULL)
+									sprintf( res->egvec_link[app_n-1], "%s/%s", path, (char *)key);
+								else
+									sprintf( res->egvec_link[app_n-1], "%s", (char *)key);
 								//strcpy( res->egvec_link[app_n-1], (char *)key);
 								xmlFree( key);
 							}
@@ -811,14 +818,20 @@ errh * read_data_file( const char * filename, data_file ** out_ptr)
 								if( !xmlStrcmp( node->name, (const xmlChar *)"WFC.1"))
 								{
 									key = xmlGetProp( node, (const xmlChar *)"iotk_link");
-									sprintf( res->wfc_link[app_n-1], "%s/%s", path, (char *)key);
+									if( path != NULL)
+										sprintf( res->wfc_link[app_n-1], "%s/%s", path, (char *)key);
+									else
+										sprintf( res->wfc_link[app_n-1], "%s", (char *)key);
 									//strcpy( res->wfc_link[app_n-1], (char *)key);
 									xmlFree( key);
 								}
 								if( !xmlStrcmp( node->name, (const xmlChar *)"WFC.2"))
 								{
 									key = xmlGetProp( node, (const xmlChar *)"iotk_link");
-									sprintf( res->wfc_link2[app_n-1], "%s/%s", path, (char *)key);
+									if( path != NULL)
+										sprintf( res->wfc_link2[app_n-1], "%s/%s", path, (char *)key);
+									else
+										sprintf( res->wfc_link2[app_n-1], "%s", (char *)key);
 									//strcpy( res->wfc_link2[app_n-1], (char *)key);
 									xmlFree( key);
 								}
@@ -828,7 +841,10 @@ errh * read_data_file( const char * filename, data_file ** out_ptr)
 								if( !xmlStrcmp( node->name, (const xmlChar *)"WFC"))
 								{
 									key = xmlGetProp( node, (const xmlChar *)"iotk_link");
-									sprintf( res->wfc_link[app_n-1], "%s/%s", path, (char *)key);
+									if( path != NULL)
+										sprintf( res->wfc_link[app_n-1], "%s/%s", path, (char *)key);
+									else
+										sprintf( res->wfc_link[app_n-1], "%s", (char *)key);
 									//strcpy( res->wfc_link[app_n-1], (char *)key);
 									xmlFree( key);
 								}
