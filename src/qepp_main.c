@@ -25,7 +25,7 @@ errh * print_band_structure_nscf( nscf_data * data, char * filename)
 			FILE * read = fopen("scf_1.out","r");
 			if( read != NULL)
 			{
-				if( get_value( "Fermi", read, 0, 0, R_FLT, &e_fermi))
+				if( qepp_get_value( "Fermi", read, 0, 0, R_FLT, &e_fermi))
 					e_fermi = 0;
 				fclose(read);
 			}
@@ -66,7 +66,7 @@ errh * print_band_structure_band(band_data * data, char * filename)
 		FILE * read = fopen("scf_1.out","r");
 		if( read != NULL)
 		{
-			if( get_value( "Fermi", read, 0, 0, R_FLT, &e_fermi))
+			if( qepp_get_value( "Fermi", read, 0, 0, R_FLT, &e_fermi))
 				e_fermi = 0;
 			fclose(read);
 		}
@@ -448,7 +448,7 @@ errh * calculate_eps( opt_data ** out_ptr, opt_data * data, double max_range, lo
 	n_pt++;
 	double fact=1;
 	char * filename="nscf_1.out";
-	if( !is_file( filename) && (v_cell == 0 || !is_file( "k.dat")))
+	if( !qepp_is_file( filename) && (v_cell == 0 || !qepp_is_file( "k.dat")))
 	{
 		filename = get_file( filename, ".out");
 	}
@@ -596,7 +596,7 @@ errh * calculate_eps_huge_files( opt_data ** out_ptr, char * mname, double max_r
 	n_pt++;
 	double fact=1;
 	char *filename="nscf_1.out";
-	if( !is_file( filename) && (v_cell == 0 || !is_file( "k.dat")))
+	if( !qepp_is_file( filename) && (v_cell == 0 || !qepp_is_file( "k.dat")))
 		filename = get_file( filename, ".out");
 
 	if( max_range == 0 || n_pt == 0)
@@ -677,7 +677,7 @@ errh * calculate_eps_huge_files( opt_data ** out_ptr, char * mname, double max_r
 	long int npt=0;
 	char buffer[256];
 	do {
-		my_getline( buffer, 256, read);
+		qepp_getline( buffer, 256, read);
 	} while( !feof( read) && buffer[0] == '#');
 	QEPP_PRINT( "Start reading from file \"%s\"...\n",mname);
 	while(!feof(read))
@@ -693,7 +693,7 @@ errh * calculate_eps_huge_files( opt_data ** out_ptr, char * mname, double max_r
 			if(vb < cb)
 			for( int i1=0; i1<3; i1++)
 				pp[k_app][p_app][i1] += kpp[i1]*df/pow(e_gap,2);
-		my_getline( buffer, 256, read);
+		qepp_getline( buffer, 256, read);
 	}
 	QEPP_PRINT( "...%li lines read. Done\n", npt);
 	fclose( read);
@@ -967,7 +967,7 @@ errh * calculate_eps_mod_huge_files( opt_data ** out_ptr, char * mname, double m
 //	double h_delta=delta/2;
 	double fact=1;
 	char *filename="nscf_1.out";
-	if( !is_file( filename) && (v_cell == 0 || !is_file( "k.dat")))
+	if( !qepp_is_file( filename) && (v_cell == 0 || !qepp_is_file( "k.dat")))
 		filename = get_file( filename, ".out");
 
 	if( max_range == 0 || n_pt == 0)
@@ -1160,11 +1160,11 @@ NbP	15.2998		15.5891		15.285 + 0.056 = 15.341
 *************************************************************************************/
 
 	long int npt=0;
-	skip_comments( read, "#");
+	qepp_skip_comments( read, "#");
 	char buffer[256];
-	my_getline( buffer, 256, read);
+	qepp_getline( buffer, 256, read);
 	/*do {
-		my_getline( buffer, 256, read);
+		qepp_getline( buffer, 256, read);
 		//QEPP_PRINT( "%s\n",buffer);
 	} while( !feof( read) && buffer[0] == '#');*/
 
@@ -1282,7 +1282,7 @@ NbP	15.2998		15.5891		15.285 + 0.056 = 15.341
 					pp[k_app][p_app][i1] += kpp[i1]*2/pow(e_gap,2);
 			}
 		}
-		my_getline( buffer, 256, read);
+		qepp_getline( buffer, 256, read);
 	}
 	QEPP_PRINT( "Read %li lines from %s\n", npt, mname);
 	QEPP_PRINT( "\t%g min gap at point number %li from line %li of file %s\n", gap_min_d, gap_min+1, p_min, mname);
@@ -3120,7 +3120,7 @@ errh * qepp_compute_matrixelements_huge( void ** dump, data_file * data)
 
 	long int start_k=0;
 	int start_b1=0;
-	if( is_file( (char *)filename))
+	if( qepp_is_file( (char *)filename))
 	{
 		WARN( "File %s already exist... attempting restart mode\n", filename);
 		out = fopen( filename, "a+");
@@ -3132,9 +3132,9 @@ errh * qepp_compute_matrixelements_huge( void ** dump, data_file * data)
 			c = fgetc( out);
 		} while( c != '\n');
 		double app;
-		my_fscanf_double( out, &app);
+		qepp_fscanf_double( out, &app);
 		start_k = app-1;
-		my_fscanf_double( out, &app);
+		qepp_fscanf_double( out, &app);
 		start_b1 = app;
 	}
 	else
@@ -3519,7 +3519,7 @@ errh * calculate_jdos_huge_files( opt_data ** out_ptr, char * mname, double max_
 	n_pt++;
 	double fact=1;
 	char *filename="nscf_1.out";
-	if( !is_file( filename) && (v_cell == 0 || !is_file( "k.dat")))
+	if( !qepp_is_file( filename) && (v_cell == 0 || !qepp_is_file( "k.dat")))
 		filename = get_file( filename, ".out");
 
 	if( max_range == 0 || n_pt == 0)
@@ -3600,7 +3600,7 @@ errh * calculate_jdos_huge_files( opt_data ** out_ptr, char * mname, double max_
 	long int npt=0;
 	char buffer[256];
 	do {
-		my_getline( buffer, 256, read);
+		qepp_getline( buffer, 256, read);
 	} while( !feof( read) && buffer[0] == '#');
 	QEPP_PRINT( "Start reading from file \"%s\"...\n",mname);
 	while(!feof(read))
@@ -3615,7 +3615,7 @@ errh * calculate_jdos_huge_files( opt_data ** out_ptr, char * mname, double max_
 		if(p_app < n_pt && p_app >=0)
 			if(vb < cb)
 				pp[k_app][p_app] += df;
-		my_getline( buffer, 256, read);
+		qepp_getline( buffer, 256, read);
 	}
 	QEPP_PRINT( "...%li lines read. Done\n", npt);
 	fclose( read);

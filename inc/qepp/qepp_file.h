@@ -25,57 +25,71 @@
 #endif
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//Internal functions
+void free_str_array( char ** ptr);
+char ** get_dir_content( char * dirpath);
+void * print_str_array( char ** ptr, char * outname);
+long int print_str_array_num( char ** ptr, char * outname);
+void sort_str_array( char ** ptr);
+void switch_val(void * a, void * b, size_t size);
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 char	* get_file(char *, char *);
 char	* get_path( char *);
 char 	* change_file( char *, char *);
 FILE * open_qe_in( char * filename);
 FILE * open_qe_out( char * filename);
 
-size_t my_getline( char buffer[], int max_size, FILE * read);
-long int get_file_size(FILE * read);
-long int skip_comments( FILE * read, char * comments);
-long int get_file_lines_comm(FILE * read, char * comments);
-#define GET_FILE_LINES(...) get_file_lines_comm(JUST2(__VA_ARGS__,0,0))
-int get_file_columns_comm(FILE * read, char * comments, char * delimiters);
-#define GET_FILE_COL(...) get_file_columns_comm(JUST3(__VA_ARGS__,0,0,0))
-long int * get_file_lines_pos(FILE * read);
+size_t qepp_getline( char buffer[], int max_size, FILE * read);
+//long int get_file_size(FILE * read);
+long int qepp_skip_comments( FILE * read, char * comments);
 
-bool strcmp_WC( char * pattern, char * candidate, int p, int c);
-#define strcmp_wc(a,b,...) strcmp_WC(a,b,0,0)
+long int qepp_get_file_lines_comm(FILE * read, char * comments);
+#define QEPP_GET_FILE_LINES(...) qepp_get_file_lines_comm(JUST2(__VA_ARGS__,0,0))
 
-void free_str_array( char ** ptr);
-char ** get_all_match( char ** haystack, char * pattern, char * exclude);
-char ** get_dir_content( char * dirpath);
-char * get_one_match( char ** haystack, char * pattern);
-bool is_file( char * filpath);
-bool is_dir( char * dirpath);
-char ** load_file( char * filpath);
-void * print_str_array( char ** ptr, char * outname);
-long int print_str_array_num( char ** ptr, char * outname);
-void sort_str_array( char ** ptr);
+int qepp_get_file_columns_comm(FILE * read, char * comments, char * delimiters);
+#define QEPP_GET_FILE_COL(...) qepp_get_file_columns_comm(JUST3(__VA_ARGS__,0,0,0))
 
-long int find_string(char * pattern, FILE * read, long int start_pos);
+//long int * get_file_lines_pos(FILE * read);
+
+
+bool qepp_strcmp_WC( char * pattern, char * candidate, int p, int c);
+#define qepp_strcmp_wc(a,b,...) qepp_strcmp_WC(a,b,0,0)
+
+
+//char ** get_all_match( char ** haystack, char * pattern, char * exclude);
+
+//char * get_one_match( char ** haystack, char * pattern);
+bool qepp_is_file( char * filpath);
+bool qepp_is_dir( char * dirpath);
+//char ** load_file( char * filpath);
+
+
+long int qepp_find_string(char * pattern, FILE * read, long int start_pos);
 enum gvk { R_INT, R_FLT, R_STR, R_LNT, R_LNF}; //get_value_kind
-int get_value( char * pattern, FILE * read, char * delim, long int start_pos, enum gvk gvk_e, void * res);
+int qepp_get_value( char * pattern, FILE * read, char * delim, long int start_pos, enum gvk gvk_e, void * res);
 
-int my_fscanf_double(FILE * to_read, double * res);
-int my_sscanf_double(char * , double *);
-int my_sscanf_double2(char * , double *, char **);
+int qepp_fscanf_double(FILE * to_read, double * res);
+//int qepp_sscanf_double(char * , double *);
+int qepp_sscanf_double(char * , double *, char **);
 
-void switch_val(void * a, void * b, size_t size);
-#define SWITCH(a,b) switch_val(a,b, sizeof(*a))
-#define COPY(a,b) memcpy(a,b,sizeof(*a))
 
+//#define SWITCH(a,b) switch_val(a,b, sizeof(*a))
+//#define COPY(a,b) memcpy(a,b,sizeof(*a))
+
+/*
 void strip_esc_seq( char * string);
 void strip_esc_seq_lvl( void ** ptr, int lvl);
+*/
 
-int get_str( char * ptr, char * res);
-void trim_ws( char * ptr);
+int qepp_get_str( char * ptr, char * res);
+void qepp_trim_ws( char * ptr);
 
 
 /*-------------------------------------------------------------------------*/
 /**
-  @name     get_xml_param
+  @name     qepp_get_xml_param
   @brief    Get the value of a param from an xml file
 
   @param    out_ptr: Address to a pointer where the data will be stored
@@ -92,11 +106,11 @@ void trim_ws( char * ptr);
   return 0 if successfull or 1 if failed
  */
 /*-------------------------------------------------------------------------*/
-int get_xml_param( double * out_ptr, FILE * read, long int pos, char * name, char * key);
+int qepp_get_xml_param( double * out_ptr, FILE * read, long int pos, char * name, char * key);
 
 /*-------------------------------------------------------------------------*/
 /**
-  @name     get_xml_value
+  @name     qepp_get_xml_value
   @brief    Get the binary value stored in a class of an xml file
 
   @param    out_ptr: Address to a pointer where the data will be stored
@@ -116,7 +130,7 @@ int get_xml_param( double * out_ptr, FILE * read, long int pos, char * name, cha
   return 0 if successfull or 1 if failed
  */
 /*-------------------------------------------------------------------------*/
-int get_xml_value( void ** out_ptr, FILE * read, long int pos, char * name, long int num, int size, int dump_s);
+int qepp_get_xml_value( void ** out_ptr, FILE * read, long int pos, char * name, long int num, int size, int dump_s);
 
 char * get_tmp_path();
 

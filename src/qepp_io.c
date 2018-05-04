@@ -82,21 +82,21 @@ void open_io_env( int node, int mode, int verb)
 		char buff[4096];
 		char * ptr;
 		if( fread( buff, 1, sizeof( buff), stdin) ) {}
-		trim_ws( buff);
+		qepp_trim_ws( buff);
 		ptr = strstr( buff, "outdir=");
-		if( get_str( ptr, outdir))
+		if( qepp_get_str( ptr, outdir))
 		{
 			fprintf( stderr, "Error reading tmp from file\n");
 			exit(1);
 		}
 		ptr = strstr( buff, "prefix=");
-		if( get_str( ptr, prefix))
+		if( qepp_get_str( ptr, prefix))
 		{
 			fprintf( stderr, "Error reading prefix from file\n");
 			exit(1);
 		}
 		ptr = strstr( buff, "workdir=");
-		if( get_str( ptr, workdir))
+		if( qepp_get_str( ptr, workdir))
 		{
 			if( getcwd( workdir, sizeof( workdir))) {};
 			fprintf( stderr, "Error reading workdir from file. Using current dir '%s'\n",workdir);
@@ -106,9 +106,9 @@ void open_io_env( int node, int mode, int verb)
 		printf( "prefix = %s\n", prefix);
 		printf( "workdir = %s\n", workdir);
 		sprintf( datafile_path, "%s/%s.save/data-file.xml", outdir, prefix);
-		if( !is_file( datafile_path))
+		if( !qepp_is_file( datafile_path))
 			sprintf( datafile_path, "%s/%s.save/data-file-schema.xml", outdir, prefix);
-		if( !is_file( datafile_path))
+		if( !qepp_is_file( datafile_path))
 		{
 			fprintf( stderr, "Can't find any datafile correspondig to version of espresso > 5.0\n");
 			exit(1);

@@ -8,6 +8,7 @@ typedef struct mpi_data mpi_data;
 #include <stdlib.h>	//malloc(), calloc()
 #include <assert.h>	//assert()
 #include <complex.h>
+#include <qepp/qepp_mem.h>
 
 #ifdef __MPI
 #include <mpi.h>	//MPI_Comm_size(), MPI_Comm_rank(), MPI_Get_processor_name()
