@@ -1,10 +1,5 @@
 #include <qepp/qepp_read.h>
 
-extern unsigned int ionode;
-extern int verbosity;
-
-extern unsigned long int TOT_MEM;
-
 extern char outdir[1024];
 extern char prefix[128];
 extern char workdir[1024];

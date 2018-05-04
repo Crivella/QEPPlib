@@ -20,15 +20,17 @@
 #include <qepp/functions.h>
 #include <qepp/my_lapack.h>
 #include <qepp/qepp_constants.h>
+#include <qepp/qepp_function.h>
 //#include <qepp/qepp_read.h>
 #include <qepp/qepp_mem.h>	//AllocateLinearMem1/2/3/4(), DuplicateLinearMem1/2/3/4(), FreeLinearMem1/2/3/4()
 #include <qepp/qepp_io.h>	//OPEN_IO_ENV(), CLOSE_IO_ENV(), QEPP_PRINT(), QEPP_ALL_PRINT(), QEPP_OUT()
+#include <qepp/qepp_mpi.h>	//mb_bcast(), mp_sum(), SET_PW_MPI()
 
 #ifdef __GSL
 #include <gsl/gsl_integration.h>
 #endif //__GSL
 
-#include <qepp/qepp_mpi.h>	//mb_bcast(), mp_sum(), SET_PW_MPI()
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //extern defined variables
@@ -49,11 +51,9 @@ char workdir[1024];
 char datafile_path[1024];
 data_file * df = NULL;
 
-#ifdef __MPI
 mpi_data * mpi = NULL;
 //unsigned long int ng_start;
 //unsigned long int ng_end;
-#endif //__MPI
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -65,14 +65,9 @@ mpi_data * mpi = NULL;
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Struct macros
 #ifdef __MPI
-	#define PRINT_DATA(a,b) mpi==NULL ? \
-		a!=NULL ? \
+	#define PRINT_DATA(a,b) mpi->world_rank == ionode ? \
 			a->print( a, b) : \
-			0 \
-		: \
-		mpi->world_rank == ionode ? \
-			a->print( a, b) : \
-			0;
+			0
 #else
 	#define PRINT_DATA(a,b) a!=NULL ? a->print( a, b) : 0;
 #endif
@@ -211,7 +206,7 @@ mpi_data * mpi = NULL;
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #endif //__MPI
 
-
+/*
 errh * print_band_structure_nscf(nscf_data *, char *);
 errh * print_band_structure_band(band_data *, char *);
 
@@ -224,6 +219,7 @@ errh * find_min_opt_gap(   long int *, nscf_data *, double *, double);
 
 errh * find_e_fermi( double *, nscf_data *);
 errh * tot_elect(    double *, nscf_data *);
+*/
 
 errh * apply_broadening( opt_data **, opt_data *, double);
 errh * calculate_eps( opt_data **, opt_data *, double, long int, double, double);

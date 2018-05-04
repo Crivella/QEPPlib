@@ -1,8 +1,8 @@
 #include <qepp/qepp_struct.h>
 
-extern unsigned long int TOT_MEM;
-extern unsigned int ionode;
-extern int verbosity;
+
+
+
 
 nscf_data * initialize_nscf_data( long int n_kpt, int n_bnd)
 {

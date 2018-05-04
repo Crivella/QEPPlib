@@ -1,8 +1,8 @@
 #include <qepp/qepp_struct.h>
 
-extern unsigned long int TOT_MEM;
-extern unsigned int ionode;
-extern int verbosity;
+
+
+
 
 data_file * initialize_data_file()
 {

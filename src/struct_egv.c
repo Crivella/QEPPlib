@@ -1,8 +1,8 @@
 #include <qepp/qepp_struct.h>
 
-extern unsigned long int TOT_MEM;
-extern unsigned int ionode;
-extern int verbosity;
+
+
+
 
 egv * initialize_egv( int n_bnd)
 {

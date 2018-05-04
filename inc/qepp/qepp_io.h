@@ -9,7 +9,13 @@
 
 #include <qepp/qepp_mpi.h>
 #include <qepp/qepp_file.h>
-#include <qepp/qepp_struct.h>
+//#include <qepp/qepp_struct.h>
+
+extern FILE * in_f;
+extern FILE * errf;
+extern FILE * outf;
+extern unsigned int ionode;
+extern int verbosity;
 
 #define JUST2(a, b, ...) (a), (b)
 
@@ -32,6 +38,14 @@ void close_io_env();
 			char buff[256]; \
 			sprintf( buff, d, ##__VA_ARGS__); \
 			qepp_print( ionode, buff, NULL); \
+		} \
+	} while(0)
+#define QEPP_ALL_OUT( w, d, ...) \
+	do { \
+		if( verbosity >= 0) { \
+			char buff[256]; \
+			sprintf( buff, d, ##__VA_ARGS__); \
+			qepp_print( -1, buff, w); \
 		} \
 	} while(0)
 #define QEPP_OUT( w, d, ...) \

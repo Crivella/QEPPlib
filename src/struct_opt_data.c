@@ -1,8 +1,8 @@
 #include <qepp/qepp_struct.h>
 
-extern unsigned long int TOT_MEM;
-extern unsigned int ionode;
-extern int verbosity;
+
+
+
 
 opt_data * initialize_opt_data( long int n_pt, int n_col)
 {

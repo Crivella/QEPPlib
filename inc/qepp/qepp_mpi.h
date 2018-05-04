@@ -10,6 +10,10 @@ typedef struct mpi_data mpi_data;
 #include <complex.h>
 #include <qepp/qepp_mem.h>
 
+extern mpi_data * mpi;
+#define ID_MPI_DATA 64
+
+
 #ifdef __MPI
 #include <mpi.h>	//MPI_Comm_size(), MPI_Comm_rank(), MPI_Get_processor_name()
 #include <qepp/mpi_base.h>
@@ -23,9 +27,6 @@ typedef struct mpi_data mpi_data;
 #endif //ARRAY_SIZE_MACRO
 
 long int mpi_get_size( void * a);
-
-
-#define ID_MPI_DATA 64
 
 #define SECOND(a, b, ...) b
 #define THIRD(a, b, c , ...) c
@@ -133,6 +134,12 @@ struct mpi_data
 
 struct mpi_data
 {
+	int typeID;
+	size_t size;
+
+	int world_rank;
+	int world_size;
+
 	void * 		(*print)( mpi_data *, FILE *);
 	mpi_data *	(*duplicate)( mpi_data *);
 	void * 		(*free)( mpi_data *);

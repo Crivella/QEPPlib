@@ -1,24 +1,18 @@
 #include <qepp/qepp_io.h>
 
-extern unsigned int ionode;
-extern FILE * in_f;
-extern FILE * errf;
-extern FILE * outf;
 extern char outdir[1024];
 extern char prefix[128];
 extern char workdir[1024];
 extern char datafile_path[1024];
-extern data_file * df;
-#ifdef __MPI
-extern mpi_data * mpi;
-#endif
-extern int verbosity;
+//extern data_file * df;
 
 void open_io_env( int node, int mode, int verb)
 {
 	struct pollfd fds[1];
 	fds[0].fd = 0;
 	fds[0].events = POLLIN;
+
+	initialize_mpi_data();
 
 	ionode = node;
 	int max;
@@ -132,7 +126,7 @@ void open_io_env( int node, int mode, int verb)
 		mp_bcast( workdir, MPI_COMM_WORLD);
 		mp_bcast( datafile_path, MPI_COMM_WORLD);
 
-		READ( &df, datafile_path);
+		//READ( &df, datafile_path);
 	}
 	//READ( &df, datafile_path);
 	//df->print(df,stdout);//PRINT_DATA( df, stdout);	
@@ -149,6 +143,7 @@ void open_io_env( int node, int mode, int verb)
 
 void close_io_env()
 {
+	free_mpi_data( mpi);
 	if( errf != stderr && errf != NULL)
 		fclose( errf);
 	if( outf != stdout && outf != NULL)

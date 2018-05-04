@@ -1,9 +1,8 @@
 #include <qepp/qepp_mpi.h>
 
-#ifdef __MPI
-
-extern mpi_data * mpi;
 extern unsigned int ionode;
+
+#ifdef __MPI
 
 /*long int mpi_get_size( void * a)
 {

@@ -6,6 +6,8 @@
 #include <stdlib.h>	//malloc(),
 #include <stdbool.h>
 
+#include <qepp/qepp_io.h>
+
 #ifdef __MPI
 #include <qepp/qepp_mpi.h>
 #endif //__MPI

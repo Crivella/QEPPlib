@@ -13,6 +13,7 @@ qepp_constants.h \
 qepp_err.h \
 qepp_io.h \
 qepp_file.h \
+qepp_function.h \
 qepp_read.h \
 qepp_main.h \
 qepp_mem.h \
@@ -23,6 +24,7 @@ DEPS = $(patsubst %,$(INC)/$(ITARGET)/%,$(_DEPS))
 
 _OBJ = \
 functions.o \
+function_nscf_data.o \
 mpi_base.o \
 my_lapack.o \
 qepp_err.o \

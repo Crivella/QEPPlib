@@ -53,6 +53,8 @@
 */
 #endif //MEM_WRAP
 
+extern unsigned long int TOT_MEM;
+
 long int qepp_mem_get_size( void * a);
 void * qepp_mem_get_base( void * a);
 

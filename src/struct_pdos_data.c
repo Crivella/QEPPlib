@@ -1,8 +1,8 @@
 #include <qepp/qepp_struct.h>
 
-extern unsigned long int TOT_MEM;
-extern unsigned int ionode;
-extern int verbosity;
+
+
+
 
 pdos_data * initialize_pdos_data( long int n_kpt, int n_bnd, int n_states)
 {
