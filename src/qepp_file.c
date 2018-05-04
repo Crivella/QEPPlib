@@ -153,19 +153,6 @@ size_t qepp_getline(char buffer[], int max_size, FILE * read)
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//Get num of chars in file
-/*
-long int get_file_size(FILE * pFile)
-{
-	long int pos = ftell(pFile);
-	long int size;
-	fseek(pFile, 0, SEEK_END);
-	size=ftell(pFile);
-	fseek(pFile, pos , SEEK_SET);
-	return size;
-}
-*/
-
 long int qepp_skip_comments( FILE * read, char * comments)
 {
 	long int nl=0;
@@ -247,27 +234,6 @@ int qepp_get_file_columns_comm(FILE * read, char * comments, char * delimiters)
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//Get position of all new lines in file
-/*
-long int * get_file_lines_pos(FILE * pFile)
-{
-	long int * lines_pos;
-
-	long int pos = ftell(pFile);
-	int lines=QEPP_GET_FILE_LINES(pFile);
-	lines_pos=malloc( lines * sizeof(long int));
-	long int count=0;
-	rewind(pFile);
-	while(!feof(pFile))
-		if(fgetc(pFile) == '\n')
-			lines_pos[count++]=ftell(pFile);
-
-	fseek(pFile, pos, SEEK_SET); 
-	return lines_pos;
-}
-*/
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool qepp_strcmp_WC( char * pattern, char * candidate, int p, int c)
 {
 	if(pattern == NULL || candidate == NULL)
@@ -297,30 +263,6 @@ void free_str_array( char ** ptr)
 	free(ptr);
 	return ;
 }
-
-/*
-char ** get_all_match( char ** haystack, char * pattern, char * exclude)
-{
-	char ** res = NULL;
-	int objects=0;
-	if( haystack == NULL)
-		return NULL;
-	for( int i=0; haystack[i] != NULL; i++)
-		if(qepp_strcmp_wc( pattern, haystack[i]) || pattern == NULL)
-			if(!qepp_strcmp_wc( exclude, haystack[i]))
-			{
-				int len = strlen( haystack[i]);
-				res = realloc( res, (objects+1) * sizeof( char *));
-				res[objects] = calloc( len, sizeof( char));
-				strcpy( res[objects], haystack[i]);
-				objects++;
-			}
-	res = realloc( res, (objects+1) * sizeof( char *));
-	res[objects] = NULL;
-
-	return res;
-}
-*/
 
 char ** get_dir_content( char * dirpath)
 {
@@ -352,19 +294,6 @@ char ** get_dir_content( char * dirpath)
 	return obj;
 }
 
-/*
-char * get_one_match( char ** haystack, char * pattern)
-{
-	if( haystack == NULL || pattern == NULL)
-		return NULL;
-	for( int i=0; haystack[i] != NULL; i++)
-		if(qepp_strcmp_wc( pattern, haystack[i]))
-			return haystack[i];
-
-	return NULL;
-}
-*/
-
 bool qepp_is_file( char * filpath)
 {
 	struct stat path_stat;
@@ -382,39 +311,6 @@ bool qepp_is_dir( char * dirpath)
 		return true;
 	return false;
 }
-
-/*
-char ** load_file( char * filpath)
-{
-	char buffer[256];
-	char ** res = NULL;
-
-	FILE * read = fopen( filpath,"r");
-	if( read == NULL)
-	{
-		fprintf( stderr, "ERROR FUNCTION load_file:\tCannot open file \"%s\"\n",filpath);
-		return NULL;
-	}
-	int line=0;
-	while(!feof(read))
-	{
-		int size = qepp_getline(buffer,256,read);
-		if(size == 0)
-			break;
-		res = realloc( res, (line+1) * sizeof( char *));
-		res[line] = malloc( size * sizeof( char));
-		int i;
-		for( i=0; buffer[i] != '\n' && buffer[i] != '\0'; i++)
-			res[line][i] = buffer[i];
-		res[line][i] = '\0';
-		line++;
-	}
-	res = realloc( res, (line+1) * sizeof( char *));
-	res[line] = NULL;
-	fclose( read);
-	return res;
-}
-*/
 
 void * print_str_array( char ** string, char * outname)
 {
@@ -600,7 +496,6 @@ int qepp_fscanf_double(FILE * read, double * res)
 	int forcequit=0;
 	while( c != ' ' && c != '\t' && c != '\n' && c != EOF && !forcequit)
 	{
-//printf("%c :%lf",c,*res);
 		switch(c)
 		{
 		case '-':
@@ -654,109 +549,18 @@ int qepp_fscanf_double(FILE * read, double * res)
 			}
 			break;
 		}
-//printf(" -> %lf\n",*res);
 		c=getc(read);
 	}
 	if(negative == 1)
 		*res*=(double)(-1);
 	*res*=pow( 10, exponent);
-//fprintf(stderr,"%.8lf\n",*res); getchar();
 	if(!feof(read))
 		fseek(read,-1,SEEK_CUR);
 
 	return 0;
 }
 
-/*
-int qepp_sscanf_double(char * str, double * res)
-{
-	if( str == NULL)
-	{
-		fprintf(stderr,"ERROR FUNCTION my_scanf_double:\tPassing NULL char * pointer.\n");
-		return EOF;
-
-	}
-	int count = -1;
-	char c=(char)1;
-	while( (c < '0' || c > '9') && c != '\0' )
-	{
-		c=str[++count];
-		if( (c == '.' || c == '-') && ( '0' <= str[count+1] && str[count+1] <= '9'))
-			break;
-	}
-	if( c == '\0')
-		return EOF;
-
-	*res = 0;
-	int negative=0, fase=0;
-	int decimal=1, exponent=0;
-	int forcequit=0;
-	while( c != ' ' && c != '\t' && c != '\n' && c != '\0' && !forcequit)
-	{
-		switch(c)
-		{
-		case '-':
-			if(fase==0 && *res==0)
-				negative=1;
-			else 
-				if(fase == 2 && exponent==0)
-					fase=3;
-				else
-				{
-					count--;
-					forcequit=1;
-				}
-			
-			break;
-		case '.':
-			fase=1;
-			break;
-		case 'e':
-		case 'd':
-		case 'E':
-			fase=2;
-			break;
-
-		default:
-			if( (c < '0' || c > '9') && c != '+')
-			{
-				forcequit = 1;
-				break;
-			}
-			switch(fase)
-			{
-			case 0:	//integer part
-				*res *= 10;
-				*res += (c-'0');
-				break;
-			case 1:	//decimal part
-				*res += (double)((c-'0')*pow(10,-decimal));
-				decimal++;
-				break;
-			case 2:	//positive exponent
-				if( c == '+')
-					break;
-				exponent *= 10;
-				exponent += (int)(c-'0');
-				break;
-			case 3:	//negative exponent
-				exponent *= 10;
-				exponent -= (int)(c-'0');
-				break;
-			}
-			break;
-		}
-		c=str[++count];
-	}
-	if(negative == 1)
-		*res*=(double)(-1);
-	*res*=pow( 10, exponent);
-
-	return 0;
-}
-*/
-
-int qepp_sscanf_double(char * str, double * res , char ** endptr)
+int qepp_sscanf_double2(char * str, double * res , char ** endptr)
 {
 	if( str == NULL)
 	{

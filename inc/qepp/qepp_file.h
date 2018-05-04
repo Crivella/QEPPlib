@@ -22,6 +22,7 @@
 #define JUST1(a, ...) (a)
 #define JUST2(a, b, ...) (a), (b)
 #define JUST3(a, b, c, ...) (a), (b), (c)
+#define SECOND(a, b, ...) b
 #endif
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -42,7 +43,6 @@ FILE * open_qe_in( char * filename);
 FILE * open_qe_out( char * filename);
 
 size_t qepp_getline( char buffer[], int max_size, FILE * read);
-//long int get_file_size(FILE * read);
 long int qepp_skip_comments( FILE * read, char * comments);
 
 long int qepp_get_file_lines_comm(FILE * read, char * comments);
@@ -51,19 +51,11 @@ long int qepp_get_file_lines_comm(FILE * read, char * comments);
 int qepp_get_file_columns_comm(FILE * read, char * comments, char * delimiters);
 #define QEPP_GET_FILE_COL(...) qepp_get_file_columns_comm(JUST3(__VA_ARGS__,0,0,0))
 
-//long int * get_file_lines_pos(FILE * read);
-
-
 bool qepp_strcmp_WC( char * pattern, char * candidate, int p, int c);
 #define qepp_strcmp_wc(a,b,...) qepp_strcmp_WC(a,b,0,0)
 
-
-//char ** get_all_match( char ** haystack, char * pattern, char * exclude);
-
-//char * get_one_match( char ** haystack, char * pattern);
 bool qepp_is_file( char * filpath);
 bool qepp_is_dir( char * dirpath);
-//char ** load_file( char * filpath);
 
 
 long int qepp_find_string(char * pattern, FILE * read, long int start_pos);
@@ -71,17 +63,8 @@ enum gvk { R_INT, R_FLT, R_STR, R_LNT, R_LNF}; //get_value_kind
 int qepp_get_value( char * pattern, FILE * read, char * delim, long int start_pos, enum gvk gvk_e, void * res);
 
 int qepp_fscanf_double(FILE * to_read, double * res);
-//int qepp_sscanf_double(char * , double *);
-int qepp_sscanf_double(char * , double *, char **);
-
-
-//#define SWITCH(a,b) switch_val(a,b, sizeof(*a))
-//#define COPY(a,b) memcpy(a,b,sizeof(*a))
-
-/*
-void strip_esc_seq( char * string);
-void strip_esc_seq_lvl( void ** ptr, int lvl);
-*/
+int qepp_sscanf_double2(char * , double *, char **);
+#define qepp_sscanf_double( a, b, ...) qepp_sscanf_double2( a, b, SECOND( 0, ##__VA_ARGS__, 0))
 
 int qepp_get_str( char * ptr, char * res);
 void qepp_trim_ws( char * ptr);
