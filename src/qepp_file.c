@@ -102,40 +102,6 @@ char 	* qepp_change_file( char * old, char * new)
 	return res;
 }
 
-FILE * open_qe_in( char * filename)
-{
-	FILE * read = NULL;
-	if( filename == NULL)
-		fprintf( stderr, "open_qe_in:\tPassing null pointer\n");
-	else if( !qepp_is_file( filename))
-	{
-		fprintf( stderr, "open_qe_in:\t%s is not a file\n",filename);
-		
-	}
-	else
-		read = fopen( filename, "r");
-
-	return read;
-}
-
-FILE * open_qe_out( char * filename)
-{
-	FILE * read = NULL;
-	if( filename == NULL)
-	{
-		WARN( "Passing null pointer");
-	}
-	else if( !qepp_is_file( filename))
-	{
-		//char buff[256]; sprintf( buff, "%s is not a file", filename);
-		WARN( "%s is not a file", filename);
-	}
-	else
-		read = fopen( filename, "r");
-
-	return read;
-}
-
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Read a line from file into the buffer (NULL terminated, include the \n)
 size_t qepp_getline(char buffer[], int max_size, FILE * read)

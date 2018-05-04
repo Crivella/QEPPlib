@@ -34,8 +34,6 @@
 char	* get_file(char *, char *);
 
 char 	* qepp_change_file( char *, char *);
-FILE * open_qe_in( char * filename);
-FILE * open_qe_out( char * filename);
 
 size_t qepp_getline( char buffer[], int max_size, FILE * read);
 long int qepp_skip_comments( FILE * read, char * comments);

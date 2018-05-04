@@ -53,7 +53,7 @@ errh * read_nscf_md( char * filename, nscf_md ** out_ptr)
 		char * buffer = qepp_change_file( filename, "scf_1.out");
 		FILE * app_f = NULL;
 		if( qepp_is_file( buffer))
-			app_f = open_qe_out( buffer);
+			app_f = fopen( buffer, "r");
 		free( buffer);
 		if( app_f != NULL)
 		{
