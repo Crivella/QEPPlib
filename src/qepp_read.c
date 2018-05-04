@@ -50,7 +50,7 @@ errh * read_nscf_md( char * filename, nscf_md ** out_ptr)
 	if( qepp_get_value( "Fermi energy", read, 0 , /*md->lines_pos[md->lines-200]*/0, R_FLT, &e_fermi))
 	{
 		int check = 1;
-		char * buffer = change_file( filename, "scf_1.out");
+		char * buffer = qepp_change_file( filename, "scf_1.out");
 		FILE * app_f = NULL;
 		if( qepp_is_file( buffer))
 			app_f = open_qe_out( buffer);

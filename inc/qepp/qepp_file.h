@@ -32,8 +32,8 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 char	* get_file(char *, char *);
-char	* get_path( char *);
-char 	* change_file( char *, char *);
+
+char 	* qepp_change_file( char *, char *);
 FILE * open_qe_in( char * filename);
 FILE * open_qe_out( char * filename);
 

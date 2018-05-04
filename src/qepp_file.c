@@ -3,6 +3,7 @@
 static void free_str_array( char ** ptr);
 static char ** get_dir_content( char * dirpath);
 static long int print_str_array_num( char ** ptr, char * outname);
+static char	* get_path( char *);
 
 char * get_file( char * filename, char * id)
 {
@@ -64,7 +65,7 @@ char * get_file( char * filename, char * id)
 	return endres;
 }
 
-char	* get_path( char * str)
+static char	* get_path( char * str)
 {
 	char * res = NULL;
 	if( str == NULL)
@@ -80,13 +81,13 @@ char	* get_path( char * str)
 	return res;
 }
 
-char 	* change_file( char * old, char * new)
+char 	* qepp_change_file( char * old, char * new)
 {
 	char * res = NULL;
 	if( old == NULL)
-		fprintf( stderr, "change_file:\tPassing null pointer\n");
+		fprintf( stderr, "qepp_change_file:\tPassing null pointer\n");
 	else if( new == NULL)
-		fprintf( stderr, "change_file:\tPassing null pointer\n");
+		fprintf( stderr, "qepp_change_file:\tPassing null pointer\n");
 	else
 	{
 		char * app = get_path( old);
