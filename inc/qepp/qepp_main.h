@@ -64,15 +64,11 @@ mpi_data * mpi = NULL;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Struct macros
-#ifdef __MPI
-	#define PRINT_DATA(a,b) mpi->world_rank == ionode ? \
-			a->print( a, b) : \
-			0
-#else
-	#define PRINT_DATA(a,b) a!=NULL ? a->print( a, b) : 0;
-#endif
-	#define DUPLICATE(a) a!=NULL ? a->duplicate( a) : 0;
-	#define FREE(a) a!=NULL ? a->free( a) : 0;
+#define PRINT_DATA(a,b) mpi->world_rank == ionode ? \
+		a->print( a, b) : \
+		0
+#define DUPLICATE(a) a!=NULL ? a->duplicate( a) : 0;
+#define FREE(a) a!=NULL ? a->free( a) : 0;
 /*#define READ( a, b, ...) \
 	_Generic( (b), \
 		nscf_data **:	parse_errh(read_nscf_data(  a, (nscf_data **)b)), \

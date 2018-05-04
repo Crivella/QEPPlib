@@ -26,6 +26,8 @@ extern int verbosity;
 #define OPEN_IO_ENV( n, m, v) \
 	open_io_env( n, m, v)
 void open_io_env( int ionode, int mode, int verb);
+#define CLOSE_IO_ENV() \
+	close_io_env()
 void close_io_env();
 
 #define QEPP_ALL_PRINT( d, ...) \

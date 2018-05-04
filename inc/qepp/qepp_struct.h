@@ -161,20 +161,11 @@ size_t		totmem_m_elem(m_elem *);
 size_t		totmeme_fit_params( fit_params * to_free);
 size_t		totmem_data_set( data_set * to_free);*/
 
-#ifdef __MPI
-	#define PRINT_DATA(a,b) mpi==NULL ? \
-		a!=NULL ? \
-			a->print( a, b) : \
-			0 \
-		: \
-		mpi->world_rank == ionode ? \
-			a->print( a, b) : \
-			0;
-#else
-	#define PRINT_DATA(a,b) a!=NULL ? a->print( a, b) : 0;
-#endif
-	#define DUPLICATE(a) a!=NULL ? a->duplicate( a) : 0;
-	#define FREE(a) a!=NULL ? a->free( a) : 0;
+#define PRINT_DATA(a,b) mpi->world_rank == ionode ? \
+		a->print( a, b) : \
+		0
+#define DUPLICATE(a) a!=NULL ? a->duplicate( a) : 0;
+#define FREE(a) a!=NULL ? a->free( a) : 0;
 
 void *		free_array_ptr(double **, long int);
 #define EPS_HEADERS {"E[eV]","eps_x","eps_y","eps_z","TOT"}

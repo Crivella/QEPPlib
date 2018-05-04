@@ -9,7 +9,7 @@ CURDIR=$(shell pwd)
 LDIR=$(PREFIX)/lib
 IDIR=$(PREFIX)/include
 
-LD_FLAGS=-D__LIBXML2 -D__GSL
+LD_FLAGS=
 
 CC=gcc
 MPICC=gcc
