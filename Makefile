@@ -13,11 +13,11 @@ qepp_constants.h \
 qepp_err.h \
 qepp_file.h \
 qepp_function.h \
-qepp_input.h \
+qepp_io.h \
 qepp_main.h \
 qepp_mem.h \
 qepp_mpi.h \
-qepp_output.h \
+qepp_read.h \
 qepp_struct.h 
 
 DEPS = $(patsubst %,$(INC)/$(ITARGET)/%,$(_DEPS))
@@ -33,10 +33,10 @@ mpi_base.o \
 my_lapack.o \
 qepp_err.o \
 qepp_file.o \
-qepp_input.o \
+qepp_io.o \
 qepp_mem.o \
 qepp_mpi.o \
-qepp_output.o \
+qepp_read.o \
 qepp_struct.o \
 struct_band_data.o \
 struct_bands_pp.o \

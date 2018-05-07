@@ -1,10 +1,10 @@
 #ifndef FUNCTION_H
 #define FUNCTION_H
 
-#include <qepp/qepp_output.h>
+#include <qepp/qepp_io.h>
 #include <qepp/qepp_err.h>
 #include <qepp/qepp_struct.h>
-#include <qepp/qepp_input.h>
+#include <qepp/qepp_read.h>
 
 #define ROUND(a) ceil(a-0.5)
 

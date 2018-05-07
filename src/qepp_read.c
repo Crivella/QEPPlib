@@ -1,4 +1,4 @@
-#include <qepp/qepp_input.h>
+#include <qepp/qepp_read.h>
 
 #define TEST_ARGS \
 	if( out_ptr == NULL) \

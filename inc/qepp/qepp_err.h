@@ -6,7 +6,7 @@
 #include <stdlib.h>	//malloc(),
 #include <stdbool.h>
 
-#include <qepp/qepp_output.h>
+#include <qepp/qepp_io.h>
 #include <qepp/qepp_mpi.h>
 
 typedef enum {	SUCCESS,

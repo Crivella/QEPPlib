@@ -1,5 +1,5 @@
 #include <qepp/qepp_mpi.h>
-#include <qepp/qepp_output.h>
+#include <qepp/qepp_io.h>
 
 
 #ifdef __MPI
