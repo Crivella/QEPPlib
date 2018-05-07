@@ -12,7 +12,7 @@ evc * initialize_evc( long int nc)
 	to_init->size = sizeof( evc);
 	
 	to_init->nc = nc;
-	to_init->val = (double complex *)AllocateLinearMem1( sizeof( double complex), nc);
+	to_init->val = (double complex *)QEPP_ALLOC( sizeof( double complex), nc);
 
 	to_init->print =	&print_evc;
 	to_init->duplicate =	&duplicate_evc;
@@ -43,7 +43,7 @@ evc * duplicate_evc( evc * to_dupl)
 	long int nc = to_dupl->nc;
 	evc * new_s = initialize_evc( nc);
 
-	new_s->val =	(double complex *)DuplicateLinearMem1( (void *)to_dupl->val);
+	new_s->val =	(double complex *)QEPP_DUPL( (void *)to_dupl->val);
 
 	return new_s;
 }
@@ -53,7 +53,7 @@ void * free_evc( evc * to_free)
 	if( to_free == NULL)
 		return NULL;
 
-	FreeLinearMem1( (void *)to_free->val);
+	QEPP_FREE( (void *)to_free->val);
 	free( to_free);
 
 	return NULL;

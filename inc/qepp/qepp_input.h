@@ -10,7 +10,7 @@
 
 #include <qepp/my_lapack.h>	//delta_k(),
 #include <qepp/qepp_err.h>	//errh, SET_ERRH(), WARN(), FAIL()
-#include <qepp/qepp_io.h>	//QEPP_PRINT(), QEPP_ALL_PRINT(), QEPP_OUT()
+#include <qepp/qepp_output.h>	//QEPP_PRINT(), QEPP_ALL_PRINT(), QEPP_OUT()
 #include <qepp/qepp_file.h>
 #include <qepp/qepp_struct.h>
 

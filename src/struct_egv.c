@@ -12,8 +12,8 @@ egv * initialize_egv( int n_bnd)
 	to_init->size = sizeof( egv);
 	
 	to_init->n_bnd = n_bnd;
-	to_init->val = (double *)AllocateLinearMem1( sizeof( double), n_bnd);
-	to_init->occ = (double *)AllocateLinearMem1( sizeof( double), n_bnd);
+	to_init->val = (double *)QEPP_ALLOC( sizeof( double), n_bnd);
+	to_init->occ = (double *)QEPP_ALLOC( sizeof( double), n_bnd);
 
 	to_init->print =	&print_egv;
 	to_init->duplicate =	&duplicate_egv;
@@ -52,8 +52,8 @@ egv * duplicate_egv( egv * to_dupl)
 	long int n_bnd = to_dupl->n_bnd;
 	egv * new_s = initialize_egv( n_bnd);
 
-	new_s->val =	(double *)DuplicateLinearMem1( (void *)to_dupl->val);
-	new_s->occ =	(double *)DuplicateLinearMem1( (void *)to_dupl->occ);
+	new_s->val =	(double *)QEPP_DUPL( (void *)to_dupl->val);
+	new_s->occ =	(double *)QEPP_DUPL( (void *)to_dupl->occ);
 
 	return new_s;
 }
@@ -63,8 +63,8 @@ void * free_egv( egv * to_free)
 	if( to_free == NULL)
 		return NULL;
 
-	FreeLinearMem1( (void *)to_free->val);
-	FreeLinearMem1( (void *)to_free->occ);
+	QEPP_FREE( (void *)to_free->val);
+	QEPP_FREE( (void *)to_free->occ);
 	free( to_free);
 
 	return NULL;

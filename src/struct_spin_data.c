@@ -13,12 +13,12 @@ spin_data * initialize_spin_data( int n_bnd, long int n_kpt)
 	to_init->n_kpt = n_kpt;
 	to_init->n_bnd = n_bnd;
 
-	to_init->m =		(double ****)AllocateLinearMem4( sizeof(double), n_kpt, n_bnd, 3, 2);
-	to_init->cd =		(double ***)AllocateLinearMem3( sizeof(double), n_kpt, n_bnd, 2);
-	to_init->elicity =	(double ***)AllocateLinearMem3( sizeof(double), n_kpt, n_bnd, 2);
-	to_init->chirality =	(double ***)AllocateLinearMem3( sizeof(double), n_kpt, n_bnd, 2);
-	//to_init->chir2 =	(double ***)AllocateLinearMem3( sizeof(double), n_kpt, n_bnd, 2);
-	to_init->m_tot =	(double ***)AllocateLinearMem3( sizeof(double), n_kpt, n_bnd, 2);
+	to_init->m =		(double ****)QEPP_ALLOC( sizeof(double), n_kpt, n_bnd, 3, 2);
+	to_init->cd =		(double ***)QEPP_ALLOC( sizeof(double), n_kpt, n_bnd, 2);
+	to_init->elicity =	(double ***)QEPP_ALLOC( sizeof(double), n_kpt, n_bnd, 2);
+	to_init->chirality =	(double ***)QEPP_ALLOC( sizeof(double), n_kpt, n_bnd, 2);
+	//to_init->chir2 =	(double ***)QEPP_ALLOC( sizeof(double), n_kpt, n_bnd, 2);
+	to_init->m_tot =	(double ***)QEPP_ALLOC( sizeof(double), n_kpt, n_bnd, 2);
 
 	to_init->print =	&print_spin_data;
 	to_init->duplicate =	&duplicate_spin_data;
@@ -77,12 +77,12 @@ spin_data * duplicate_spin_data( spin_data * to_dupl)
 	long int n_kpt = to_dupl->n_kpt;
 	spin_data * res = initialize_spin_data( n_bnd, n_kpt);
 
-	res->m =		(double ****)DuplicateLinearMem4( (void ****)to_dupl->m);
-	res->cd =		(double ***)DuplicateLinearMem3( (void ***)to_dupl->cd);
-	res->elicity =		(double ***)DuplicateLinearMem3( (void ***)to_dupl->elicity);
-	res->chirality =	(double ***)DuplicateLinearMem3( (void ***)to_dupl->chirality);
-	//res->chir2 =		(double ***)DuplicateLinearMem3( (void ***)to_dupl->chir2);
-	res->m_tot =		(double ***)DuplicateLinearMem3( (void ***)to_dupl->m_tot);
+	res->m =		(double ****)QEPP_DUPL( (void ****)to_dupl->m);
+	res->cd =		(double ***)QEPP_DUPL( (void ***)to_dupl->cd);
+	res->elicity =		(double ***)QEPP_DUPL( (void ***)to_dupl->elicity);
+	res->chirality =	(double ***)QEPP_DUPL( (void ***)to_dupl->chirality);
+	//res->chir2 =		(double ***)QEPP_DUPL( (void ***)to_dupl->chir2);
+	res->m_tot =		(double ***)QEPP_DUPL( (void ***)to_dupl->m_tot);
 
 	return res;
 }
@@ -92,12 +92,12 @@ void * free_spin_data( spin_data * to_free)
 	if( to_free == NULL)
 		return NULL;
 
-	FreeLinearMem4( (void ****)to_free->m);
-	FreeLinearMem3( (void ***)to_free->cd);
-	FreeLinearMem3( (void ***)to_free->elicity);
-	FreeLinearMem3( (void ***)to_free->chirality);
-	//FreeLinearMem3( (void ***)to_free->chir2);
-	FreeLinearMem3( (void ***)to_free->m_tot);
+	QEPP_FREE( (void ****)to_free->m);
+	QEPP_FREE( (void ***)to_free->cd);
+	QEPP_FREE( (void ***)to_free->elicity);
+	QEPP_FREE( (void ***)to_free->chirality);
+	//QEPP_FREE( (void ***)to_free->chir2);
+	QEPP_FREE( (void ***)to_free->m_tot);
 
 	free( to_free);
 

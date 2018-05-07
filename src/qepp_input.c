@@ -1,4 +1,4 @@
-#include <qepp/qepp_read.h>
+#include <qepp/qepp_input.h>
 
 #define TEST_ARGS \
 	if( out_ptr == NULL) \
@@ -712,11 +712,11 @@ errh * read_data_file( const char * filename, data_file ** out_ptr)
 					{
 						key = xmlNodeListGetString( document, node->xmlChildrenNode, 1);
 						res->n_kpt = strtol( (char *)key, 0, 10);
-						res->kpt = (double **)AllocateLinearMem2( sizeof( double), res->n_kpt, 3);
-						res->weight = (double *)AllocateLinearMem1( sizeof( double), res->n_kpt);
-						res->egval_link = (char **)AllocateLinearMem2( sizeof( char), res->n_kpt, 256);
-						res->egvec_link = (char **)AllocateLinearMem2( sizeof( char), res->n_kpt, 256);
-						res->wfc_link = (char **)AllocateLinearMem2( sizeof( char), res->n_kpt, 256);
+						res->kpt = (double **)QEPP_ALLOC( sizeof( double), res->n_kpt, 3);
+						res->weight = (double *)QEPP_ALLOC( sizeof( double), res->n_kpt);
+						res->egval_link = (char **)QEPP_ALLOC( sizeof( char), res->n_kpt, 256);
+						res->egvec_link = (char **)QEPP_ALLOC( sizeof( char), res->n_kpt, 256);
+						res->wfc_link = (char **)QEPP_ALLOC( sizeof( char), res->n_kpt, 256);
 						xmlFree( key);
 					}
 					if( !xmlStrcmp( node->name, (const xmlChar *)"UNITS_FOR_K-POINTS"))
@@ -882,7 +882,7 @@ errh * read_data_file( const char * filename, data_file ** out_ptr)
 						xmlFree( key);
 
 						if( res->n_spin == 4)
-							res->wfc_link2 = (char **)AllocateLinearMem2( sizeof( char), res->n_kpt, 256);
+							res->wfc_link2 = (char **)QEPP_ALLOC( sizeof( char), res->n_kpt, 256);
 					}
 				}
 				node = app;

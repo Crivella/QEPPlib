@@ -1,4 +1,4 @@
-#include <qepp/qepp_io.h>
+#include <qepp/qepp_output.h>
 
 void open_io_env( int node, int mode, int verb)
 {

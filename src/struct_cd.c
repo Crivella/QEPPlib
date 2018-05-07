@@ -14,8 +14,8 @@ cd * initialize_cd(long int x, long int y, long int z)
 	to_init->y = y;
 	to_init->z = z;
 
-	to_init->dens = 	(double ***)AllocateLinearMem3( sizeof( double), x, y, z);
-	to_init->coord = 	(double ****)AllocateLinearMem4( sizeof( double), x, y, z, 3);	
+	to_init->dens = 	(double ***)QEPP_ALLOC( sizeof( double), x, y, z);
+	to_init->coord = 	(double ****)QEPP_ALLOC( sizeof( double), x, y, z, 3);	
 	QEPP_PRINT( "Allocating %.2lf MB of mem for cd struct...\n", sizeof(double)*x*y*z*4./(1024.*1024.));
 
 	to_init->print =	&print_cd;
@@ -73,8 +73,8 @@ void * free_cd( cd * to_free)
 	if( to_free == NULL)
 		return NULL;
 
-	FreeLinearMem3( (void ***)to_free->dens);
-	FreeLinearMem4( (void ****)to_free->coord);
+	QEPP_FREE( (void ***)to_free->dens);
+	QEPP_FREE( (void ****)to_free->coord);
 
 	free( to_free);
 

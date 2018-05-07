@@ -680,7 +680,7 @@ opt_data * apply_MSKK_real(opt_data * data, int n_ref, double * ref[2])
 	double * app_y[n_col];
 	gsl_integration_cquad_workspace * wsp = gsl_integration_cquad_workspace_alloc( 1000);
 	for( int j=0; j<n_col; j++)
-		app_y[j] = (double *)AllocateLinearMem1( sizeof( double), n_pt);//malloc( n_pt * sizeof( double));
+		app_y[j] = (double *)QEPP_ALLOC( sizeof( double), n_pt);//malloc( n_pt * sizeof( double));
 	for( long int i=0; i<n_pt; i++)
 		for( int j=0; j<n_col; j++)
 			app_y[j][i] = data->values[i][j];
@@ -768,7 +768,7 @@ opt_data * apply_MSKK_real(opt_data * data, int n_ref, double * ref[2])
 	QEPP_PRINT( "Integration concluded with %li integration calls.\n", (long int)n_eval);
 	QEPP_PRINT( "Average per pooint: eval->%lf,  abserr->%g\n", (double)n_eval/n_pt, (double)abserr/n_pt);
 	for( int i=0; i<n_col; i++)
-		FreeLinearMem1( (void *)app_y[i]);
+		QEPP_FREE( (void *)app_y[i]);
 	gsl_integration_cquad_workspace_free( wsp);
 
 	QEPP_PRINT( "...done\n");

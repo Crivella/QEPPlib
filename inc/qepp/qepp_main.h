@@ -21,9 +21,9 @@
 #include <qepp/my_lapack.h>
 #include <qepp/qepp_constants.h>
 #include <qepp/qepp_function.h>
-//#include <qepp/qepp_read.h>
-#include <qepp/qepp_mem.h>	//AllocateLinearMem1/2/3/4(), DuplicateLinearMem1/2/3/4(), FreeLinearMem1/2/3/4()
-#include <qepp/qepp_io.h>	//OPEN_IO_ENV(), CLOSE_IO_ENV(), QEPP_PRINT(), QEPP_ALL_PRINT(), QEPP_OUT()
+//#include <qepp/qepp_input.h>
+#include <qepp/qepp_mem.h>	//QEPP_ALLOC/2/3/4(), QEPP_DUPL/2/3/4(), QEPP_FREE/2/3/4()
+#include <qepp/qepp_output.h>	//OPEN_IO_ENV(), CLOSE_IO_ENV(), QEPP_PRINT(), QEPP_ALL_PRINT(), QEPP_OUT()
 #include <qepp/qepp_mpi.h>	//mb_bcast(), mp_sum(), SET_PW_MPI()
 
 #ifdef __GSL
@@ -69,24 +69,7 @@ mpi_data * mpi = NULL;
 		0
 #define DUPLICATE(a) a!=NULL ? a->duplicate( a) : 0;
 #define FREE(a) a!=NULL ? a->free( a) : 0;
-/*#define READ( a, b, ...) \
-	_Generic( (b), \
-		nscf_data **:	parse_errh(read_nscf_data(  a, (nscf_data **)b)), \
-		band_data **:	parse_errh(read_band_data(  a, (band_data **)b)), \
-		spin_data **:	parse_errh(read_spin_data(  a, (spin_data **)b)), \
-		band_pp **:	parse_errh(read_band_pp(    a, (band_pp **)b)), \
-		nscf_md **:	parse_errh(read_nscf_md(    a, (nscf_md **)b)), \
-		opt_data **:	parse_errh(read_opt_data(   a, (opt_data **)b, SECOND( 0, ##__VA_ARGS__, NULL))), \
-		m_elem **:	parse_errh(read_m_elem(     a, (m_elem **)b, SECOND( 0, ##__VA_ARGS__, NULL))),\
-		fit_params **:	parse_errh(read_fit_params( a, (fit_params **)b)), \
-		data_set **:	parse_errh(read_data_set(   a, (data_set **)b)), \
-		pdos_data **:	parse_errh(read_pdos_data(  a, (pdos_data **)b, SECOND( 0, ##__VA_ARGS__, NULL))), \
-		pdos_state **:	parse_errh(read_pdos_state( a, (pdos_state **)b)), \
-		data_file **:	parse_errh(read_data_file(  a, (data_file **)b)), \
-		wfc **:		parse_errh(read_wfc(        a, (wfc **)b)), \
-		gkv **:		parse_errh(read_gkv(        a, (gkv **)b)), \
-		default: 	fprintf( stderr, "Calling macro READ type not implemented...\n") \
-	)*/
+
 #define READ( a, b, ...) \
 	_Generic( (b), \
 		nscf_data **:	parse_errh(read_nscf_data(  (char *)a, (nscf_data **)b)), \

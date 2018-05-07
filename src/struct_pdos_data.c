@@ -17,7 +17,7 @@ pdos_data * initialize_pdos_data( long int n_kpt, int n_bnd, int n_states)
 	to_init->n_states = n_states;
 
 	fprintf( stdout, "Allocating  %.2lf MB of RAM for pdos_data...\n", n_kpt*n_bnd*n_states*sizeof( double)/(1024.*1024.));
-	to_init->pdos =		(double ***)AllocateLinearMem3( sizeof( double), n_kpt, n_bnd, n_states);
+	to_init->pdos =		(double ***)QEPP_ALLOC( sizeof( double), n_kpt, n_bnd, n_states);
 
 	to_init->states = malloc( n_states * sizeof( pdos_state *));
 	for( int i=0; i<n_states; i++)
@@ -64,7 +64,7 @@ void * free_pdos_data(pdos_data * to_free)
 	if(to_free == NULL)
 		return NULL;
 
-	FreeLinearMem3( (void ***)to_free->pdos);
+	QEPP_FREE( (void ***)to_free->pdos);
 
 	for( int i=0; i<to_free->n_states; i++)
 		FREE( to_free->states[i]);

@@ -1,5 +1,5 @@
 #include <qepp/qepp_struct.h>
-#include <qepp/qepp_read.h>
+#include <qepp/qepp_input.h>
 
 void * free_array_ptr(double  **to_free, long int size)
 {

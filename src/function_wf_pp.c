@@ -308,7 +308,7 @@ errh * qepp_compute_matrixelements_huge( void ** dump, data_file * data)
 	if( out == NULL)
 		FAIL( FAIL, "Cannout open file matrixelements for write");
 
-	double complex * app = (double complex *)AllocateLinearMem1( sizeof( double complex), 3);
+	double complex * app = (double complex *)QEPP_ALLOC( sizeof( double complex), 3);
 
 	//double tpiba = 2  * PI / (data->lp);
 	double tpiba2 = pow( data->a_t, 2);
@@ -403,7 +403,7 @@ errh * qepp_compute_matrixelements_huge( void ** dump, data_file * data)
 		FREE( gkv1);
 	}
 
-	FreeLinearMem1( (void *)app);
+	QEPP_FREE( (void *)app);
 
 	fclose( out);	
 	SUCCESS();
@@ -429,7 +429,7 @@ errh * qepp_compute_berry_phase( double complex ** out_ptr, data_file * data)
 	n_kpt = data->n_kpt;
 	n_bnd = data->n_bnd;		
 
-	res = (double complex *)AllocateLinearMem1( sizeof( double complex), n_bnd);
+	res = (double complex *)QEPP_ALLOC( sizeof( double complex), n_bnd);
 	for( int i=0; i<n_bnd; i++)
 		res[i] = 1;
 
@@ -540,11 +540,11 @@ errh * qepp_compute_berry_phase2( double complex ** out_ptr, data_file * data, l
 	if( klist == NULL)
 	{
 		n_kpt = data->n_kpt;
-		klist = AllocateLinearMem1( sizeof( long int), n_kpt);
+		klist = QEPP_ALLOC( sizeof( long int), n_kpt);
 		for( long int i=0; i<n_kpt; i++)
 			klist[i] = i;
 	}		
-	res = (double complex *)AllocateLinearMem1( sizeof( double complex), n_bnd);
+	res = (double complex *)QEPP_ALLOC( sizeof( double complex), n_bnd);
 	for( int i=0; i<n_bnd; i++)
 	{
 		res[i] = 1;
@@ -665,8 +665,8 @@ errh * qepp_compute_berry_phase2( double complex ** out_ptr, data_file * data, l
 
 	QEPP_PRINT( "%g +i %g:  (clog)%g  <->  (atan)%g\n", creal(berry1), cimag(berry1), -cimag(clog(berry1)), fmod( berry2, 2*PI));
 
-	//FreeLinearMem1( (void *)app_v);
-	FreeLinearMem1( (void *)klist);
+	//QEPP_FREE( (void *)app_v);
+	QEPP_FREE( (void *)klist);
 
 	*out_ptr = res;
 	SUCCESS();

@@ -1,49 +1,45 @@
 #ifndef QEPP_MEM_H
 #define QEPP_MEM_H
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <assert.h>
+#include <stdlib.h>	//malloc(), free(), exit()
+#include <string.h>	//memcpy()
+#include <assert.h>	//assert()
 
 #ifndef ARRAY_SIZE_MACRO
 #define ARRAY_SIZE_MACRO
+// MACRO BASE_ADDR(a)
+// Get true address of the allocated memory for array 'a'
 #define BASE_ADDR(a) (long int *)a - 1
+// MACRO BASE_NUM(a)
+// Get size of the allocated memory for array 'a'
 #define BASE_NUM(a) qepp_mem_get_size( a)
+// MACRO BASE_DIM(a)
+// Get dimensionality of the allocated array 'a'
 #define BASE_DIM(a) (*((long int **)a - 1))[0]
+// MACRO BASE_ADDR(a)
+// Get size of the elements of array 'a'
 #define BASE_SIZE(a) (*((long int **)a - 1))[1]
+// MACRO BASE_CHECK(a)
+// Get check variable for handling multidimensional array
 #define BASE_CHECK(a) (*((long int **)a - 1))[2]
 #endif
 
 #ifndef MEM_WRAP
 #define MEM_WRAP
 
-#define alloc1(a,b) AllocateLinearMem1(a,b)
-#define alloc2(a,b,c) AllocateLinearMem2(a,b,c)
-#define alloc3(a,b,c,d) AllocateLinearMem3(a,b,c,d)
-#define alloc4(a,b,c,d,e) AllocateLinearMem4(a,b,c,d,e)
-#define duplicate1(a) DuplicateLinearMem1(a)
-#define duplicate2(a) DuplicateLinearMem2(a)
-#define duplicate3(a) DuplicateLinearMem3(a)
-#define duplicate4(a) DuplicateLinearMem4(a)
-#define free1(a) FreeLinearMem1(a)
-#define free2(a) FreeLinearMem2(a)
-#define free3(a) FreeLinearMem3(a)
-#define free4(a) FreeLinearMem4(a)
-
-#define QEPP_free( a) FreeLinearMem( a)
-#define QEPP_dupl( a) DuplicateLinearMem( a)
-#define QEPP_alloc( a, b, ...) malloc_app( a, b, ##__VA_ARGS__, 0, 0, 0)
+#define QEPP_FREE( a) FreeLinearMem( a)
+#define QEPP_DUPL( a) DuplicateLinearMem( a)
+#define QEPP_ALLOC( a, b, ...) malloc_app( a, b, ##__VA_ARGS__, 0, 0, 0)
 #define malloc_app(a, b, c, d, e, ...) \
 	( c != 0 ? \
 		( d != 0 ? \
 			( e != 0 ? \
-				alloc4( a, b, c, d, e) : \
-				alloc3( a, b, c, d) \
+				AllocateLinearMem4( a, b, c, d, e) : \
+				AllocateLinearMem3( a, b, c, d) \
 			) : \
-			alloc2( a, b, c) \
+			AllocateLinearMem2( a, b, c) \
 		) : \
-		alloc1( a, b) \
+		AllocateLinearMem1( a, b) \
 	)
 #define malloc( a) malloc_b( a)
 /*

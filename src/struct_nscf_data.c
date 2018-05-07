@@ -16,10 +16,10 @@ nscf_data * initialize_nscf_data( long int n_kpt, int n_bnd)
 	to_init->n_bnd = n_bnd;
 	to_init->tot_weight = 0;
 
-	to_init->kpt =		(double **)AllocateLinearMem2( sizeof( double), n_kpt, 3);
-	to_init->energies =	(double **)AllocateLinearMem2( sizeof( double), n_kpt, n_bnd);
-	to_init->occup =	(double **)AllocateLinearMem2( sizeof( double), n_kpt, n_bnd);
-	to_init->weight =	(double *)AllocateLinearMem1( sizeof( double), n_kpt);
+	to_init->kpt =		(double **)QEPP_ALLOC( sizeof( double), n_kpt, 3);
+	to_init->energies =	(double **)QEPP_ALLOC( sizeof( double), n_kpt, n_bnd);
+	to_init->occup =	(double **)QEPP_ALLOC( sizeof( double), n_kpt, n_bnd);
+	to_init->weight =	(double *)QEPP_ALLOC( sizeof( double), n_kpt);
 
 	to_init->print =	&print_nscf_data;
 	to_init->duplicate =	&duplicate_nscf_data;
@@ -76,10 +76,10 @@ nscf_data * duplicate_nscf_data(nscf_data *to_dupl)
 
 	new_s->md=DUPLICATE(to_dupl->md);
 
-	new_s->kpt =		(double **)DuplicateLinearMem2( (void **)to_dupl->kpt);
-	new_s->energies =	(double **)DuplicateLinearMem2( (void **)to_dupl->energies);
-	new_s->occup =		(double **)DuplicateLinearMem2( (void **)to_dupl->occup);
-	new_s->weight =		(double *)DuplicateLinearMem1( (void *)to_dupl->weight);
+	new_s->kpt =		(double **)QEPP_DUPL( (void **)to_dupl->kpt);
+	new_s->energies =	(double **)QEPP_DUPL( (void **)to_dupl->energies);
+	new_s->occup =		(double **)QEPP_DUPL( (void **)to_dupl->occup);
+	new_s->weight =		(double *)QEPP_DUPL( (void *)to_dupl->weight);
 
 	return new_s;	
 }
@@ -89,10 +89,10 @@ void * free_nscf_data(nscf_data * to_free)
 	if(to_free == NULL)
 		return NULL;
 
-	FreeLinearMem2( (void **)to_free->kpt);
-	FreeLinearMem2( (void **)to_free->energies);
-	FreeLinearMem2( (void **)to_free->occup);
-	FreeLinearMem1( (void *)to_free->weight);
+	QEPP_FREE( (void **)to_free->kpt);
+	QEPP_FREE( (void **)to_free->energies);
+	QEPP_FREE( (void **)to_free->occup);
+	QEPP_FREE( (void *)to_free->weight);
 
 	FREE(to_free->md);
 	free(to_free);

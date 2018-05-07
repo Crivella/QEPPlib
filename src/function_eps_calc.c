@@ -47,14 +47,14 @@ errh * calculate_eps( opt_data ** out_ptr, opt_data * data, double max_range, lo
 			FAIL( FAIL, "Can't acquire k-points data");
 		n_kpt=app->n_kpt;
 		tot_w = app->tot_weight/2;
-		weight = (double *)AllocateLinearMem1( sizeof( double), n_kpt);//malloc( n_kpt * sizeof( double));
+		weight = (double *)QEPP_ALLOC( sizeof( double), n_kpt);//malloc( n_kpt * sizeof( double));
 		memcpy(weight, app->weight, app->n_kpt * sizeof( double));
 		FREE(app);
 	}
 	else
 	{
 		n_kpt=k_pt->n_pt;
-		weight = (double *)AllocateLinearMem1( sizeof( double), n_kpt);//malloc( n_kpt * sizeof( double));
+		weight = (double *)QEPP_ALLOC( sizeof( double), n_kpt);//malloc( n_kpt * sizeof( double));
 		double app;
 		for( long int i=0; i<k_pt->n_pt; i++)
 		{
@@ -82,7 +82,7 @@ errh * calculate_eps( opt_data ** out_ptr, opt_data * data, double max_range, lo
 //matrix element[k][x->en][i/j/k]]
 	QEPP_PRINT( "Allocating %.2lf MB of RAM for pp...\n", n_kpt*n_pt*3.*8./1024./1024.);
 	double ***pp;
-	pp = (double ***)AllocateLinearMem3( sizeof( double), n_kpt, n_pt, 3);
+	pp = (double ***)QEPP_ALLOC( sizeof( double), n_kpt, n_pt, 3);
 	QEPP_PRINT( "...done\n");
 // data->values[x] =?   x: 0-> v_b  1-> c_b  2/3/4-> |p_x/y/z|^2  5-> e_gap  6-> Df(occ)
 	long int k_app, p_app;
@@ -128,21 +128,21 @@ errh * calculate_eps( opt_data ** out_ptr, opt_data * data, double max_range, lo
 	}
 //Remove 0 pt
 	eps->n_pt--;
-	double * app1 = (double *)AllocateLinearMem1( sizeof( double), eps->n_pt);
+	double * app1 = (double *)QEPP_ALLOC( sizeof( double), eps->n_pt);
 	memcpy( app1, eps->x+1, eps->n_pt * sizeof( double));
-	FreeLinearMem1( (void *)eps->x);
+	QEPP_FREE( (void *)eps->x);
 	eps->x=app1;
 
-	double ** app2 = (double **)AllocateLinearMem2( sizeof(double), eps->n_pt, eps->n_col);
+	double ** app2 = (double **)QEPP_ALLOC( sizeof(double), eps->n_pt, eps->n_col);
 	for( long int i=0; i<eps->n_pt; i++)
 		memcpy( app2[i], eps->values[i+1], eps->n_col * sizeof( double));
-	FreeLinearMem2( (void **)eps->values);
+	QEPP_FREE( (void **)eps->values);
 	eps->values=app2;
 
 //Free all unused variables
 	FREE(k_pt);
-	FreeLinearMem1( (void *)weight);
-	FreeLinearMem3( (void ***)pp);
+	QEPP_FREE( (void *)weight);
+	QEPP_FREE( (void ***)pp);
 
 	*out_ptr = eps;
 	QEPP_PRINT( "End eps calculation\n");
@@ -193,14 +193,14 @@ errh * calculate_eps_huge_files( opt_data ** out_ptr, char * mname, double max_r
 			FAIL( FAIL, "Can't acquire k-points data");
 		n_kpt=app->n_kpt;
 		tot_w = app->tot_weight/2;
-		weight = (double *)AllocateLinearMem1( sizeof( double), n_kpt);//malloc( n_kpt * sizeof( double));
+		weight = (double *)QEPP_ALLOC( sizeof( double), n_kpt);//malloc( n_kpt * sizeof( double));
 		memcpy(weight, app->weight, app->n_kpt * sizeof( double));
 		FREE(app);
 	}
 	else
 	{
 		n_kpt= k_pt->n_pt;
-		weight = (double *)AllocateLinearMem1( sizeof( double), n_kpt);//malloc( n_kpt * sizeof( double));
+		weight = (double *)QEPP_ALLOC( sizeof( double), n_kpt);//malloc( n_kpt * sizeof( double));
 		double app;
 		for( long int i=0; i<k_pt->n_pt; i++)
 		{
@@ -231,7 +231,7 @@ errh * calculate_eps_huge_files( opt_data ** out_ptr, char * mname, double max_r
 //matrix element[k][x->en][i/j/k]]
 	QEPP_PRINT( "Allocating %.2lf MB of RAM for pp...\n", n_kpt*n_pt*3.*8./1024./1024.);
 	double ***pp;
-	pp = (double ***)AllocateLinearMem3( sizeof( double), n_kpt, n_pt, 3);
+	pp = (double ***)QEPP_ALLOC( sizeof( double), n_kpt, n_pt, 3);
 	QEPP_PRINT( "...done\n");
 // data->values[x] =?   x: 0-> v_b  1-> c_b  2/3/4-> |p_x/y/z|^2  5-> e_gap  6-> Df(occ)
 	long int k_app, p_app;
@@ -296,21 +296,21 @@ errh * calculate_eps_huge_files( opt_data ** out_ptr, char * mname, double max_r
 	}
 //Remove 0 pt
 	eps->n_pt--;
-	double * app1 = (double *)AllocateLinearMem1( sizeof( double), eps->n_pt);
+	double * app1 = (double *)QEPP_ALLOC( sizeof( double), eps->n_pt);
 	memcpy( app1, eps->x+1, eps->n_pt * sizeof( double));
-	FreeLinearMem1( (void *)eps->x);
+	QEPP_FREE( (void *)eps->x);
 	eps->x=app1;
 
-	double ** app2 = (double **)AllocateLinearMem2( sizeof(double), eps->n_pt, eps->n_col);
+	double ** app2 = (double **)QEPP_ALLOC( sizeof(double), eps->n_pt, eps->n_col);
 	for( long int i=0; i<eps->n_pt; i++)
 		memcpy( app2[i], eps->values[i+1], eps->n_col * sizeof( double));
-	FreeLinearMem2( (void **)eps->values);
+	QEPP_FREE( (void **)eps->values);
 	eps->values=app2;
 
 //Free all unused variables
 	FREE(k_pt);
-	FreeLinearMem1( (void *)weight);
-	FreeLinearMem3( (void ***)pp);
+	QEPP_FREE( (void *)weight);
+	QEPP_FREE( (void ***)pp);
 
 	*out_ptr = eps;
 	QEPP_PRINT( "End eps_mod calculation\n");
@@ -362,14 +362,14 @@ errh * calculate_eps_mod(opt_data * data, double max_range, long int n_pt, doubl
 			FAIL( FAIL, "Can't acquire k-points data");
 		n_kpt=app->n_kpt;
 		tot_w = app->tot_weight/2;
-		weight = (double *)AllocateLinearMem1( sizeof( double), n_kpt);//malloc( n_kpt * sizeof( double));
+		weight = (double *)QEPP_ALLOC( sizeof( double), n_kpt);//malloc( n_kpt * sizeof( double));
 		memcpy(weight, app->weight, app->n_kpt * sizeof( double));
 		FREE(app);
 	}
 	else
 	{
 		n_kpt=k_pt->n_pt;
-		weight = (double *)AllocateLinearMem1( sizeof( double), n_kpt);//malloc( n_kpt * sizeof( double));
+		weight = (double *)QEPP_ALLOC( sizeof( double), n_kpt);//malloc( n_kpt * sizeof( double));
 		double app;
 		for( long int i=0; i<k_pt->n_pt; i++)
 		{
@@ -396,7 +396,7 @@ errh * calculate_eps_mod(opt_data * data, double max_range, long int n_pt, doubl
 //matrix element[k][x->en][i/j/k]]
 	QEPP_PRINT( "Allocating %.2lf MB of RAM for pp...\n", n_kpt*n_pt*3.*8./1024./1024.);
 	double ***pp;
-	pp = (double ***)AllocateLinearMem3( sizeof( double), n_kpt, n_pt, 3);
+	pp = (double ***)QEPP_ALLOC( sizeof( double), n_kpt, n_pt, 3);
 	QEPP_PRINT( "...done\n");
 // data->values[x] =?   x: 0-> v_b  1-> c_b  2/3/4-> |p_x/y/z|^2  5-> e_gap  6-> Df(occ)
 	long int k_app, p_app;
@@ -499,21 +499,21 @@ NbP	15.2998		15.5891		15.285 + 0.056
 	}
 //Remove 0 pt
 	eps->n_pt--;
-	double * app1 = (double *)AllocateLinearMem1( sizeof( double), eps->n_pt);
+	double * app1 = (double *)QEPP_ALLOC( sizeof( double), eps->n_pt);
 	memcpy( app1, eps->x+1, eps->n_pt * sizeof( double));
-	FreeLinearMem1( (void *)eps->x);
+	QEPP_FREE( (void *)eps->x);
 	eps->x=app1;
 
-	double ** app2 = (double **)AllocateLinearMem2( sizeof(double), eps->n_pt, eps->n_col);
+	double ** app2 = (double **)QEPP_ALLOC( sizeof(double), eps->n_pt, eps->n_col);
 	for( long int i=0; i<eps->n_pt; i++)
 		memcpy( app2[i], eps->values[i+1], eps->n_col * sizeof( double));
-	FreeLinearMem2( (void **)eps->values);
+	QEPP_FREE( (void **)eps->values);
 	eps->values=app2;
 
 //Free all unused variables
 	FREE(k_pt);
-	FreeLinearMem1( (void *)weight);
-	FreeLinearMem3( (void ***)pp);
+	QEPP_FREE( (void *)weight);
+	QEPP_FREE( (void ***)pp);
 	QEPP_PRINT( "End eps_mod calculation\n");
 	//return eps;
 	SUCCESS();
@@ -565,14 +565,14 @@ errh * calculate_eps_mod_huge_files( opt_data ** out_ptr, char * mname, double m
 
 		n_kpt=app11->n_kpt;
 		tot_w = app11->tot_weight/2;
-		weight = (double *)AllocateLinearMem1( sizeof( double), n_kpt);//malloc( n_kpt * sizeof( double));
+		weight = (double *)QEPP_ALLOC( sizeof( double), n_kpt);//malloc( n_kpt * sizeof( double));
 		memcpy(weight, app11->weight, app11->n_kpt * sizeof( double));
 		FREE(app11);
 	}
 	else
 	{
 		n_kpt=k_pt->n_pt;
-		weight = (double *)AllocateLinearMem1( sizeof( double), n_kpt);//malloc( n_kpt * sizeof( double));
+		weight = (double *)QEPP_ALLOC( sizeof( double), n_kpt);//malloc( n_kpt * sizeof( double));
 		double app;
 		for( long int i=0; i<k_pt->n_pt; i++)
 		{
@@ -604,7 +604,7 @@ errh * calculate_eps_mod_huge_files( opt_data ** out_ptr, char * mname, double m
 //matrix element[k][x->en][i/j/k]]
 	QEPP_PRINT( "Allocating %.2lf MB of RAM for pp...\n", n_kpt*n_pt*3.*8./1024./1024.);
 	double ***pp;
-	pp = (double ***)AllocateLinearMem3( sizeof( double), n_kpt, n_pt, 3);
+	pp = (double ***)QEPP_ALLOC( sizeof( double), n_kpt, n_pt, 3);
 	QEPP_PRINT( "...done\n");
 
 // data->values[x] =?   x: 0-> v_b  1-> c_b  2/3/4-> |p_x/y/z|^2  5-> e_gap  6-> Df(occ)
@@ -918,29 +918,29 @@ NbP	15.2998		15.5891		15.285 + 0.056 = 15.341
 //Remove 0 pt
 	eps->n_pt--;
 	//double * app1 = malloc( eps->n_pt * sizeof( double));
-	double * app1 = (double *)AllocateLinearMem1( sizeof( double), eps->n_pt);
+	double * app1 = (double *)QEPP_ALLOC( sizeof( double), eps->n_pt);
 	memcpy( app1, eps->x+1, eps->n_pt * sizeof( double));
 	//free(eps->x);
-	FreeLinearMem1( (void *)eps->x);
+	QEPP_FREE( (void *)eps->x);
 	eps->x=app1;
 /*
 	//double ** app2 = malloc( eps->n_pt * sizeof( double *));
-	double ** app2 = (double **)AllocateLinearMem1( sizeof(double *), eps->n_pt);
+	double ** app2 = (double **)QEPP_ALLOC( sizeof(double *), eps->n_pt);
 	memcpy( app2, eps->values+1, eps->n_pt * sizeof( double *));
 	free(eps->values[0]);
 	free(eps->values);
 	eps->values=app2;
 */
-	double ** app2 = (double **)AllocateLinearMem2( sizeof(double), eps->n_pt, eps->n_col);
+	double ** app2 = (double **)QEPP_ALLOC( sizeof(double), eps->n_pt, eps->n_col);
 	for( long int i=0; i<eps->n_pt; i++)
 		memcpy( app2[i], eps->values[i+1], eps->n_col * sizeof( double));
-	FreeLinearMem2( (void **)eps->values);
+	QEPP_FREE( (void **)eps->values);
 	eps->values=app2;
 
 //Free all unused variables
 	FREE(k_pt);
-	FreeLinearMem1( (void *)weight);
-	FreeLinearMem3( (void ***)pp);
+	QEPP_FREE( (void *)weight);
+	QEPP_FREE( (void ***)pp);
 
 	*out_ptr = eps;
 	QEPP_PRINT( "End eps_mod calculation\n");
@@ -990,14 +990,14 @@ errh * calculate_jdos_huge_files( opt_data ** out_ptr, char * mname, double max_
 			FAIL( FAIL, "Can't acquire k-points data");
 		n_kpt=app->n_kpt;
 		tot_w = app->tot_weight/2;
-		weight = (double *)AllocateLinearMem1( sizeof( double), n_kpt);//malloc( n_kpt * sizeof( double));
+		weight = (double *)QEPP_ALLOC( sizeof( double), n_kpt);//malloc( n_kpt * sizeof( double));
 		memcpy(weight, app->weight, app->n_kpt * sizeof( double));
 		FREE(app);
 	}
 	else
 	{
 		n_kpt= k_pt->n_pt;
-		weight = (double *)AllocateLinearMem1( sizeof( double), n_kpt);//malloc( n_kpt * sizeof( double));
+		weight = (double *)QEPP_ALLOC( sizeof( double), n_kpt);//malloc( n_kpt * sizeof( double));
 		double app;
 		for( long int i=0; i<k_pt->n_pt; i++)
 		{
@@ -1028,7 +1028,7 @@ errh * calculate_jdos_huge_files( opt_data ** out_ptr, char * mname, double max_
 //matrix element[k][x->en][i/j/k]]
 	QEPP_PRINT( "Allocating %.2lf MB of RAM for pp...\n", n_kpt*n_pt*8./1024./1024.);
 	double **pp;
-	pp = (double **)AllocateLinearMem2( sizeof( double), n_kpt, n_pt);
+	pp = (double **)QEPP_ALLOC( sizeof( double), n_kpt, n_pt);
 	QEPP_PRINT( "...done\n");
 // data->values[x] =?   x: 0-> v_b  1-> c_b  2/3/4-> |p_x/y/z|^2  5-> e_gap  6-> Df(occ)
 	long int k_app, p_app;
@@ -1084,21 +1084,21 @@ errh * calculate_jdos_huge_files( opt_data ** out_ptr, char * mname, double max_
 
 //Remove 0 pt
 	eps->n_pt--;
-	double * app1 = (double *)AllocateLinearMem1( sizeof( double), eps->n_pt);
+	double * app1 = (double *)QEPP_ALLOC( sizeof( double), eps->n_pt);
 	memcpy( app1, eps->x+1, eps->n_pt * sizeof( double));
-	FreeLinearMem1( (void *)eps->x);
+	QEPP_FREE( (void *)eps->x);
 	eps->x=app1;
 
-	double ** app2 = (double **)AllocateLinearMem2( sizeof(double), eps->n_pt, eps->n_col);
+	double ** app2 = (double **)QEPP_ALLOC( sizeof(double), eps->n_pt, eps->n_col);
 	for( long int i=0; i<eps->n_pt; i++)
 		memcpy( app2[i], eps->values[i+1], eps->n_col * sizeof( double));
-	FreeLinearMem2( (void **)eps->values);
+	QEPP_FREE( (void **)eps->values);
 	eps->values=app2;
 
 //Free all unused variables
 	FREE(k_pt);
-	FreeLinearMem1( (void *)weight);
-	FreeLinearMem2( (void **)pp);
+	QEPP_FREE( (void *)weight);
+	QEPP_FREE( (void **)pp);
 
 	*out_ptr = eps;
 	QEPP_PRINT( "End jdos calculation\n");

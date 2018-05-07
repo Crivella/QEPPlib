@@ -1,14 +1,21 @@
 #ifndef FUNCTION_H
 #define FUNCTION_H
 
+#include <qepp/qepp_output.h>
 #include <qepp/qepp_err.h>
-#include <qepp/qepp_io.h>
 #include <qepp/qepp_struct.h>
+#include <qepp/qepp_input.h>
 
 #define ROUND(a) ceil(a-0.5)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
-// nscf_data PostProcessing
+//
+//
+//                                        nscf_data PostProcessing                                     
+//
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+
 errh * print_band_structure_nscf(nscf_data *, char *);
 errh * print_band_structure_band(band_data *, char *);
 
@@ -23,7 +30,12 @@ errh * find_e_fermi( double *, nscf_data *);
 errh * tot_elect(    double *, nscf_data *);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
-// opt_data PostProcessing
+//
+//
+//                                         opt_data PostProcessing                                     
+//
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////////
 errh * apply_broadening( opt_data **, opt_data *, double);
 errh * calculate_opt_properties( opt_data ** out_ptr, opt_data * eps1, opt_data * eps2);
 
@@ -98,6 +110,13 @@ opt_data	* apply_MSKK_im(opt_data * data, int n_ref, double * ref[2]);
 //opt_data	* apply_MSKK_real_light(opt_data *, int, double * [2]);
 
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//
+//                                      Wave-function PostProcessing                                   
+//
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 // Wave-function PostProcessing
 errh * qepp_compute_cd_datafile( cd **, data_file *, long int, long int, long int, long int, int, int);

@@ -8,9 +8,9 @@
 #include <complex.h>
 
 #include <qepp/qepp_constants.h>
-#include <qepp/qepp_io.h>
+//#include <qepp/qepp_output.h>
 #include <qepp/qepp_err.h>	//errh, SET_ERRH(), MSG(), WARN()
-#include <qepp/qepp_mem.h>	//AllocateLinearMem_(), DuplicateLinearMem_(), FreeLinearMem_()
+#include <qepp/qepp_mem.h>	//QEPP_ALLOC(), QEPP_DUPL(), QEPP_FREE()
 
 //Struct IDs
 #define ID_NSCF_DATA	1
@@ -69,7 +69,7 @@ typedef struct egv egv;
 typedef struct cd cd;
 
 extern data_file * df;
-#include <qepp/qepp_read.h>	//READ()
+//#include <qepp/qepp_read.h>	//READ()
 
 
 nscf_md		* initialize_nscf_md();

@@ -13,10 +13,10 @@ fit_params * initialize_fit_params( int nparams)
 
 	to_init->nparams = nparams;
 
-	to_init->params =	(double *)AllocateLinearMem1( sizeof( double), nparams);
-	to_init->min =		(double *)AllocateLinearMem1( sizeof( double), nparams);
-	to_init->max =		(double *)AllocateLinearMem1( sizeof( double), nparams);
-	to_init->delta =	(double *)AllocateLinearMem1( sizeof( double), nparams);
+	to_init->params =	(double *)QEPP_ALLOC( sizeof( double), nparams);
+	to_init->min =		(double *)QEPP_ALLOC( sizeof( double), nparams);
+	to_init->max =		(double *)QEPP_ALLOC( sizeof( double), nparams);
+	to_init->delta =	(double *)QEPP_ALLOC( sizeof( double), nparams);
 
 	to_init->offset=0;
 
@@ -48,10 +48,10 @@ fit_params * duplicate_fit_params( fit_params * to_dupl)
 
 	fit_params * res = initialize_fit_params( to_dupl->nparams);
 
-	res->params =	(double *)DuplicateLinearMem1( (void *)to_dupl->params);
-	res->min =	(double *)DuplicateLinearMem1( (void *)to_dupl->min);
-	res->max =	(double *)DuplicateLinearMem1( (void *)to_dupl->max);
-	res->delta =	(double *)DuplicateLinearMem1( (void *)to_dupl->delta);
+	res->params =	(double *)QEPP_DUPL( (void *)to_dupl->params);
+	res->min =	(double *)QEPP_DUPL( (void *)to_dupl->min);
+	res->max =	(double *)QEPP_DUPL( (void *)to_dupl->max);
+	res->delta =	(double *)QEPP_DUPL( (void *)to_dupl->delta);
 
 	res->offset = to_dupl->offset;
 
@@ -63,10 +63,10 @@ void * free_fit_params(fit_params * to_free)
 	if( to_free == NULL)
 		return NULL;
 
-	FreeLinearMem1( (void *)to_free->params);
-	FreeLinearMem1( (void *)to_free->min);
-	FreeLinearMem1( (void *)to_free->max);
-	FreeLinearMem1( (void *)to_free->delta);
+	QEPP_FREE( (void *)to_free->params);
+	QEPP_FREE( (void *)to_free->min);
+	QEPP_FREE( (void *)to_free->max);
+	QEPP_FREE( (void *)to_free->delta);
 
 	free( to_free);
 
