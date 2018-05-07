@@ -134,7 +134,6 @@ errh * qepp_compute_cd_datafile( cd ** out_ptr, data_file * data, long int x, lo
 						double exponential=0;
 
 						cc = 0; cc2=0;
-
 						for( long int ng=start; ng<end; ng++)
 						{
 							exponential = 0;
@@ -160,6 +159,7 @@ errh * qepp_compute_cd_datafile( cd ** out_ptr, data_file * data, long int x, lo
 
 						if( data->n_spin == 4)
 						{
+							mp_sum( &cc2, MPI_COMM_WORLD, 1);
 							n_app2 += cc2 * conj( cc2);
 							n_app2 /= vol;
 							n_app2 *= weight * fac;
@@ -172,7 +172,6 @@ errh * qepp_compute_cd_datafile( cd ** out_ptr, data_file * data, long int x, lo
 				}
 			}
 		}
-
 		FREE( w);
 		FREE( w2);
 		FREE( g);

@@ -375,7 +375,7 @@ void FreeLinearMem( void * a)
 		FreeLinearMem1( (void *)a);
 		break;
 	case 2:
-		FreeLinearMem( (void **)a);
+		FreeLinearMem2( (void **)a);
 		break;
 	case 3:
 		FreeLinearMem3( (void ***)a);
@@ -420,8 +420,8 @@ void FreeLinearMem2( void ** a)
 	long int size = ptr[1];
 	int dim = ptr[0];
 
-	FreeLinearMem1( a);
 	free( ptr);
+	FreeLinearMem1( a);
 	free( app);
 
 	TOT_MEM -= s1*s2*size + sizeof( long int *) * (1) + sizeof( long int) * (3+dim);
