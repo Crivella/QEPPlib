@@ -1,8 +1,8 @@
 #include <qepp/qepp_struct.h>
 
-extern unsigned long int TOT_MEM;
-extern unsigned int ionode;
-extern int verbosity;
+
+
+
 
 band_data * initialize_band_data( int n_bnd, long int n_kpt)
 {
@@ -13,8 +13,8 @@ band_data * initialize_band_data( int n_bnd, long int n_kpt)
 	to_init->n_kpt = n_kpt;
 	to_init->n_bnd = n_bnd;
 
-	to_init->kpt =		(double **)AllocateLinearMem2( sizeof( double), n_kpt, 3);
-	to_init->bands =	(double **)AllocateLinearMem2( sizeof( double), n_kpt, n_bnd);
+	to_init->kpt =		(double **)QEPP_ALLOC( sizeof( double), n_kpt, 3);
+	to_init->bands =	(double **)QEPP_ALLOC( sizeof( double), n_kpt, n_bnd);
 
 	to_init->print =	&print_band_data;
 	to_init->duplicate =	&duplicate_band_data;
@@ -58,8 +58,8 @@ band_data * duplicate_band_data( band_data * to_dupl)
 	long int n_kpt = to_dupl->n_kpt;
 	band_data * new_s = initialize_band_data( n_bnd, n_kpt);
 
-	new_s->kpt =	(double **)DuplicateLinearMem2( (void **)to_dupl->kpt);
-	new_s->bands =	(double **)DuplicateLinearMem2( (void **)to_dupl->bands);
+	new_s->kpt =	(double **)QEPP_DUPL( (void **)to_dupl->kpt);
+	new_s->bands =	(double **)QEPP_DUPL( (void **)to_dupl->bands);
 
 	return new_s;
 }
@@ -69,8 +69,8 @@ void * free_band_data( band_data * to_free)
 	if( to_free == NULL)
 		return NULL;
 
-	FreeLinearMem2( (void **)to_free->kpt);
-	FreeLinearMem2( (void **)to_free->bands);
+	QEPP_FREE( (void **)to_free->kpt);
+	QEPP_FREE( (void **)to_free->bands);
 	free( to_free);
 
 	return NULL;

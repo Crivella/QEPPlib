@@ -6,9 +6,8 @@
 #include <stdlib.h>	//malloc(),
 #include <stdbool.h>
 
-#ifdef __MPI
+#include <qepp/qepp_io.h>
 #include <qepp/qepp_mpi.h>
-#endif //__MPI
 
 typedef enum {	SUCCESS,
 		WARNING,
@@ -21,10 +20,6 @@ typedef enum {	SUCCESS,
 } ecode;
 
 typedef struct error_handle errh;
-
-#define SECOND( a, b, ...) b
-#define THIRD( a, b, c, ...) c
-#define SKIP( dump, b, ...) __VA_ARGS__
 
 #define PRINT_ERRH( a, ...) parse_errh( set_errh( a, __func__, ##__VA_ARGS__))
 /*#define MSG( a, ...) \
@@ -51,8 +46,8 @@ typedef struct error_handle errh;
 
 #define SUCCESS() \
 	return set_errh( SUCCESS, __func__, NULL)
-/*#define SET_ERRH( a, ...) \
-	set_errh( a, __func__, SECOND( 0, ##__VA_ARGS__, NULL))*/
+
+
 errh * set_errh( ecode, const char [], const char []);
 
 struct error_handle {

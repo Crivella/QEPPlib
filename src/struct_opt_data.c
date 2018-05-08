@@ -1,8 +1,8 @@
 #include <qepp/qepp_struct.h>
 
-extern unsigned long int TOT_MEM;
-extern unsigned int ionode;
-extern int verbosity;
+
+
+
 
 opt_data * initialize_opt_data( long int n_pt, int n_col)
 {
@@ -15,9 +15,9 @@ opt_data * initialize_opt_data( long int n_pt, int n_col)
 	to_init->n_pt = n_pt;
 	to_init->n_col= n_col;
 
-	to_init->x =		(double *)AllocateLinearMem1( sizeof( double), n_pt);
-	to_init->values =	(double **)AllocateLinearMem2( sizeof( double), n_pt, n_col);
-	to_init->headers =	(char **)AllocateLinearMem2( sizeof( char), n_col+1, MAX_H_SIZE);
+	to_init->x =		(double *)QEPP_ALLOC( sizeof( double), n_pt);
+	to_init->values =	(double **)QEPP_ALLOC( sizeof( double), n_pt, n_col);
+	to_init->headers =	(char **)QEPP_ALLOC( sizeof( char), n_col+1, MAX_H_SIZE);
 	for( int i=0; i<n_col+1; i++)
 		to_init->headers[i][0] = '\0';
 
@@ -76,9 +76,9 @@ opt_data * duplicate_opt_data(opt_data * to_dupl)
 
 	opt_data * new_s=initialize_opt_data( n_pt, n_col);
 
-	new_s->x =	(double *)DuplicateLinearMem1( (void *)to_dupl->x);
-	new_s->values =	(double **)DuplicateLinearMem2( (void **)to_dupl->values);
-	new_s->headers =(char **)DuplicateLinearMem2( (void **)to_dupl->headers);
+	new_s->x =	(double *)QEPP_DUPL( (void *)to_dupl->x);
+	new_s->values =	(double **)QEPP_DUPL( (void **)to_dupl->values);
+	new_s->headers =(char **)QEPP_DUPL( (void **)to_dupl->headers);
 
 	return new_s;
 }
@@ -88,9 +88,9 @@ void * free_opt_data(opt_data * to_free)
 	if(to_free == NULL)
 		return NULL;
 
-	FreeLinearMem1( (void *)to_free->x);
-	FreeLinearMem2( (void **)to_free->values);
-	FreeLinearMem2( (void **)to_free->headers);
+	QEPP_FREE( (void *)to_free->x);
+	QEPP_FREE( (void **)to_free->values);
+	QEPP_FREE( (void **)to_free->headers);
 	
 
 	free(to_free);

@@ -1,15 +1,10 @@
 #include <qepp/qepp_read.h>
-
-extern unsigned int ionode;
-extern int verbosity;
-
-extern unsigned long int TOT_MEM;
-
-extern char outdir[1024];
-extern char prefix[128];
-extern char workdir[1024];
-extern char datafile_path[1024];
-extern data_file * df;
+#ifdef __LIBXML2
+#include <libxml/parser.h>
+static evc  * read_evc_xml( xmlDoc * document, xmlNode * root, xmlNode * node);
+#else
+static evc  * read_evc_xml( );
+#endif // __LIBXML2
 
 #define TEST_ARGS \
 	if( out_ptr == NULL) \
@@ -585,6 +580,7 @@ errh * read_data_file( const char * filename, data_file ** out_ptr)
 		path = malloc( 1024 * sizeof( char));
 		sprintf( path, "%s/%s.save/", outdir, prefix);
 	}
+	//QEPP_PRINT("path = %s\n", path);
 	//if( path == NULL)
 	//	FAIL( FAIL, "Can't find tmp directory");
 	//sprintf( fname, "%s/%s", path, filename);
@@ -722,11 +718,11 @@ errh * read_data_file( const char * filename, data_file ** out_ptr)
 					{
 						key = xmlNodeListGetString( document, node->xmlChildrenNode, 1);
 						res->n_kpt = strtol( (char *)key, 0, 10);
-						res->kpt = (double **)AllocateLinearMem2( sizeof( double), res->n_kpt, 3);
-						res->weight = (double *)AllocateLinearMem1( sizeof( double), res->n_kpt);
-						res->egval_link = (char **)AllocateLinearMem2( sizeof( char), res->n_kpt, 256);
-						res->egvec_link = (char **)AllocateLinearMem2( sizeof( char), res->n_kpt, 256);
-						res->wfc_link = (char **)AllocateLinearMem2( sizeof( char), res->n_kpt, 256);
+						res->kpt = (double **)QEPP_ALLOC( sizeof( double), res->n_kpt, 3);
+						res->weight = (double *)QEPP_ALLOC( sizeof( double), res->n_kpt);
+						res->egval_link = (char **)QEPP_ALLOC( sizeof( char), res->n_kpt, 256);
+						res->egvec_link = (char **)QEPP_ALLOC( sizeof( char), res->n_kpt, 256);
+						res->wfc_link = (char **)QEPP_ALLOC( sizeof( char), res->n_kpt, 256);
 						xmlFree( key);
 					}
 					if( !xmlStrcmp( node->name, (const xmlChar *)"UNITS_FOR_K-POINTS"))
@@ -783,7 +779,10 @@ errh * read_data_file( const char * filename, data_file ** out_ptr)
 							{
 								key = xmlGetProp( node, (const xmlChar *)"iotk_link");
 //QEPP_PRINT("%s\n", key);
-								sprintf( res->egval_link[app_n-1], "%s/%s", path, (char *)key);
+								if( path != NULL)
+									sprintf( res->egval_link[app_n-1], "%s/%s", path, (char *)key);
+								else
+									sprintf( res->egval_link[app_n-1], "%s", (char *)key);
 //QEPP_PRINT("%s\n", res->egval_link[app_n-1]);
 //printf("%s\n", res->egval_link[app_n-1]); 
 								//strcpy( res->egval_link[app_n-1], (char *)key);
@@ -813,7 +812,10 @@ errh * read_data_file( const char * filename, data_file ** out_ptr)
 							if( !xmlStrcmp( node->name, (const xmlChar *)"GK-VECTORS"))
 							{
 								key = xmlGetProp( node, (const xmlChar *)"iotk_link");
-								sprintf( res->egvec_link[app_n-1], "%s/%s", path, (char *)key);
+								if( path != NULL)
+									sprintf( res->egvec_link[app_n-1], "%s/%s", path, (char *)key);
+								else
+									sprintf( res->egvec_link[app_n-1], "%s", (char *)key);
 								//strcpy( res->egvec_link[app_n-1], (char *)key);
 								xmlFree( key);
 							}
@@ -822,14 +824,20 @@ errh * read_data_file( const char * filename, data_file ** out_ptr)
 								if( !xmlStrcmp( node->name, (const xmlChar *)"WFC.1"))
 								{
 									key = xmlGetProp( node, (const xmlChar *)"iotk_link");
-									sprintf( res->wfc_link[app_n-1], "%s/%s", path, (char *)key);
+									if( path != NULL)
+										sprintf( res->wfc_link[app_n-1], "%s/%s", path, (char *)key);
+									else
+										sprintf( res->wfc_link[app_n-1], "%s", (char *)key);
 									//strcpy( res->wfc_link[app_n-1], (char *)key);
 									xmlFree( key);
 								}
 								if( !xmlStrcmp( node->name, (const xmlChar *)"WFC.2"))
 								{
 									key = xmlGetProp( node, (const xmlChar *)"iotk_link");
-									sprintf( res->wfc_link2[app_n-1], "%s/%s", path, (char *)key);
+									if( path != NULL)
+										sprintf( res->wfc_link2[app_n-1], "%s/%s", path, (char *)key);
+									else
+										sprintf( res->wfc_link2[app_n-1], "%s", (char *)key);
 									//strcpy( res->wfc_link2[app_n-1], (char *)key);
 									xmlFree( key);
 								}
@@ -839,7 +847,10 @@ errh * read_data_file( const char * filename, data_file ** out_ptr)
 								if( !xmlStrcmp( node->name, (const xmlChar *)"WFC"))
 								{
 									key = xmlGetProp( node, (const xmlChar *)"iotk_link");
-									sprintf( res->wfc_link[app_n-1], "%s/%s", path, (char *)key);
+									if( path != NULL)
+										sprintf( res->wfc_link[app_n-1], "%s/%s", path, (char *)key);
+									else
+										sprintf( res->wfc_link[app_n-1], "%s", (char *)key);
 									//strcpy( res->wfc_link[app_n-1], (char *)key);
 									xmlFree( key);
 								}
@@ -877,7 +888,7 @@ errh * read_data_file( const char * filename, data_file ** out_ptr)
 						xmlFree( key);
 
 						if( res->n_spin == 4)
-							res->wfc_link2 = (char **)AllocateLinearMem2( sizeof( char), res->n_kpt, 256);
+							res->wfc_link2 = (char **)QEPP_ALLOC( sizeof( char), res->n_kpt, 256);
 					}
 				}
 				node = app;
@@ -1034,7 +1045,7 @@ errh * read_wfc_xml( const char * filename, wfc ** out_ptr)
 	SUCCESS();
 }
 
-evc * read_evc_xml( xmlDoc * document, xmlNode * root, xmlNode * node)
+static evc * read_evc_xml( xmlDoc * document, xmlNode * root, xmlNode * node)
 {
 	evc * res = NULL;
 	if( document == NULL || root == NULL)
@@ -1223,11 +1234,11 @@ errh * read_egv_xml( const char * filename, egv ** out_ptr)
 	SUCCESS();
 }
 #else //__LIBXML
-errh * read_data_file( const char * filename, data_file **); {FAIL( FAIL, "Only available with libxml2 compilation\n");}
-errh * read_wfc_xml( ); {FAIL( FAIL, "Only available with libxml2 compilation\n");}
-evc  * read_evc_xml( ); {FAIL( FAIL, "Only available with libxml2 compilation\n");}
-errh * read_gkv_xml( ); {FAIL( FAIL, "Only available with libxml2 compilation\n");}
-errh * read_egv_xml( ); {FAIL( FAIL, "Only available with libxml2 compilation\n");}
+errh * read_data_file( const char * filename, data_file ** data) {FAIL( FAIL, "Only available with libxml2 compilation\n");}
+errh * read_wfc_xml( const char * filename, wfc ** a) {FAIL( FAIL, "Only available with libxml2 compilation\n");}
+static evc  * read_evc_xml( ) {return NULL;}
+errh * read_gkv_xml( const char * filename, gkv ** a) {FAIL( FAIL, "Only available with libxml2 compilation\n");}
+errh * read_egv_xml( const char * filename, egv **) {FAIL( FAIL, "Only available with libxml2 compilation\n");}
 #endif //__LIBXML
 
 

@@ -1,12 +1,5 @@
 #include <qepp/qepp_err.h>
 
-extern int verbosity;
-extern FILE * errf;
-#ifdef __MPI
-extern mpi_data * mpi;
-#endif
-extern int ionode;
-
 ecode parse_errh( errh * e)
 {
 	ecode app = e->code;
@@ -15,33 +8,33 @@ ecode parse_errh( errh * e)
 		switch( e->code)
 		{
 		case SUCCESS:
-			if( verbosity >= 4) fprintf( errf, "%s(): SUCCESS\n", e->cname);
+			if( verbosity >= 4) QEPP_ALL_OUT( errf, "%s(): SUCCESS\n", e->cname);
 			break;
 		case WARNING:
-			if( verbosity >= 3) fprintf( errf, "%s(): WARNING:", e->cname);
+			if( verbosity >= 3) QEPP_ALL_OUT( errf, "%s(): WARNING:", e->cname);
 			break;
 		/*case MSG:
-			if( verbosity >= 4) fprintf( errf, "%s(): ", e->cname);
+			if( verbosity >= 4) QEPP_ALL_OUT( errf, "%s(): ", e->cname);
 			break;*/
 		case FAIL:
-			fprintf( errf, "%s(): FAIL:", e->cname);
+			QEPP_ALL_OUT( errf, "%s(): FAIL:", e->cname);
 			break;
 		case NULL_IN:
-			if( verbosity >= 2) fprintf( errf, "%s(): passing null pointer for input", e->cname);
+			if( verbosity >= 2) QEPP_ALL_OUT( errf, "%s(): passing null pointer for input", e->cname);
 			break;
 		case NULL_OUT:
-			if( verbosity >= 2) fprintf( errf, "%s(): passing null pointer for output", e->cname);
+			if( verbosity >= 2) QEPP_ALL_OUT( errf, "%s(): passing null pointer for output", e->cname);
 			break;
 		case OPEN_IN_FAIL:
-			if( verbosity >= 2) fprintf( errf, "%s(): Failed to open input file: ", e->cname);
+			if( verbosity >= 2) QEPP_ALL_OUT( errf, "%s(): Failed to open input file: ", e->cname);
 			break;
 		default:
-			fprintf( errf, "%s: Case not implemented...yet...", e->cname);
+			QEPP_ALL_OUT( errf, "%s: Case not implemented...yet...", e->cname);
 			break;
 		}
 		if( e->ext && verbosity >= 4)
-			fprintf( errf, "  %s", e->extra);
-		fprintf( errf, "\n");
+			QEPP_ALL_OUT( errf, "  %s", e->extra);
+		QEPP_ALL_OUT( errf, "\n");
 	}
 	free( e);
 	return app;

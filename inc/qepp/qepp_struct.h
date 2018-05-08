@@ -8,9 +8,9 @@
 #include <complex.h>
 
 #include <qepp/qepp_constants.h>
-#include <qepp/qepp_io.h>
+//#include <qepp/qepp_io.h>
 #include <qepp/qepp_err.h>	//errh, SET_ERRH(), MSG(), WARN()
-#include <qepp/qepp_mem.h>	//AllocateLinearMem_(), DuplicateLinearMem_(), FreeLinearMem_()
+#include <qepp/qepp_mem.h>	//QEPP_ALLOC(), QEPP_DUPL(), QEPP_FREE()
 
 //Struct IDs
 #define ID_NSCF_DATA	1
@@ -68,7 +68,8 @@ typedef struct egv egv;
 
 typedef struct cd cd;
 
-#include <qepp/qepp_read.h>	//READ()
+extern data_file * df;
+//#include <qepp/qepp_read.h>	//READ()
 
 
 nscf_md		* initialize_nscf_md();
@@ -160,20 +161,11 @@ size_t		totmem_m_elem(m_elem *);
 size_t		totmeme_fit_params( fit_params * to_free);
 size_t		totmem_data_set( data_set * to_free);*/
 
-#ifdef __MPI
-	#define PRINT_DATA(a,b) mpi==NULL ? \
-		a!=NULL ? \
-			a->print( a, b) : \
-			0 \
-		: \
-		mpi->world_rank == ionode ? \
-			a->print( a, b) : \
-			0;
-#else
-	#define PRINT_DATA(a,b) a!=NULL ? a->print( a, b) : 0;
-#endif
-	#define DUPLICATE(a) a!=NULL ? a->duplicate( a) : 0;
-	#define FREE(a) a!=NULL ? a->free( a) : 0;
+#define PRINT_DATA(a,b) mpi->world_rank == ionode ? \
+		a->print( a, b) : \
+		0
+#define DUPLICATE(a) a!=NULL ? a->duplicate( a) : 0;
+#define FREE(a) a!=NULL ? a->free( a) : 0;
 
 void *		free_array_ptr(double **, long int);
 #define EPS_HEADERS {"E[eV]","eps_x","eps_y","eps_z","TOT"}

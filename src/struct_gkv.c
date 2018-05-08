@@ -1,8 +1,8 @@
 #include <qepp/qepp_struct.h>
 
-extern unsigned long int TOT_MEM;
-extern unsigned int ionode;
-extern int verbosity;
+
+
+
 
 gkv * initialize_gkv( long int ngkv)
 {
@@ -12,8 +12,8 @@ gkv * initialize_gkv( long int ngkv)
 	to_init->size = sizeof( gkv);
 	
 	to_init->ngkv = ngkv;
-	to_init->index = (int *)AllocateLinearMem1( sizeof( long int), ngkv);
-	to_init->grid = (int **)AllocateLinearMem2( sizeof( int), ngkv, 3);
+	to_init->index = (int *)QEPP_ALLOC( sizeof( long int), ngkv);
+	to_init->grid = (int **)QEPP_ALLOC( sizeof( int), ngkv, 3);
 
 	to_init->print =	&print_gkv;
 	to_init->duplicate =	&duplicate_gkv;
@@ -70,8 +70,8 @@ gkv * duplicate_gkv( gkv * to_dupl)
 	long int ngkv = to_dupl->ngkv;
 	gkv * new_s = initialize_gkv( ngkv);
 
-	new_s->index =	(int *)DuplicateLinearMem1( (void *)to_dupl->index);
-	new_s->grid =	(int **)DuplicateLinearMem2( (void **)to_dupl->grid);
+	new_s->index =	(int *)QEPP_DUPL( (void *)to_dupl->index);
+	new_s->grid =	(int **)QEPP_DUPL( (void **)to_dupl->grid);
 
 	return new_s;
 }
@@ -81,8 +81,8 @@ void * free_gkv( gkv * to_free)
 	if( to_free == NULL)
 		return NULL;
 
-	FreeLinearMem1( (void *)to_free->index);
-	FreeLinearMem2( (void **)to_free->grid);
+	QEPP_FREE( (void *)to_free->index);
+	QEPP_FREE( (void **)to_free->grid);
 	free( to_free);
 
 	return NULL;

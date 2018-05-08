@@ -1,9 +1,10 @@
 #include <qepp/qepp_mem.h>
 
-extern unsigned long int TOT_MEM;
-
 long int qepp_mem_get_size( void * a)
 {
+	if( a == NULL)
+		return 0;
+
 	long int res=1;
 	a = qepp_mem_get_base( a);
 	int dim = BASE_DIM(a);
@@ -71,7 +72,7 @@ void * AllocateLinearMem2( unsigned long int size, long int s1, long int s2)
 
 	//memapp = s1 * sizeof( void *);
 	//new = malloc( memapp);
-	new = QEPP_alloc( sizeof( void *), s1);
+	new = QEPP_ALLOC( sizeof( void *), s1);
 	app1 = (long int **)BASE_ADDR(new);
 	app1[0][2] = 0;
 	for( int i1=0; i1<s1; i1++)
@@ -106,14 +107,14 @@ void * AllocateLinearMem3( unsigned long int size, long int s1, long int s2, lon
 
 	//memapp = s1 * sizeof( void **);
 	//new = malloc( memapp);
-	new = QEPP_alloc( sizeof( void *), s1);
+	new = QEPP_ALLOC( sizeof( void *), s1);
 	app1 = (long int **)BASE_ADDR(new);
 	app1[0][2] = 0;
 	for( int i1=0; i1<s1; i1++)
 	{
 		//memapp = s2 * sizeof( void *);
 		//new[i1] = malloc( memapp);
-		new[i1] = QEPP_alloc( sizeof( void *), s2);
+		new[i1] = QEPP_ALLOC( sizeof( void *), s2);
 		app1 = (long int **)BASE_ADDR(new[i1]);
 		app1[0][2] = 0;
 		for( int i2=0; i2<s2; i2++)
@@ -150,21 +151,21 @@ void * AllocateLinearMem4( unsigned long int size, long int s1, long int s2, lon
 
 	//memapp = s1 * sizeof( void ***);
 	//new = malloc( memapp);
-	new = QEPP_alloc( sizeof( void *), s1);
+	new = QEPP_ALLOC( sizeof( void *), s1);
 	app1 = (long int **)BASE_ADDR(new);
 	app1[0][2] = 0;
 	for( int i1=0; i1<s1; i1++)
 	{
 		//memapp = s2 * sizeof( void **);
 		//new[i1] = malloc( memapp);
-		new[i1] = QEPP_alloc( sizeof( void *), s2);
+		new[i1] = QEPP_ALLOC( sizeof( void *), s2);
 		app1 = (long int **)BASE_ADDR(new[i1]);
 		app1[0][2] = 0;
 		for( int i2=0; i2<s2; i2++)
 		{
 			//memapp = s3 * sizeof( void *);
 			//new[i1][i2] = malloc( memapp);
-			new[i1][i2] = QEPP_alloc( sizeof( void *), s3);
+			new[i1][i2] = QEPP_ALLOC( sizeof( void *), s3);
 			app1 = (long int **)BASE_ADDR(new[i1][i2]);
 			app1[0][2] = 0;
 			for( int i3=0; i3<s3; i3++)
@@ -196,13 +197,13 @@ void * DuplicateLinearMem( void * a)
 	switch( dim)
 	{
 	case 1:
-		return duplicate1( (void *)a);
+		return DuplicateLinearMem1( (void *)a);
 	case 2:
-		return duplicate2( (void **)a);
+		return DuplicateLinearMem2( (void **)a);
 	case 3:
-		return duplicate3( (void ***)a);
+		return DuplicateLinearMem3( (void ***)a);
 	case 4:
-		return duplicate4( (void ****)a);
+		return DuplicateLinearMem4( (void ****)a);
 	default:
 		return NULL;
 	}
@@ -251,7 +252,7 @@ void * DuplicateLinearMem2( void ** a)
 	memcpy( app1[0], ptr, (3+dim) * sizeof( long int));
 
 	//res = malloc( s1 * sizeof( void *));
-	res = QEPP_alloc( sizeof( void *), s1);
+	res = QEPP_ALLOC( sizeof( void *), s1);
 	ptr1 = (long int **)BASE_ADDR( res);
 	ptr1[0][2] = 0;
 	for( int i1=0; i1<s1; i1++)
@@ -285,13 +286,13 @@ void * DuplicateLinearMem3( void *** a)
 	memcpy( app1[0], ptr, (3+dim) * sizeof( long int));
 
 	//res = malloc( s1 * sizeof( void **));
-	res = QEPP_alloc( sizeof( void *), s1);
+	res = QEPP_ALLOC( sizeof( void *), s1);
 	ptr1 = (long int **)BASE_ADDR( res);
 	ptr1[0][2] = 0;
 	for( int i1=0; i1<s1; i1++)
 	{
 		//res[i1] = malloc(  s2 * sizeof( void *));
-		res[i1] = QEPP_alloc( sizeof( void *), s2);
+		res[i1] = QEPP_ALLOC( sizeof( void *), s2);
 		ptr1 = (long int **)BASE_ADDR( res[i1]);
 		ptr1[0][2] = 0;
 		for( int i2=0; i2<s2; i2++)
@@ -327,19 +328,19 @@ void * DuplicateLinearMem4( void **** a)
 	memcpy( app1[0], ptr, (3+dim) * sizeof( long int));
 
 	//res = malloc( s1 * sizeof( void ***));
-	res = QEPP_alloc( sizeof( void *), s1);
+	res = QEPP_ALLOC( sizeof( void *), s1);
 	ptr1 = (long int **)BASE_ADDR( res);
 	ptr1[0][2] = 0;
 	for( int i1=0; i1<s1; i1++)
 	{
 		//res[i1] = malloc( s2 * sizeof( void **));
-		res[i1] = QEPP_alloc( sizeof( void *), s2);
+		res[i1] = QEPP_ALLOC( sizeof( void *), s2);
 		ptr1 = (long int **)BASE_ADDR( res[i1]);
 		ptr1[0][2] = 0;
 		for( int i2=0; i2<s2; i2++)
 		{
 			//res[i1][i2] = malloc( s3 * sizeof( void *));
-			res[i1][i2] = QEPP_alloc( sizeof( void *), s3);
+			res[i1][i2] = QEPP_ALLOC( sizeof( void *), s3);
 			ptr1 = (long int **)BASE_ADDR( res[i1][i2]);
 			ptr1[0][2] = 0;
 			for( int i3=0; i3<s3; i3++)
@@ -371,18 +372,19 @@ void FreeLinearMem( void * a)
 	switch( dim)
 	{
 	case 1:
-		free1( (void *)a);
+		FreeLinearMem1( (void *)a);
 		break;
 	case 2:
-		free2( (void **)a);
+		FreeLinearMem2( (void **)a);
 		break;
 	case 3:
-		free3( (void ***)a);
+		FreeLinearMem3( (void ***)a);
 		break;
 	case 4:
-		free4( (void ****)a);
+		FreeLinearMem4( (void ****)a);
 		break;
 	default:
+		exit(1);
 		break;
 	}
 
@@ -418,8 +420,8 @@ void FreeLinearMem2( void ** a)
 	long int size = ptr[1];
 	int dim = ptr[0];
 
-	free1( a);
 	free( ptr);
+	FreeLinearMem1( a);
 	free( app);
 
 	TOT_MEM -= s1*s2*size + sizeof( long int *) * (1) + sizeof( long int) * (3+dim);
@@ -441,8 +443,8 @@ void FreeLinearMem3( void *** a)
 
 	free( ptr);
 	for( int i=0; i<s1; i++)
-		free1( a[i]);
-	free1( a);
+		FreeLinearMem1( a[i]);
+	FreeLinearMem1( a);
 	free( app);
 
 	TOT_MEM -= s1*s2*s3*size + sizeof( long int *) * (1) + sizeof( long int) * (3+dim);
@@ -467,10 +469,10 @@ void FreeLinearMem4( void **** a)
 	for( int i=0; i<s1; i++)
 	{
 		for( int j=0; j<s2; j++)
-			free1( a[i][j]);
-		free1( a[i]);
+			FreeLinearMem1( a[i][j]);
+		FreeLinearMem1( a[i]);
 	}
-	free1( a);
+	FreeLinearMem1( a);
 	free( app);
 
 	TOT_MEM -= s1*s2*s3*s4*size + sizeof( long int *) * (1) + sizeof( long int) * (3+dim);

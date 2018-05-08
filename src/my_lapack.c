@@ -107,7 +107,7 @@ int matrix_comp(double ** a,double ** b)
 //Restituisce dopo quante applicazioni della simmetria il vettore torna in se stesso
 int symm_order(double ** matrix)
 {
-	double ** app = (double **)AllocateLinearMem2( sizeof( double), 3, 3);
+	double ** app = (double **)QEPP_ALLOC( sizeof( double), 3, 3);
 	int a=0;
 	for(int i=0;i<3;i++)
 		for(int j=0;j<3;j++)
@@ -118,7 +118,7 @@ int symm_order(double ** matrix)
 		matrix_matrix(matrix,app,app);
 	}while(!matrix_comp(matrix,app) && a<30);
 
-	FreeLinearMem2( (void **)app);
+	QEPP_FREE( (void **)app);
 	return a;
 }
 
