@@ -6,7 +6,6 @@ TARGET=libqepp.so
 ITARGET = qepp
 
 _DEPS = \
-functions.h \
 mpi_base.h \
 my_lapack.h \
 qepp_constants.h \
@@ -23,7 +22,6 @@ qepp_struct.h
 DEPS = $(patsubst %,$(INC)/$(ITARGET)/%,$(_DEPS))
 
 _OBJ = \
-functions.o \
 function_eps_calc.o \
 function_eps_kk.o \
 function_nscf_data.o \
