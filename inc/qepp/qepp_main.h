@@ -17,7 +17,6 @@
 //#include <qepp/qepp_err.h>	//errh, SET_ERRH(), WARN(), FAIL()
 #include <qepp/qepp_struct.h>	//structs, initialize_...(), print_...(), duplicate_...(), free_...()
 #include <qepp/qepp_file.h>	//
-#include <qepp/functions.h>
 #include <qepp/my_lapack.h>
 #include <qepp/qepp_constants.h>
 #include <qepp/qepp_function.h>
