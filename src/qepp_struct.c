@@ -1,10 +1,6 @@
 #include <qepp/qepp_struct.h>
 #include <qepp/qepp_read.h>
 
-extern unsigned long int TOT_MEM;
-extern int ionode;
-extern int verbosity;
-
 void * free_array_ptr(double  **to_free, long int size)
 {
 	if( to_free == NULL)

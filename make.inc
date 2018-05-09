@@ -9,8 +9,8 @@ CURDIR=$(shell pwd)
 LDIR=$(PREFIX)/lib
 IDIR=$(PREFIX)/include
 
-LD_FLAGS=-D__LIBXML2 -D__GSL -D__MPI
+LD_FLAGS=-D__LIBXML2
 
 CC=gcc
-MPICC=mpicc
-CFLAGS=-g -O2 -Wall -fpic -std=c11 -I$(IDIR) -I$(INC) $(LD_FLAGS)
+MPICC=gcc
+CFLAGS=-g -O2 -Wall -fpic -std=c11 -I$(INC) $(LD_FLAGS)

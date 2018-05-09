@@ -1,8 +1,8 @@
 #include <qepp/qepp_struct.h>
 
-extern unsigned long int TOT_MEM;
-extern unsigned int ionode;
-extern int verbosity;
+
+
+
 
 band_pp * initialize_band_pp( long int n_kpt, int n_bnd)
 {
@@ -15,9 +15,9 @@ band_pp * initialize_band_pp( long int n_kpt, int n_bnd)
 	to_init->n_kpt = n_kpt;
 	to_init->n_bnd = n_bnd;
 
-	to_init->n_bnd_occ =	(int *)AllocateLinearMem1( sizeof( int), n_kpt);
-	to_init->kpt =		(double **)AllocateLinearMem2( sizeof( double), n_kpt, 3);
-	to_init->pp =		(double ****)AllocateLinearMem4( sizeof( double), n_kpt, n_bnd, n_bnd, 3);
+	to_init->n_bnd_occ =	(int *)QEPP_ALLOC( sizeof( int), n_kpt);
+	to_init->kpt =		(double **)QEPP_ALLOC( sizeof( double), n_kpt, 3);
+	to_init->pp =		(double ****)QEPP_ALLOC( sizeof( double), n_kpt, n_bnd, n_bnd, 3);
 
 
 	to_init->print =	&print_band_pp;
@@ -74,9 +74,9 @@ band_pp * duplicate_band_pp( band_pp * to_dupl)
 
 	band_pp * new_s = initialize_band_pp( n_kpt, n_bnd);
 
-	new_s->n_bnd_occ =	(int *)DuplicateLinearMem1( (void *)to_dupl->n_bnd_occ);
-	new_s->kpt =		(double **)DuplicateLinearMem2( (void **)to_dupl->kpt);
-	new_s->pp =		(double ****)DuplicateLinearMem4( (void ****)to_dupl->pp);
+	new_s->n_bnd_occ =	(int *)QEPP_DUPL( (void *)to_dupl->n_bnd_occ);
+	new_s->kpt =		(double **)QEPP_DUPL( (void **)to_dupl->kpt);
+	new_s->pp =		(double ****)QEPP_DUPL( (void ****)to_dupl->pp);
 
 	return new_s;
 }
@@ -86,9 +86,9 @@ void * free_band_pp( band_pp * to_free)
 	if(to_free == NULL)
 		return NULL;
 
-	FreeLinearMem1( (void *)to_free->n_bnd_occ);
-	FreeLinearMem2( (void **)to_free->kpt);
-	FreeLinearMem4( (void ****)to_free->pp);
+	QEPP_FREE( (void *)to_free->n_bnd_occ);
+	QEPP_FREE( (void **)to_free->kpt);
+	QEPP_FREE( (void ****)to_free->pp);
 
 	free( to_free);
 

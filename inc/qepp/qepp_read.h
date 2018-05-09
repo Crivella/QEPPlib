@@ -14,12 +14,6 @@
 #include <qepp/qepp_file.h>
 #include <qepp/qepp_struct.h>
 
-#ifdef __LIBXML2
-#include <libxml/parser.h>
-#endif
-
-
-
 #define SECOND(a, b, ...) b
 
 #define READ( a, b, ...) \
@@ -77,13 +71,12 @@ errh * read_pdos_state(char *, pdos_state **);
 errh * read_wfc( const char * filename, wfc **);
 errh * read_gkv( const char * filename, gkv **);
 errh * read_egv( const char * filename, egv **);
-#ifdef __LIBXML2
 errh * read_data_file( const char * filename, data_file **);
+
 errh * read_wfc_xml( const char * filename, wfc **);
-evc  * read_evc_xml( xmlDoc * document, xmlNode * root, xmlNode * node);
 errh * read_gkv_xml( const char * filename, gkv **);
 errh * read_egv_xml( const char * filename, egv **);
-#endif //__LIBXML2
+
 errh * read_wfc_dat( const char * filename, wfc **);
 evc  * read_evc_dat( FILE *, int);
 errh * read_gkv_dat( const char * filename, gkv **);

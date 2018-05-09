@@ -1,12 +1,8 @@
-#include <qepp/qepp_struct.h>
+#include <qepp/qepp_mpi.h>
+#include <qepp/qepp_io.h>
 
-extern unsigned long int TOT_MEM;
-extern unsigned int ionode;
-extern int verbosity;
 
 #ifdef __MPI
-
-extern mpi_data * mpi;
 
 mpi_data * initialize_mpi_data()
 {
@@ -72,10 +68,31 @@ void * free_mpi_data( mpi_data * to_free)
 
 
 #else //__MPI
-void * initialize_mpi_data()
+mpi_data * initialize_mpi_data()
 {
+	mpi_data * to_init;
+
+	to_init = calloc( 1, sizeof( mpi_data));
+	mpi = to_init;
+	to_init->typeID = ID_MPI_DATA;
+	to_init->size = sizeof( mpi_data);
+
+	to_init->world_size=1;
+	to_init->world_rank=0;
+
+	return to_init;
+}
+
+void * free_mpi_data( mpi_data * to_free)
+{
+	if(to_free == NULL)
+		return NULL;
+
+	free(to_free);
+
 	return NULL;
 }
+
 
 #endif //__MPI
 
