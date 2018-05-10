@@ -1310,7 +1310,7 @@ evc * read_evc_dat( FILE * read, int n)
 
 	long int pos = ftell( read);
 	sprintf( needle, "evc.%d", n);
-	if( qepp_get_xml_param( &app1, read, ftell( read), needle, "size")) return NULL;	size = app1;
+	if( qepp_get_xml_param( &app1, read, pos, needle, "size")) return NULL;	size = app1;
 
 	res = initialize_evc( size);
 

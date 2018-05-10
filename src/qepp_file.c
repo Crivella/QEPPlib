@@ -635,14 +635,8 @@ int qepp_get_xml_value( void ** out_ptr, FILE * read, long int pos, char * name,
 		if( fread( dump, dump_s, 1, read) < 1)
 			return 1;
 
-	//double complex app;
-	//fread( &app, 16, 1, read);
-	//printf( "%lf,  %lf\n",creal(app),cimag(app));
-
 	if( fread( res, size, num, read) < num)
 		return 1;
-
-	//printf( "%lf,  %lf\n",creal(((double complex *)res)[0]),cimag(((double complex *)res)[0]));
 
 	free( dump);
 	*out_ptr = res;
