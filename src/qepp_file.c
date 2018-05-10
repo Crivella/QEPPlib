@@ -615,7 +615,7 @@ int qepp_get_xml_param( double * out_ptr, FILE * read, long int pos, char * name
 	return 0;
 }
 
-int qepp_get_xml_value( void ** out_ptr, FILE * read, long int pos, char * name, long int num, int size, int dump_s)
+int qepp_get_xml_value( void * out_ptr, FILE * read, long int pos, char * name, long int num, int size, int dump_s)
 {
 	if( out_ptr == NULL)
 		return 1;
@@ -623,7 +623,7 @@ int qepp_get_xml_value( void ** out_ptr, FILE * read, long int pos, char * name,
 	char needle[128];
 	sprintf( needle, "<%s ", name);
 	void * dump = malloc( dump_s);
-	void * res  = malloc( num*size);
+	//void * res  = malloc( num*size);
 
 	fseek( read, pos, SEEK_SET);
 	while( strstr( buffer, needle)==NULL && !feof( read))
@@ -635,11 +635,11 @@ int qepp_get_xml_value( void ** out_ptr, FILE * read, long int pos, char * name,
 		if( fread( dump, dump_s, 1, read) < 1)
 			return 1;
 
-	if( fread( res, size, num, read) < num)
+	if( fread( out_ptr, size, num, read) < num)
 		return 1;
 
 	free( dump);
-	*out_ptr = res;
+	//*out_ptr = res;
 	return 0;
 }
 

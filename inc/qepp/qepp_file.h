@@ -109,7 +109,7 @@ int qepp_get_xml_param( double * out_ptr, FILE * read, long int pos, char * name
   return 0 if successfull or 1 if failed
  */
 /*-------------------------------------------------------------------------*/
-int qepp_get_xml_value( void ** out_ptr, FILE * read, long int pos, char * name, long int num, int size, int dump_s);
+int qepp_get_xml_value( void * out_ptr, FILE * read, long int pos, char * name, long int num, int size, int dump_s);
 
 char * get_tmp_path();
 

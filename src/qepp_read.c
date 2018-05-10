@@ -1308,7 +1308,7 @@ errh * read_wfc_dat( const char * filename, wfc ** out_ptr)
 evc * read_evc_dat( FILE * read, int n)
 {
 	double app1;
-	double complex * app;
+	//double complex * app;
 	char needle[64];
 	long int size;
 	//void * dump = malloc( 12);
@@ -1322,13 +1322,15 @@ evc * read_evc_dat( FILE * read, int n)
 
 	res = initialize_evc( size);
 
-	if( qepp_get_xml_value( (void **)&app, read, pos, needle, size, sizeof( double complex), dump_size))
+	//app = qepp_mem_get_base( res->val);
+	if( qepp_get_xml_value( qepp_mem_get_base( res->val), read, pos, needle, size, sizeof( double complex), dump_size))
 	{
 		FREE( res);
 		return NULL;
 	}
-	memcpy( &res->val[0], app, size*sizeof( double complex));
-	free( app);
+
+	//memcpy( &res->val[0], app, size*sizeof( double complex));
+	//free( app);
 
 	return res;
 }
@@ -1339,8 +1341,7 @@ errh * read_gkv_dat( const char * filename, gkv ** out_ptr)
 	long int size;
 	double app;
 	int kind;
-	long int * app_l=NULL;
-	int * app_i=NULL;
+	int app_i;
 	long int ngkv;
 
 	gkv * res = NULL;
@@ -1360,16 +1361,16 @@ errh * read_gkv_dat( const char * filename, gkv ** out_ptr)
 	switch( kind)
 	{
 	case 4:
-		if( qepp_get_xml_value( (void **)&app_i, read, pos, "NUMBER_OF_GK-VECTORS", 1, kind, dump_size)) 
+		//app_i = &a_i;
+		if( qepp_get_xml_value( &app_i, read, pos, "NUMBER_OF_GK-VECTORS", 1, kind, dump_size)) 
 			FAIL( FAIL, "Can't read ngkv");
-		ngkv = *app_i;
-		free( app_i);
+		ngkv = app_i;
 		break;
 	case 8:
-		if( qepp_get_xml_value( (void **)&app_i, read, pos, "NUMBER_OF_GK-VECTORS", 1, kind, dump_size)) 
+		//app_l = &a_l;
+		if( qepp_get_xml_value( &ngkv, read, pos, "NUMBER_OF_GK-VECTORS", 1, kind, dump_size)) 
 			FAIL( FAIL, "Can't read ngkv");
-		ngkv = *app_l;
-		free( app_l);
+		//ngkv = app_l;
 		break;
 	default:
 		FAIL( FAIL, "kind for ngkw not implemented");
@@ -1386,47 +1387,40 @@ errh * read_gkv_dat( const char * filename, gkv ** out_ptr)
 	switch( kind)
 	{
 	case 4:
-		if( qepp_get_xml_value( (void **)&app_i, read, pos, "MAX_NUMBER_OF_GK-VECTORS", 1, kind, dump_size)) 
+		if( qepp_get_xml_value( &app_i, read, pos, "MAX_NUMBER_OF_GK-VECTORS", 1, kind, dump_size)) 
 			FAIL( FAIL, "Can't read ngkv");
-		res->max_ngkv = *app_i;
-		free( app_i);
+		res->max_ngkv = app_i;
 		break;
 	case 8:
-		if( qepp_get_xml_value( (void **)&app_i, read, pos, "MAX_NUMBER_OF_GK-VECTORS", 1, kind, dump_size)) 
+		if( qepp_get_xml_value( &res->max_ngkv, read, pos, "MAX_NUMBER_OF_GK-VECTORS", 1, kind, dump_size)) 
 			FAIL( FAIL, "Can't read ngkv");
-		res->max_ngkv = *app_l;
-		free( app_l);
 		break;
 	default:
 		FAIL( FAIL, "kind for ngkw not implemented");
 	}
 
 	//read kpt coord
-	double * kpt = NULL;
-	if( qepp_get_xml_value( (void **)&kpt, read, pos, "K-POINT_COORDS", 3, sizeof( double), dump_size)) 
+	if( qepp_get_xml_value( res->kpt, read, pos, "K-POINT_COORDS", 3, sizeof( double), dump_size)) 
 		FAIL( FAIL, "Can't read ngkv");
-	memcpy( res->kpt, kpt, 3 * sizeof( double));
-	free( kpt);
+	for( long int i=0; i< 3; i++)
+		QEPP_PRINT( "%7.4f", res->kpt[i]);
+	QEPP_PRINT( "\n");
 
 	//read index
 	pos = ftell( read);
 	if( qepp_get_xml_param( &app, read, pos, "INDEX", "size"))
 		FAIL( FAIL, " ");
 	size = app;
-	if( qepp_get_xml_value( (void **)&app_i, read, pos, "INDEX", size, sizeof( int), dump_size)) 
+	if( qepp_get_xml_value( qepp_mem_get_base( res->index), read, pos, "INDEX", size, sizeof( int), dump_size)) 
 		FAIL( FAIL, "Can't read index");
-	memcpy( res->index, app_i, size * sizeof( int));
-	free( app_i);
 
 	//read grid
 	pos = ftell( read);
 	if( qepp_get_xml_param( &app, read, pos, "GRID", "size"))
 		FAIL( FAIL, " ");
 	size = app;
-	if( qepp_get_xml_value( (void **)&app_i, read, pos, "GRID", size, sizeof( int), dump_size)) 
+	if( qepp_get_xml_value( qepp_mem_get_base( res->grid), read, pos, "GRID", size, sizeof( int), dump_size)) 
 		FAIL( FAIL, "Can't read grid");
-	memcpy( &res->grid[0][0], app_i, size * sizeof( int));
-	free( app_i);
 
 	fclose( read);
 
