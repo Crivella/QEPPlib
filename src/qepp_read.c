@@ -2,8 +2,8 @@
 #ifdef __LIBXML2
 #include <libxml/parser.h>
 static evc  * read_evc_xml( xmlDoc * document, xmlNode * root, xmlNode * node);
-#else
-static evc  * read_evc_xml( );
+//#else
+//static evc  * read_evc_xml( );
 #endif // __LIBXML2
 
 #define TEST_ARGS \
@@ -1236,9 +1236,9 @@ errh * read_egv_xml( const char * filename, egv ** out_ptr)
 #else //__LIBXML
 errh * read_data_file( const char * filename, data_file ** data) {FAIL( FAIL, "Only available with libxml2 compilation\n");}
 errh * read_wfc_xml( const char * filename, wfc ** a) {FAIL( FAIL, "Only available with libxml2 compilation\n");}
-static evc  * read_evc_xml( ) {return NULL;}
+//static evc  * read_evc_xml( ) {return NULL;}
 errh * read_gkv_xml( const char * filename, gkv ** a) {FAIL( FAIL, "Only available with libxml2 compilation\n");}
-errh * read_egv_xml( const char * filename, egv **) {FAIL( FAIL, "Only available with libxml2 compilation\n");}
+errh * read_egv_xml( const char * filename, egv ** a) {FAIL( FAIL, "Only available with libxml2 compilation\n");}
 #endif //__LIBXML
 
 

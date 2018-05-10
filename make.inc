@@ -13,4 +13,4 @@ LD_FLAGS=-D__LIBXML2
 
 CC=gcc
 MPICC=gcc
-CFLAGS=-g -O2 -Wall -fpic -std=c11 -I$(INC) $(LD_FLAGS)
+CFLAGS=-g -O2 -Wall -fpic -std=c11 -I$(INC) -I/usr/include/libxml2 $(LD_FLAGS)
