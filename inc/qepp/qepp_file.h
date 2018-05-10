@@ -62,6 +62,9 @@ int qepp_sscanf_double2(char * , double *, char **);
 int qepp_get_str( char * ptr, char * res);
 void qepp_trim_ws( char * ptr);
 
+void free_str_array( char ** ptr);
+char ** get_dir_content( char * dirpath);
+
 
 /*-------------------------------------------------------------------------*/
 /**

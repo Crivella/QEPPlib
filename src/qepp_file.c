@@ -1,7 +1,7 @@
 #include <qepp/qepp_file.h>
 
-static void free_str_array( char ** ptr);
-static char ** get_dir_content( char * dirpath);
+//static void free_str_array( char ** ptr);
+//static char ** get_dir_content( char * dirpath);
 static long int print_str_array_num( char ** ptr, char * outname);
 static char	* get_path( char *);
 
@@ -225,7 +225,7 @@ bool qepp_strcmp_WC( char * pattern, char * candidate, int p, int c)
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-static void free_str_array( char ** ptr)
+void free_str_array( char ** ptr)
 {
 	if(ptr == NULL)
 		return ;
@@ -235,7 +235,7 @@ static void free_str_array( char ** ptr)
 	return ;
 }
 
-static char ** get_dir_content( char * dirpath)
+char ** get_dir_content( char * dirpath)
 {
 	char ** obj = NULL;
 	if( dirpath == NULL)
