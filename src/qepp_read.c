@@ -1322,15 +1322,11 @@ evc * read_evc_dat( FILE * read, int n)
 
 	res = initialize_evc( size);
 
-	//app = qepp_mem_get_base( res->val);
 	if( qepp_get_xml_value( qepp_mem_get_base( res->val), read, pos, needle, size, sizeof( double complex), dump_size))
 	{
 		FREE( res);
 		return NULL;
 	}
-
-	//memcpy( &res->val[0], app, size*sizeof( double complex));
-	//free( app);
 
 	return res;
 }

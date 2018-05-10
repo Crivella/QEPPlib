@@ -34,7 +34,7 @@ do for[i=0:zmax] {
 	set table '1.table'
 	splot FILE u (column(1)/au):(column(2)/au):(column(5)==i?column(4)*au**3:1/0)
 	unset table
-
+ 
 	set contour base
 	set cntrparam level auto clines
 	unset surface
@@ -83,7 +83,7 @@ unset colorbox
 set multiplot layout 1,2
 set view 45,10
 set ztics
-splot 	FILE u (column(1)/au):(column(2)/au):(column(5)==i?column(4)*au**3:1/0) w lp pt 7 ps 0.1 title "xy projected"
+splot 	FILE u (column(1)/au):(column(2)/au):(column(6)) w lp pt 7 ps 0.1 title "xy projected"
 set view 0,0
 unset ztics
 replot

@@ -426,7 +426,7 @@ struct data_file
 	size_t size;
 	size_t mem;
 
-	long int version;	//QE version x.nn.aa -> xnnaa
+	long int version;	//QE version xxx.nnn.aaa -> xxxnnnaaa
 
 	double n_el;		//Number of electron in the system
 	int n_spin;		//Identifier for spin usage in calculation
