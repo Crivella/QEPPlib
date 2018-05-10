@@ -462,7 +462,7 @@ errh * read_pdos_data(char * filename, pdos_data ** out_ptr, char * comments)
 		n_states++;
 		qepp_getline(buffer,256,read);
 	}
-	printf("%li kpt, %d bands, %d states found\n",nscf->n_kpt,nscf->n_bnd,n_states);
+	QEPP_PRINT("%li kpt, %d bands, %d states found\n",nscf->n_kpt,nscf->n_bnd,n_states);
 
 	data = initialize_pdos_data( nscf->n_kpt, nscf->n_bnd, n_states);
 	data->nscf = DUPLICATE( nscf);
@@ -472,23 +472,35 @@ errh * read_pdos_data(char * filename, pdos_data ** out_ptr, char * comments)
 	int state_app;
 	int app=1;
 	pdos_state * p_app;
+	char c;
+	int cc=0;
 	for( int i=0; i<n_states; i++)
 	{
 		p_app = data->states[i];
-		while( fgetc(read) != '#') {}
-		app *= fscanf( read, "%d", &state_app);
-		while( fgetc(read) != 'm') {}
-		app *= fscanf( read, "%d", &p_app->atom_n);
-		while( fgetc(read) != '(') {}
-		app *= fscanf( read, "%s)", p_app->name);
-		while( fgetc(read) != 'c') {}
-		app *= fscanf( read, "%d", &p_app->wfc_n);
-		while( fgetc(read) != '=') {}
-		app *= fscanf( read, "%lf", &p_app->j);
-		while( fgetc(read) != '=') {}
-		app *= fscanf( read, "%d", &p_app->l);
-		while( fgetc(read) != '=') {}
-		app *= fscanf( read, "%lf", &p_app->m_j);
+		qepp_getline( buffer, 256, read);
+		cc = 0;
+//QEPP_PRINT( "%s\n", buffer+cc);
+		while( (c = buffer[cc++]) != '#') {}
+		app *= sscanf( buffer+cc, "%d", &state_app);
+//QEPP_PRINT( "%s   %d\n", buffer+cc, state_app);
+		while( (c = buffer[cc++]) != 'm') {}
+		app *= sscanf( buffer+cc, "%d", &p_app->atom_n);
+//QEPP_PRINT( "%s   %d\n", buffer+cc, p_app->atom_n);
+		while( (c = buffer[cc++]) != '(') {}
+		app *= sscanf( buffer+cc, "%s)", p_app->name);
+//QEPP_PRINT( "%s   %s\n", buffer+cc, p_app->name);
+		while( (c = buffer[cc++]) != 'c') {}
+		app *= sscanf( buffer+cc, "%d", &p_app->wfc_n);
+//QEPP_PRINT( "%s   %d\n", buffer+cc, p_app->wfc_n);
+		while( (c = buffer[cc++]) != '=') {}
+		app *= sscanf( buffer+cc, "%lf", &p_app->j);
+//QEPP_PRINT( "%s   %.1lf\n", buffer+cc, p_app->j);
+		while( (c = buffer[cc++]) != '=') {}
+		app *= sscanf( buffer+cc, "%d", &p_app->l);
+//QEPP_PRINT( "%s   %d\n", buffer+cc, p_app->l);
+		while( (c = buffer[cc++]) != '=') {}
+		app *= sscanf( buffer+cc, "%lf", &p_app->m_j);
+//QEPP_PRINT( "%s   %.1lf\n", buffer+cc, p_app->m_j);
 		if( app == 0)
 		{
 			FREE( data);
@@ -502,7 +514,6 @@ errh * read_pdos_data(char * filename, pdos_data ** out_ptr, char * comments)
 	double v_app[3];
 	int b_app, b_app_r;
 	double en_app;
-	char c;
 	int n_c;
 	int c_app;
 	app=1;
@@ -522,8 +533,8 @@ errh * read_pdos_data(char * filename, pdos_data ** out_ptr, char * comments)
 			while( fgetc(read) != '(' && !feof(read)) {}
 			app *= fscanf( read, "%d", &b_app_r); b_app_r--;
 			qepp_fscanf_double( read, &en_app);
-			qepp_getline(buffer,256,read);
-			if( fabs( en_app - nscf->energies[k_app][b_app]) > 0.005)
+			qepp_getline( buffer, 256, read);
+			if( fabs( en_app - nscf->energies[k_app][b_app]) > 2.E-3)
 			{
 				FREE( data);
 				FAIL( FAIL, "Mismatch between pdos and nscf file for k_pt #%li enrgies at band #%d...\n", k_app, b_app);
