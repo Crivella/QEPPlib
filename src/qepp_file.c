@@ -1,7 +1,7 @@
 #include <qepp/qepp_file.h>
 
-static void free_str_array( char ** ptr);
-static char ** get_dir_content( char * dirpath);
+//static void free_str_array( char ** ptr);
+//static char ** get_dir_content( char * dirpath);
 static long int print_str_array_num( char ** ptr, char * outname);
 static char	* get_path( char *);
 
@@ -225,7 +225,7 @@ bool qepp_strcmp_WC( char * pattern, char * candidate, int p, int c)
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-static void free_str_array( char ** ptr)
+void free_str_array( char ** ptr)
 {
 	if(ptr == NULL)
 		return ;
@@ -235,7 +235,7 @@ static void free_str_array( char ** ptr)
 	return ;
 }
 
-static char ** get_dir_content( char * dirpath)
+char ** get_dir_content( char * dirpath)
 {
 	char ** obj = NULL;
 	if( dirpath == NULL)
@@ -635,14 +635,8 @@ int qepp_get_xml_value( void ** out_ptr, FILE * read, long int pos, char * name,
 		if( fread( dump, dump_s, 1, read) < 1)
 			return 1;
 
-	//double complex app;
-	//fread( &app, 16, 1, read);
-	//printf( "%lf,  %lf\n",creal(app),cimag(app));
-
 	if( fread( res, size, num, read) < num)
 		return 1;
-
-	//printf( "%lf,  %lf\n",creal(((double complex *)res)[0]),cimag(((double complex *)res)[0]));
 
 	free( dump);
 	*out_ptr = res;
