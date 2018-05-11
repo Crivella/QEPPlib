@@ -17,7 +17,8 @@ qepp_main.h \
 qepp_mem.h \
 qepp_mpi.h \
 qepp_read.h \
-qepp_struct.h 
+qepp_struct.h \
+wrapper_libxml.h
 
 DEPS = $(patsubst %,$(INC)/$(ITARGET)/%,$(_DEPS))
 
@@ -53,7 +54,8 @@ struct_opt_data.o \
 struct_pdos_data.o \
 struct_pdos_state.o \
 struct_spin_data.o \
-struct_wfc.o
+struct_wfc.o \
+wrapper_libxml.o
   
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
