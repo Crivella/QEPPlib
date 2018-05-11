@@ -375,7 +375,7 @@ errh * read_m_elem(char * filename, m_elem ** out_ptr, char * comments)
 	if( !qepp_is_file( "nscf_1.out"))
 	{
 		if( !qepp_is_file( "bands_1.out"))
-			fname = get_file( "nscf_1.out", ".out");
+			fname = qepp_get_file( "nscf_1.out", ".out");
 		else
 		{
 			strcpy( fname_app, "bands_1.out");
@@ -448,7 +448,7 @@ errh * read_pdos_data(char * filename, pdos_data ** out_ptr, char * comments)
 	char buffer[256];
 	int n_states=0;
 
-	char * nscf_f = get_file( "nscf_1.out", ".out");
+	char * nscf_f = qepp_get_file( "nscf_1.out", ".out");
 	QEPP_PRINT("Acquiring nscf output file data from: %s...\n", nscf_f);
 	nscf_data * nscf;
 	READ( nscf_f, &nscf);
@@ -1265,28 +1265,28 @@ errh * read_wfc_dat( const char * filename, wfc ** out_ptr)
 
 	long int pos = ftell( read);
 
-	if( qepp_get_xml_param( &app, read, pos, "INFO", "nbnd"))		FAIL( FAIL, "Can't read nbnd");	n_bnd = app;
+	if( qepp_get_dat_attr( &app, read, pos, "INFO", "nbnd"))		FAIL( FAIL, "Can't read nbnd");	n_bnd = app;
 	res = initialize_wfc( n_bnd);
 //QEPP_PRINT( "%li\n", n_bnd);
-	if( qepp_get_xml_param( &app, read, pos, "INFO", "ngw"))
+	if( qepp_get_dat_attr( &app, read, pos, "INFO", "ngw"))
 		FAIL( FAIL, "Can't read ngw");
 	res->ngw = app;
-	if( qepp_get_xml_param( &app, read, pos, "INFO", "igwx"))
+	if( qepp_get_dat_attr( &app, read, pos, "INFO", "igwx"))
 		FAIL( FAIL, "Can't read igwx");
 	res->igwx = app;
-	if( qepp_get_xml_param( &app, read, pos, "INFO", "ik"))
+	if( qepp_get_dat_attr( &app, read, pos, "INFO", "ik"))
 		FAIL( FAIL, "Can't read ik");
 	res->ik = app;
-	if( qepp_get_xml_param( &app, read, pos, "INFO", "nk"))
+	if( qepp_get_dat_attr( &app, read, pos, "INFO", "nk"))
 		FAIL( FAIL, "Can't read nk");
 	res->nk = app;
-	if( qepp_get_xml_param( &app, read, pos, "INFO", "ispin"))
+	if( qepp_get_dat_attr( &app, read, pos, "INFO", "ispin"))
 		FAIL( FAIL, "Can't read ispin");
 	res->ispin = app;
-	if( qepp_get_xml_param( &app, read, pos, "INFO", "nspin"))
+	if( qepp_get_dat_attr( &app, read, pos, "INFO", "nspin"))
 		FAIL( FAIL, "Can't read nspin");
 	res->nspin = app;
-	if( qepp_get_xml_param( &app, read, pos, "INFO", "scale_factor"))
+	if( qepp_get_dat_attr( &app, read, pos, "INFO", "scale_factor"))
 	FAIL( FAIL, "Can't read scale");
 	res->scale_factor = app;
 		
@@ -1318,11 +1318,11 @@ evc * read_evc_dat( FILE * read, int n)
 
 	long int pos = ftell( read);
 	sprintf( needle, "evc.%d", n);
-	if( qepp_get_xml_param( &app1, read, pos, needle, "size")) return NULL;	size = app1;
+	if( qepp_get_dat_attr( &app1, read, pos, needle, "size")) return NULL;	size = app1;
 
 	res = initialize_evc( size);
 
-	if( qepp_get_xml_value( qepp_mem_get_base( res->val), read, pos, needle, size, sizeof( double complex), dump_size))
+	if( qepp_get_dat_value( qepp_mem_get_base( res->val), read, pos, needle, size, sizeof( double complex), dump_size))
 	{
 		FREE( res);
 		return NULL;
@@ -1351,20 +1351,20 @@ errh * read_gkv_dat( const char * filename, gkv ** out_ptr)
 
 	//read ngkw
 	pos = ftell( read);
-	if( qepp_get_xml_param( &app, read, pos, "NUMBER_OF_GK-VECTORS", "kind"))
+	if( qepp_get_dat_attr( &app, read, pos, "NUMBER_OF_GK-VECTORS", "kind"))
 		FAIL( FAIL, " ");
 	kind = app;
 	switch( kind)
 	{
 	case 4:
 		//app_i = &a_i;
-		if( qepp_get_xml_value( &app_i, read, pos, "NUMBER_OF_GK-VECTORS", 1, kind, dump_size)) 
+		if( qepp_get_dat_value( &app_i, read, pos, "NUMBER_OF_GK-VECTORS", 1, kind, dump_size)) 
 			FAIL( FAIL, "Can't read ngkv");
 		ngkv = app_i;
 		break;
 	case 8:
 		//app_l = &a_l;
-		if( qepp_get_xml_value( &ngkv, read, pos, "NUMBER_OF_GK-VECTORS", 1, kind, dump_size)) 
+		if( qepp_get_dat_value( &ngkv, read, pos, "NUMBER_OF_GK-VECTORS", 1, kind, dump_size)) 
 			FAIL( FAIL, "Can't read ngkv");
 		//ngkv = app_l;
 		break;
@@ -1377,18 +1377,18 @@ errh * read_gkv_dat( const char * filename, gkv ** out_ptr)
 
 	//read max_ngkv
 	pos = ftell( read);
-	if( qepp_get_xml_param( &app, read, pos, "MAX_NUMBER_OF_GK-VECTORS", "kind"))
+	if( qepp_get_dat_attr( &app, read, pos, "MAX_NUMBER_OF_GK-VECTORS", "kind"))
 		FAIL( FAIL, " ");
 	kind = app;
 	switch( kind)
 	{
 	case 4:
-		if( qepp_get_xml_value( &app_i, read, pos, "MAX_NUMBER_OF_GK-VECTORS", 1, kind, dump_size)) 
+		if( qepp_get_dat_value( &app_i, read, pos, "MAX_NUMBER_OF_GK-VECTORS", 1, kind, dump_size)) 
 			FAIL( FAIL, "Can't read ngkv");
 		res->max_ngkv = app_i;
 		break;
 	case 8:
-		if( qepp_get_xml_value( &res->max_ngkv, read, pos, "MAX_NUMBER_OF_GK-VECTORS", 1, kind, dump_size)) 
+		if( qepp_get_dat_value( &res->max_ngkv, read, pos, "MAX_NUMBER_OF_GK-VECTORS", 1, kind, dump_size)) 
 			FAIL( FAIL, "Can't read ngkv");
 		break;
 	default:
@@ -1396,7 +1396,7 @@ errh * read_gkv_dat( const char * filename, gkv ** out_ptr)
 	}
 
 	//read kpt coord
-	if( qepp_get_xml_value( res->kpt, read, pos, "K-POINT_COORDS", 3, sizeof( double), dump_size)) 
+	if( qepp_get_dat_value( res->kpt, read, pos, "K-POINT_COORDS", 3, sizeof( double), dump_size)) 
 		FAIL( FAIL, "Can't read ngkv");
 	for( long int i=0; i< 3; i++)
 		QEPP_PRINT( "%7.4f", res->kpt[i]);
@@ -1404,18 +1404,18 @@ errh * read_gkv_dat( const char * filename, gkv ** out_ptr)
 
 	//read index
 	pos = ftell( read);
-	if( qepp_get_xml_param( &app, read, pos, "INDEX", "size"))
+	if( qepp_get_dat_attr( &app, read, pos, "INDEX", "size"))
 		FAIL( FAIL, " ");
 	size = app;
-	if( qepp_get_xml_value( qepp_mem_get_base( res->index), read, pos, "INDEX", size, sizeof( int), dump_size)) 
+	if( qepp_get_dat_value( qepp_mem_get_base( res->index), read, pos, "INDEX", size, sizeof( int), dump_size)) 
 		FAIL( FAIL, "Can't read index");
 
 	//read grid
 	pos = ftell( read);
-	if( qepp_get_xml_param( &app, read, pos, "GRID", "size"))
+	if( qepp_get_dat_attr( &app, read, pos, "GRID", "size"))
 		FAIL( FAIL, " ");
 	size = app;
-	if( qepp_get_xml_value( qepp_mem_get_base( res->grid), read, pos, "GRID", size, sizeof( int), dump_size)) 
+	if( qepp_get_dat_value( qepp_mem_get_base( res->grid), read, pos, "GRID", size, sizeof( int), dump_size)) 
 		FAIL( FAIL, "Can't read grid");
 
 	fclose( read);

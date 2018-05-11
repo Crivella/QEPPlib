@@ -31,7 +31,7 @@
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-char	* get_file(char *, char *);
+char	* qepp_get_file(char *, char *);
 
 char 	* qepp_change_file( char *, char *);
 
@@ -68,7 +68,7 @@ char ** get_dir_content( char * dirpath);
 
 /*-------------------------------------------------------------------------*/
 /**
-  @name     qepp_get_xml_param
+  @name     qepp_get_dat_attr
   @brief    Get the value of a param from an xml file
 
   @param    out_ptr: Address to a pointer where the data will be stored
@@ -85,11 +85,11 @@ char ** get_dir_content( char * dirpath);
   return 0 if successfull or 1 if failed
  */
 /*-------------------------------------------------------------------------*/
-int qepp_get_xml_param( double * out_ptr, FILE * read, long int pos, char * name, char * key);
+int qepp_get_dat_attr( double * out_ptr, FILE * read, long int pos, char * name, char * key);
 
 /*-------------------------------------------------------------------------*/
 /**
-  @name     qepp_get_xml_value
+  @name     qepp_get_dat_value
   @brief    Get the binary value stored in a class of an xml file
 
   @param    out_ptr: Address to a pointer where the data will be stored
@@ -109,7 +109,7 @@ int qepp_get_xml_param( double * out_ptr, FILE * read, long int pos, char * name
   return 0 if successfull or 1 if failed
  */
 /*-------------------------------------------------------------------------*/
-int qepp_get_xml_value( void * out_ptr, FILE * read, long int pos, char * name, long int num, int size, int dump_s);
+int qepp_get_dat_value( void * out_ptr, FILE * read, long int pos, char * name, long int num, int size, int dump_s);
 
 char * get_tmp_path();
 

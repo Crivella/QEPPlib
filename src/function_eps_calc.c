@@ -16,7 +16,7 @@ errh * calculate_eps( opt_data ** out_ptr, opt_data * data, double max_range, lo
 	char * filename="nscf_1.out";
 	if( !qepp_is_file( filename) && (v_cell == 0 || !qepp_is_file( "k.dat")))
 	{
-		filename = get_file( filename, ".out");
+		filename = qepp_get_file( filename, ".out");
 	}
 
 	if( max_range == 0 || n_pt == 0)
@@ -163,7 +163,7 @@ errh * calculate_eps_huge_files( opt_data ** out_ptr, char * mname, double max_r
 	double fact=1;
 	char *filename="nscf_1.out";
 	if( !qepp_is_file( filename) && (v_cell == 0 || !qepp_is_file( "k.dat")))
-		filename = get_file( filename, ".out");
+		filename = qepp_get_file( filename, ".out");
 
 	if( max_range == 0 || n_pt == 0)
 		FAIL( FAIL, "Invalid input parameters");
@@ -534,7 +534,7 @@ errh * calculate_eps_mod_huge_files( opt_data ** out_ptr, char * mname, double m
 	double fact=1;
 	char *filename="nscf_1.out";
 	if( !qepp_is_file( filename) && (v_cell == 0 || !qepp_is_file( "k.dat")))
-		filename = get_file( filename, ".out");
+		filename = qepp_get_file( filename, ".out");
 
 	if( max_range == 0 || n_pt == 0)
 		FAIL( FAIL, "Invalid input parameters");
@@ -960,7 +960,7 @@ errh * calculate_jdos_huge_files( opt_data ** out_ptr, char * mname, double max_
 	double fact=1;
 	char *filename="nscf_1.out";
 	if( !qepp_is_file( filename) && (v_cell == 0 || !qepp_is_file( "k.dat")))
-		filename = get_file( filename, ".out");
+		filename = qepp_get_file( filename, ".out");
 
 	if( max_range == 0 || n_pt == 0)
 		FAIL( FAIL, "Invalid input parameters");

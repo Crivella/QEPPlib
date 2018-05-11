@@ -5,7 +5,7 @@
 static long int print_str_array_num( char ** ptr, char * outname);
 static char	* get_path( char *);
 
-char * get_file( char * filename, char * id)
+char * qepp_get_file( char * filename, char * id)
 {
 	char * endres=NULL;
 	if( qepp_is_file( filename))
@@ -43,7 +43,7 @@ char * get_file( char * filename, char * id)
 	res[n] = 0;
 
 	if( res[0] == NULL)
-		fprintf( stderr, "WARNING get_fileout(): No valid output found...\n");
+		fprintf( stderr, "WARNING qepp_get_file(): No valid output found...\n");
 	else
 	{
 		printf("Choose the nscf output among the list:\n");
@@ -590,7 +590,7 @@ int qepp_sscanf_double2(char * str, double * res , char ** endptr)
 	return 0;
 }
 
-int qepp_get_xml_param( double * out_ptr, FILE * read, long int pos, char * name, char * key)
+int qepp_get_dat_attr( double * out_ptr, FILE * read, long int pos, char * name, char * key)
 {
 	if( out_ptr == NULL)
 		return 1;
@@ -615,7 +615,7 @@ int qepp_get_xml_param( double * out_ptr, FILE * read, long int pos, char * name
 	return 0;
 }
 
-int qepp_get_xml_value( void * out_ptr, FILE * read, long int pos, char * name, long int num, int size, int dump_s)
+int qepp_get_dat_value( void * out_ptr, FILE * read, long int pos, char * name, long int num, int size, int dump_s)
 {
 	if( out_ptr == NULL)
 		return 1;
