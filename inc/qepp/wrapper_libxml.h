@@ -5,7 +5,7 @@
 
 #include <libxml/parser.h>
 
-
+xmlNodePtr qepp_libxml_find_node( char * name);
 
 
 

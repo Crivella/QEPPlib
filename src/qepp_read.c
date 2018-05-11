@@ -1,7 +1,8 @@
 #include <qepp/qepp_read.h>
 #ifdef __LIBXML2
 #include <libxml/parser.h>
-static evc  * read_evc_xml( xmlDoc * document, xmlNode * root, xmlNode * node);
+#include <qepp/wrapper_libxml.h>
+static evc  * read_evc_xml( xmlDocPtr document, xmlNodePtr root, xmlNodePtr node);
 #endif // __LIBXML2
 
 #define TEST_ARGS \
@@ -603,8 +604,8 @@ errh * read_data_file( const char * filename, data_file ** out_ptr)
 
 	res = initialize_data_file();
 
-	xmlDoc		* document;
-	xmlNode		* root, * node, * app, * app1;
+	xmlDocPtr	document;
+	xmlNodePtr	root, node, app, app1;
 	xmlChar		* key;
 
 	document = xmlReadFile( fname, NULL, 0);
@@ -981,8 +982,8 @@ errh * read_wfc_xml( const char * filename, wfc ** out_ptr)
 		FAIL( OPEN_IN_FAIL, "%s", filename);
 	fclose( read);
 
-	xmlDoc		* document;
-	xmlNode		* root, * node;
+	xmlDocPtr	document;
+	xmlNodePtr	root, node;
 	xmlChar		*key;
 
 	int n_evc=0;
@@ -1054,7 +1055,7 @@ errh * read_wfc_xml( const char * filename, wfc ** out_ptr)
 	SUCCESS();
 }
 
-static evc * read_evc_xml( xmlDoc * document, xmlNode * root, xmlNode * node)
+static evc * read_evc_xml( xmlDocPtr document, xmlNodePtr root, xmlNodePtr node)
 {
 	evc * res = NULL;
 	if( document == NULL || root == NULL)
