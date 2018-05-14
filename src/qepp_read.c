@@ -574,353 +574,6 @@ errh * read_pdos_state(char * filename, pdos_state ** out_ptr)
 }
 
 #ifdef __LIBXML2
-
-errh * read_data_file_old( const char * filename, data_file ** out_ptr)
-{
-	data_file * res = NULL;
-	if( out_ptr == NULL)
-		FAIL( NULL_OUT, " ");
-	if( filename == NULL)
-		FAIL( NULL_IN, " ");
-	char fname[1024];
-	char * path;
-	if( outdir[0] == '\0' || prefix[0] == '\0')
-		path = get_tmp_path( );
-	else
-	{
-		path = malloc( 1024 * sizeof( char));
-		sprintf( path, "%s/%s.save/", outdir, prefix);
-	}
-	//QEPP_PRINT("path = %s\n", path);
-	//if( path == NULL)
-	//	FAIL( FAIL, "Can't find tmp directory");
-	//sprintf( fname, "%s/%s", path, filename);
-	strcpy( fname, filename);
-//printf("fname: %s\npath: %s\n\n", fname,path);
-	//FILE * read = fopen(fname,"r");
-	//if( read == NULL)
-	//	FAIL( OPEN_IN_FAIL, "%s", fname);
-	//fclose( read);
-	
-
-
-	res = initialize_data_file();
-
-	xmlDocPtr	document;
-	xmlNodePtr	root, node, app, app1;
-	xmlChar		* key;
-
-	document = xmlReadFile( fname, NULL, 0);
-	root = xmlDocGetRootElement( document);
-
-	char * endptr = NULL;
-	//printf( "%s\n", root->name); fflush(stdout);
-	if( !xmlStrcmp( root->name, (const xmlChar *)"Root"))
-	{
-		for( node = root->children; node; node=node->next)
-		{
-			if( !xmlStrcmp( node->name, (const xmlChar *)"CELL"))
-			{
-				app = node;
-				for( node = node->children; node; node=node->next)
-				{
-					if( !xmlStrcmp( node->name, (const xmlChar *)"BRAVAIS_LATTICE"))
-					{
-						key = xmlNodeListGetString( document, node->xmlChildrenNode, 1);
-						strcpy( res->bravais, (char *)key);
-						xmlFree( key);
-					}
-
-					if( !xmlStrcmp( node->name, (const xmlChar *)"LATTICE_PARAMETER"))
-					{
-						key = xmlGetProp( node, (const xmlChar *)"UNITS");
-						if( strcasestr( (char *)key, "bohr") != NULL)
-							res->lp_t = BOHR_TO_M;
-						xmlFree( key);
-
-						key = xmlNodeListGetString( document, node->xmlChildrenNode, 1);
-						qepp_sscanf_double( (char *)key, &res->lp, NULL);
-						xmlFree( key);
-					}
-					if( !xmlStrcmp( node->name, (const xmlChar *)"CELL_DIMENSIONS"))
-					{
-						key = xmlNodeListGetString( document, node->xmlChildrenNode, 1);
-						endptr = (char *)key;
-						for( int n=0; n<6; n++)
-							qepp_sscanf_double( endptr, &res->c_dim[n], &endptr);
-						xmlFree( key);
-					}
-					if( !xmlStrcmp( node->name, (const xmlChar *)"DIRECT_LATTICE_VECTORS"))
-					{
-						app1 = node;
-						node = node->children;
-						if( node == NULL)
-						{
-							node = app1;
-							WARN( "Failed to acquire direct lattice info");
-							break;
-						}
-						while( strstr( (char *)node->name, "UNITS") == NULL)
-							node = node->next;
-
-						key = xmlGetProp( node, (const xmlChar *)"UNITS");
-						strcpy( res->a_n, (char *)key);
-						if( !xmlStrcmp( key, (const xmlChar *)"Bohr"))
-							res->a_t = BOHR_TO_M;
-						xmlFree( key);
-
-						for(int i=0; i<3&&node; i++, node=node->next)
-						{
-							while( strstr( (char *)node->name, "a") == NULL)
-								node=node->next;
-							key = xmlNodeListGetString( document, node->xmlChildrenNode, 1);
-							endptr = (char *)key;
-							for( int j=0; j<3; j++)
-								qepp_sscanf_double( endptr, &res->a[i][j], &endptr);
-							xmlFree( key);
-						}
-
-						node = app1;
-					}
-					if( !xmlStrcmp( node->name, (const xmlChar *)"RECIPROCAL_LATTICE_VECTORS"))
-					{
-						app1 = node;
-						node = node->children;
-						if( node == NULL)
-						{
-							node = app1;
-							WARN( "Failed to acquire reciprocal lattice info");
-							break;
-						}
-						while( strstr( (char *)node->name, "UNITS") == NULL)
-							node = node->next;
-
-						key = xmlGetProp( node, (const xmlChar *)"UNITS");
-						strcpy( res->b_n, (char *)key);
-						if( !xmlStrcmp( key, (const xmlChar *)"2 pi / a"))
-							res->b_t = 2*PI/(res->lp*res->lp_t);
-
-						xmlFree( key);
-
-
-						for(int i=0; i<3&&node; i++, node=node->next)
-						{
-							while( strstr( (char *)node->name, "b") == NULL)
-								node=node->next;	
-							key = xmlNodeListGetString( document, node->xmlChildrenNode, 1);
-							endptr = (char *)key;
-							for( int j=0; j<3; j++)
-								qepp_sscanf_double( endptr, &res->b[i][j], &endptr);
-							xmlFree( key);
-						}
-
-						node = app1;
-					}
-				}
-				node = app;
-			}
-			if( !xmlStrcmp( node->name, (const xmlChar *)"BRILLOUIN_ZONE"))
-			{
-				app = node;
-				char buffer[64]="K-POINT.1";
-				int app_n=1;
-				for( node=node->children; node; node=node->next)
-				{
-					if( !xmlStrcmp( node->name, (const xmlChar *)"NUMBER_OF_K-POINTS"))
-					{
-						key = xmlNodeListGetString( document, node->xmlChildrenNode, 1);
-						res->n_kpt = strtol( (char *)key, 0, 10);
-						res->kpt = (double **)QEPP_ALLOC( sizeof( double), res->n_kpt, 3);
-						res->weight = (double *)QEPP_ALLOC( sizeof( double), res->n_kpt);
-						res->egval_link = (char **)QEPP_ALLOC( sizeof( char), res->n_kpt, 256);
-						res->egvec_link = (char **)QEPP_ALLOC( sizeof( char), res->n_kpt, 256);
-						res->wfc_link = (char **)QEPP_ALLOC( sizeof( char), res->n_kpt, 256);
-						xmlFree( key);
-					}
-					if( !xmlStrcmp( node->name, (const xmlChar *)"UNITS_FOR_K-POINTS"))
-					{
-						key = xmlGetProp( node, (const xmlChar *)"UNITS");
-						if( !xmlStrcmp( key, (const xmlChar *)"2 pi / a"))
-							res->kpt_t = 2*PI/(res->lp*res->lp_t);
-						xmlFree( key);
-					}
-					if( !xmlStrcmp( node->name, (const xmlChar *)buffer))
-					{
-						key = xmlGetProp( node, (const xmlChar *)"XYZ");
-						endptr = (char *)key;
-						for( int n=0; n<3; n++)
-							qepp_sscanf_double( endptr, &res->kpt[app_n-1][n], &endptr);
-						xmlFree( key);
-
-						key = xmlGetProp( node, (const xmlChar *)"WEIGHT");
-						qepp_sscanf_double( (char *)key, &res->weight[app_n-1], 0);
-						xmlFree( key);
-
-						app_n++;
-						sprintf( buffer, "K-POINT.%d", app_n);
-					}
-				}
-				node = app;
-			}
-			if( !xmlStrcmp( node->name, (const xmlChar *)"EIGENVALUES"))
-			{
-				app = node;
-				char buffer[64]="K-POINT.1";
-				int app_n=1;
-				for( node=node->children; node; node=node->next)
-				{
-					if( !xmlStrcmp( node->name, (const xmlChar *)buffer))
-					{
-						app1 = node;
-						for( node=node->children; node; node=node->next)
-						{
-							if( !xmlStrcmp( node->name, (const xmlChar *)"K-POINT_COORDS"))
-							{
-								key = xmlNodeListGetString( document, node->xmlChildrenNode, 1);
-								endptr = (char *)key;
-								double a;
-								for( int n=0; n<3; n++)
-								{
-									qepp_sscanf_double( endptr, &a, &endptr);
-									if( a != res->kpt[app_n-1][n])
-										WARN( "kpt coordinates in eigenvalue list differ from BZ list");
-								}
-								xmlFree( key);
-							}
-							if( !xmlStrcmp( node->name, (const xmlChar *)"DATAFILE"))
-							{
-								key = xmlGetProp( node, (const xmlChar *)"iotk_link");
-//QEPP_PRINT("%s\n", key);
-								if( path != NULL)
-									sprintf( res->egval_link[app_n-1], "%s/%s", path, (char *)key);
-								else
-									sprintf( res->egval_link[app_n-1], "%s", (char *)key);
-//QEPP_PRINT("%s\n", res->egval_link[app_n-1]);
-//printf("%s\n", res->egval_link[app_n-1]); 
-								//strcpy( res->egval_link[app_n-1], (char *)key);
-								xmlFree( key);
-							}
-						}
-						node = app1;
-
-						app_n++;
-						sprintf( buffer, "K-POINT.%d", app_n);
-					}
-				}
-				node = app;
-			}
-			if( !xmlStrcmp( node->name, (const xmlChar *)"EIGENVECTORS"))
-			{
-				app = node;
-				char buffer[64]="K-POINT.1";
-				int app_n=1;
-				for( node=node->children; node; node=node->next)
-				{
-					if( !xmlStrcmp( node->name, (const xmlChar *)buffer))
-					{
-						app1 = node;
-						for( node=node->children; node; node=node->next)
-						{
-							if( !xmlStrcmp( node->name, (const xmlChar *)"GK-VECTORS"))
-							{
-								key = xmlGetProp( node, (const xmlChar *)"iotk_link");
-								if( path != NULL)
-									sprintf( res->egvec_link[app_n-1], "%s/%s", path, (char *)key);
-								else
-									sprintf( res->egvec_link[app_n-1], "%s", (char *)key);
-								//strcpy( res->egvec_link[app_n-1], (char *)key);
-								xmlFree( key);
-							}
-							if( res->n_spin == 4)
-							{
-								if( !xmlStrcmp( node->name, (const xmlChar *)"WFC.1"))
-								{
-									key = xmlGetProp( node, (const xmlChar *)"iotk_link");
-									if( path != NULL)
-										sprintf( res->wfc_link[app_n-1], "%s/%s", path, (char *)key);
-									else
-										sprintf( res->wfc_link[app_n-1], "%s", (char *)key);
-									//strcpy( res->wfc_link[app_n-1], (char *)key);
-									xmlFree( key);
-								}
-								if( !xmlStrcmp( node->name, (const xmlChar *)"WFC.2"))
-								{
-									key = xmlGetProp( node, (const xmlChar *)"iotk_link");
-									if( path != NULL)
-										sprintf( res->wfc_link2[app_n-1], "%s/%s", path, (char *)key);
-									else
-										sprintf( res->wfc_link2[app_n-1], "%s", (char *)key);
-									//strcpy( res->wfc_link2[app_n-1], (char *)key);
-									xmlFree( key);
-								}
-							}
-							else
-							{
-								if( !xmlStrcmp( node->name, (const xmlChar *)"WFC"))
-								{
-									key = xmlGetProp( node, (const xmlChar *)"iotk_link");
-									if( path != NULL)
-										sprintf( res->wfc_link[app_n-1], "%s/%s", path, (char *)key);
-									else
-										sprintf( res->wfc_link[app_n-1], "%s", (char *)key);
-									//strcpy( res->wfc_link[app_n-1], (char *)key);
-									xmlFree( key);
-								}
-							}
-						}
-						node = app1;
-
-						app_n++;
-						sprintf( buffer, "K-POINT.%d", app_n);
-					}
-				}
-				node = app;
-			}
-			if( !xmlStrcmp( node->name, (const xmlChar *)"BAND_STRUCTURE_INFO"))
-			{
-				app = node;
-				for( node=node->children; node; node=node->next)
-				{
-					if( !xmlStrcmp( node->name, (const xmlChar *)"NUMBER_OF_BANDS"))
-					{
-						key = xmlNodeListGetString( document, node->xmlChildrenNode, 1);
-						res->n_bnd = atoi( (char *)key);
-						xmlFree( key);
-					}
-					if( !xmlStrcmp( node->name, (const xmlChar *)"NUMBER_OF_ELECTRONS"))
-					{
-						key = xmlNodeListGetString( document, node->xmlChildrenNode, 1);
-						res->n_el = atof( (char *)key);
-						xmlFree( key);
-					}
-					if( !xmlStrcmp( node->name, (const xmlChar *)"NUMBER_OF_SPIN_COMPONENTS"))
-					{
-						key = xmlNodeListGetString( document, node->xmlChildrenNode, 1);
-						res->n_spin = atoi( (char *)key);
-						xmlFree( key);
-
-						if( res->n_spin == 4)
-							res->wfc_link2 = (char **)QEPP_ALLOC( sizeof( char), res->n_kpt, 256);
-					}
-				}
-				node = app;
-			}
-			if( !xmlStrcmp( node->name, (const xmlChar *)"INFO"))
-			{
-			}
-		}
-	}
-	else
-	{
-		FAIL( FAIL, "Non-recognized version of espresso (must be <= 6.1)");
-	}
-	xmlFreeDoc( document);
-	free( path);
-
-	*out_ptr = res;
-	SUCCESS();
-}//*/
-
 errh * read_data_file( const char * filename, data_file ** out_ptr)
 {
 	data_file * res = NULL;
@@ -948,6 +601,11 @@ errh * read_data_file( const char * filename, data_file ** out_ptr)
 		FAIL( OPEN_IN_FAIL, "%s", fname);
 	fclose( read);*/
 
+	if( path == NULL)
+	{
+		path = malloc( 12);
+		strcpy( path, "./");
+	}
 
 	res = initialize_data_file();
 
@@ -958,7 +616,6 @@ errh * read_data_file( const char * filename, data_file ** out_ptr)
 	document = xmlReadFile( fname, NULL, 0);
 	root = xmlDocGetRootElement( document);
 
-	char * endptr = NULL;
 	char buffer[128];
 
 	//Check espresso version
@@ -970,60 +627,40 @@ errh * read_data_file( const char * filename, data_file ** out_ptr)
 	app = qepp_libxml_find_node( "CELL", root);
 
 	node = qepp_libxml_find_node( "BRAVAIS_LATTICE", app);
-	key = xmlNodeListGetString( document, node->xmlChildrenNode, 1);
-	strcpy( res->bravais, (char *)key);
-	xmlFree( key);
+	assert( !qepp_libxml_get_node_value( &res->bravais, node, R_STR, 1));
 
 	node = qepp_libxml_find_node( "LATTICE_PARAMETER", app);
 	key = xmlGetProp( node, (const xmlChar *)"UNITS");
 	if( strcasestr( (char *)key, "bohr") != NULL)
 		res->lp_t = BOHR_TO_M;
 	xmlFree( key);
-	key = xmlNodeListGetString( document, node->xmlChildrenNode, 1);
-	qepp_sscanf_double( (char *)key, &res->lp, NULL);
-	xmlFree( key);
+	assert( !qepp_libxml_get_node_value( &res->lp, node, R_LNF, 1));
 
 	node = qepp_libxml_find_node( "CELL_DIMENSIONS", app);
-	key = xmlNodeListGetString( document, node->xmlChildrenNode, 1);
-	endptr = (char *)key;
-	for( int n=0; n<6; n++)
-		qepp_sscanf_double( endptr, &res->c_dim[n], &endptr);
-	xmlFree( key);
+	assert( !qepp_libxml_get_node_value( &res->c_dim, node, R_LNF, 6));
 
 	node = qepp_libxml_find_node( "DIRECT_LATTICE_VECTORS/UNITS_FOR_DIRECT_LATTICE_VECTORS", app);
-	key = xmlGetProp( node, (const xmlChar *)"UNITS");
-	strcpy( res->a_n, (char *)key);
-	if( !xmlStrcmp( key, (const xmlChar *)"Bohr"))
+	assert( !qepp_libxml_get_node_attr( &res->a_n, "UNITS", node, R_STR, 1));
+	if( !strcmp( res->a_n, "Bohr"))
 		res->a_t = BOHR_TO_M;
-	xmlFree( key);
 
 	for(int i=0; i<3; i++)
 	{
 		sprintf( buffer, "DIRECT_LATTICE_VECTORS/a%d", i+1);
 		node = qepp_libxml_find_node( buffer, app);
-		key = xmlNodeListGetString( document, node->xmlChildrenNode, 1);
-		endptr = (char *)key;
-		for( int j=0; j<3; j++)
-			qepp_sscanf_double( endptr, &res->a[i][j], &endptr);
-		xmlFree( key);
+		assert( !qepp_libxml_get_node_value( &res->a[i][0], node, R_LNF, 3));
 	}
 
 	node = qepp_libxml_find_node( "RECIPROCAL_LATTICE_VECTORS/UNITS_FOR_RECIPROCAL_LATTICE_VECTORS", app);
-	key = xmlGetProp( node, (const xmlChar *)"UNITS");
-	strcpy( res->b_n, (char *)key);
-	if( !xmlStrcmp( key, (const xmlChar *)"2 pi / a"))
+	assert( !qepp_libxml_get_node_attr( &res->b_n, "UNITS", node, R_STR, 1));
+	if( !strcmp( res->b_n, "2 pi / a"))
 		res->b_t = 2*PI/(res->lp*res->lp_t);
-	xmlFree( key);
 
 	for(int i=0; i<3; i++)
 	{
 		sprintf( buffer, "RECIPROCAL_LATTICE_VECTORS/b%d", i+1);
 		node = qepp_libxml_find_node( buffer, app);
-		key = xmlNodeListGetString( document, node->xmlChildrenNode, 1);
-		endptr = (char *)key;
-		for( int j=0; j<3; j++)
-			qepp_sscanf_double( endptr, &res->b[i][j], &endptr);
-		xmlFree( key);
+		assert( !qepp_libxml_get_node_value( &res->b[i][0], node, R_LNF, 3));
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1031,14 +668,14 @@ errh * read_data_file( const char * filename, data_file ** out_ptr)
 	app = qepp_libxml_find_node( "BRILLOUIN_ZONE", root);
 
 	node = qepp_libxml_find_node( "NUMBER_OF_K-POINTS", app);
-	key = xmlNodeListGetString( document, node->xmlChildrenNode, 1);
-	res->n_kpt = strtol( (char *)key, 0, 10);
+	assert( !qepp_libxml_get_node_value( &res->n_kpt, node, R_LNT, 1));
+
 	res->kpt = (double **)QEPP_ALLOC( sizeof( double), res->n_kpt, 3);
 	res->weight = (double *)QEPP_ALLOC( sizeof( double), res->n_kpt);
 	res->egval_link = (char **)QEPP_ALLOC( sizeof( char), res->n_kpt, 256);
 	res->egvec_link = (char **)QEPP_ALLOC( sizeof( char), res->n_kpt, 256);
 	res->wfc_link = (char **)QEPP_ALLOC( sizeof( char), res->n_kpt, 256);
-	xmlFree( key);
+
 
 
 	node = qepp_libxml_find_node( "UNITS_FOR_K-POINTS", app);
@@ -1051,15 +688,8 @@ errh * read_data_file( const char * filename, data_file ** out_ptr)
 	{
 		sprintf( buffer, "K-POINT.%li", i+1);
 		node = qepp_libxml_find_node( buffer, app);
-		key = xmlGetProp( node, (const xmlChar *)"XYZ");
-		endptr = (char *)key;
-		for( int n=0; n<3; n++)
-			qepp_sscanf_double( endptr, &res->kpt[i][n], &endptr);
-		xmlFree( key);
-
-		key = xmlGetProp( node, (const xmlChar *)"WEIGHT");
-		qepp_sscanf_double( (char *)key, &res->weight[i], 0);
-		xmlFree( key);
+		assert( !qepp_libxml_get_node_attr( &res->kpt[i][0], "XYZ", node, R_LNF, 3));
+		assert( !qepp_libxml_get_node_attr( &res->weight[i], "WEIGHT", node, R_LNF, 1));
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1067,20 +697,14 @@ errh * read_data_file( const char * filename, data_file ** out_ptr)
 	app = qepp_libxml_find_node( "BAND_STRUCTURE_INFO", root);
 
 	node = qepp_libxml_find_node( "NUMBER_OF_BANDS", app);
-	key = xmlNodeListGetString( document, node->xmlChildrenNode, 1);
-	res->n_bnd = atoi( (char *)key);
-	xmlFree( key);
+	assert( !qepp_libxml_get_node_value( &res->n_bnd, node, R_INT, 1));
 
 
 	node = qepp_libxml_find_node( "NUMBER_OF_ELECTRONS", app);
-	key = xmlNodeListGetString( document, node->xmlChildrenNode, 1);
-	res->n_el = atof( (char *)key);
-	xmlFree( key);
+	assert( !qepp_libxml_get_node_value( &res->n_el, node, R_LNF, 1));
 
 	node = qepp_libxml_find_node( "NUMBER_OF_SPIN_COMPONENTS", app);
-	key = xmlNodeListGetString( document, node->xmlChildrenNode, 1);
-	res->n_spin = atoi( (char *)key);
-	xmlFree( key);
+	assert( !qepp_libxml_get_node_value( &res->n_spin, node, R_INT, 1));
 
 	if( res->n_spin == 4)
 		res->wfc_link2 = (char **)QEPP_ALLOC( sizeof( char), res->n_kpt, 256);
@@ -1093,25 +717,16 @@ errh * read_data_file( const char * filename, data_file ** out_ptr)
 	{
 		sprintf( buffer, "K-POINT.%li/K-POINT_COORDS", i+1);
 		node = qepp_libxml_find_node( buffer, app);
-		key = xmlNodeListGetString( document, node->xmlChildrenNode, 1);
-		endptr = (char *)key;
-		double a;
+		double a[3];
+		assert( !qepp_libxml_get_node_value( &a[0], node, R_LNF, 3));
 		for( int n=0; n<3; n++)
-		{
-			qepp_sscanf_double( endptr, &a, &endptr);
-			if( a != res->kpt[i][n])
+			if( a[n] != res->kpt[i][n])
 				WARN( "kpt coordinates in eigenvalue list differ from BZ list");
-		}
-		xmlFree( key);
 
 		sprintf( buffer, "K-POINT.%li/DATAFILE", i+1);
 		node = qepp_libxml_find_node( buffer, app);
-		key = xmlGetProp( node, (const xmlChar *)"iotk_link");
-		if( path != NULL)
-			sprintf( res->egval_link[i], "%s/%s", path, (char *)key);
-		else
-			sprintf( res->egval_link[i], "%s", (char *)key);
-		xmlFree( key);
+		assert( !qepp_libxml_get_node_attr( &buffer, "iotk_link", node, R_STR, 1));
+		sprintf( res->egval_link[i], "%s%s", path, buffer);
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1122,44 +737,28 @@ errh * read_data_file( const char * filename, data_file ** out_ptr)
 	{
 		sprintf( buffer, "K-POINT.%li/GK-VECTORS", i+1);
 		node = qepp_libxml_find_node( buffer, app);
-		key = xmlGetProp( node, (const xmlChar *)"iotk_link");
-		if( path != NULL)
-			sprintf( res->egvec_link[i], "%s/%s", path, (char *)key);
-		else
-			sprintf( res->egvec_link[i], "%s", (char *)key);
-		xmlFree( key);
-
+		assert( !qepp_libxml_get_node_attr( &buffer, "iotk_link", node, R_STR, 1));
+		sprintf( res->egvec_link[i], "%s%s", path, buffer);
+	
 		if( res->n_spin == 4)
 		{
 			sprintf( buffer, "K-POINT.%li/WFC.1", i+1);
 			node = qepp_libxml_find_node( buffer, app);
-			key = xmlGetProp( node, (const xmlChar *)"iotk_link");
-			if( path != NULL)
-				sprintf( res->wfc_link[i], "%s/%s", path, (char *)key);
-			else
-				sprintf( res->wfc_link[i], "%s", (char *)key);
-			xmlFree( key);
+			assert( !qepp_libxml_get_node_attr( &buffer, "iotk_link", node, R_STR, 1));
+			sprintf( res->wfc_link[i], "%s%s", path, buffer);
 
 
 			sprintf( buffer, "K-POINT.%li/WFC.2", i+1);
 			node = qepp_libxml_find_node( buffer, app);
-			key = xmlGetProp( node, (const xmlChar *)"iotk_link");
-			if( path != NULL)
-				sprintf( res->wfc_link2[i], "%s/%s", path, (char *)key);
-			else
-				sprintf( res->wfc_link2[i], "%s", (char *)key);
-			xmlFree( key);
+			assert( !qepp_libxml_get_node_attr( &buffer, "iotk_link", node, R_STR, 1));
+			sprintf( res->wfc_link2[i], "%s%s", path, buffer);
 		}
 		else
 		{
 			sprintf( buffer, "K-POINT.%li/WFC", i+1);
 			node = qepp_libxml_find_node( buffer, app);
-			key = xmlGetProp( node, (const xmlChar *)"iotk_link");
-			if( path != NULL)
-				sprintf( res->wfc_link[i], "%s/%s", path, (char *)key);
-			else
-				sprintf( res->wfc_link[i], "%s", (char *)key);
-			xmlFree( key);
+			assert( !qepp_libxml_get_node_attr( &buffer, "iotk_link", node, R_STR, 1));
+			sprintf( res->wfc_link[i], "%s%s", path, buffer);
 		}
 	}
 
@@ -1650,9 +1249,9 @@ errh * read_gkv_dat( const char * filename, gkv ** out_ptr)
 	//read kpt coord
 	if( qepp_get_dat_value( res->kpt, read, pos, "K-POINT_COORDS", 3, sizeof( double), dump_size)) 
 		FAIL( FAIL, "Can't read ngkv");
-	for( long int i=0; i< 3; i++)
+	/*for( long int i=0; i< 3; i++)
 		QEPP_PRINT( "%7.4f", res->kpt[i]);
-	QEPP_PRINT( "\n");
+	QEPP_PRINT( "\n");*/
 
 	//read index
 	pos = ftell( read);

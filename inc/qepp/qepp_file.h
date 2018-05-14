@@ -52,7 +52,10 @@ bool qepp_is_dir( char * dirpath);
 
 
 long int qepp_find_string(char * pattern, FILE * read, long int start_pos);
+#ifndef R_gvk
+#define R_gvk
 enum gvk { R_INT, R_FLT, R_STR, R_LNT, R_LNF}; //get_value_kind
+#endif //R_gvk
 int qepp_get_value( char * pattern, FILE * read, char * delim, long int start_pos, enum gvk gvk_e, void * res);
 
 int qepp_fscanf_double(FILE * to_read, double * res);

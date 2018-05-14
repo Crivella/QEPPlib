@@ -34,6 +34,90 @@ xmlNodePtr qepp_libxml_find_node( char * name, xmlNodePtr root)
 	return res;
 }
 
+int qepp_libxml_get_node_value( void * res, xmlNodePtr node, enum gvk type, unsigned long int num)
+{
+	if( node == NULL)
+		return 1;
+
+	xmlChar * key;
+	xmlDocPtr document;
+
+	document = node->doc;
+	if( document == NULL)
+		return 1;
+
+	key = xmlNodeListGetString( document, node->xmlChildrenNode, 1);
+	char * endptr = (char *)key;
+	for( unsigned long int i=0; i<num; i++)
+	{
+		switch( type)
+		{
+			case R_INT:
+				sscanf( endptr, "%d", (int *)res+i*sizeof( int));
+				break;
+			case R_LNT:
+				sscanf( endptr, "%li", (long int *)res+i*sizeof(long int));
+				break;
+			case R_FLT:
+				sscanf( endptr, "%f", (float *)res+i*sizeof( float));
+				break;
+			case R_LNF:
+				assert( !qepp_sscanf_double( endptr, res+i*sizeof(double), &endptr));
+				break;
+			case R_STR:
+				if( num != 1)
+					return 1;
+				strcpy( res, endptr);
+				break;
+		}
+	}
+	xmlFree( key);
+
+	return 0;
+}
+
+int qepp_libxml_get_node_attr( void * res, char * name, xmlNodePtr node, enum gvk type, unsigned long int num)
+{
+	if( node == NULL)
+		return 1;
+
+	xmlChar * key;
+	xmlDocPtr document;
+
+	document = node->doc;
+	if( document == NULL)
+		return 1;
+
+	key = xmlGetProp( node, (const xmlChar *)name);
+	char * endptr = (char *)key;
+	for( unsigned long int i=0; i<num; i++)
+	{
+		switch( type)
+		{
+			case R_INT:
+				sscanf( endptr, "%d", (int *)res+i*sizeof( int));
+				break;
+			case R_LNT:
+				sscanf( endptr, "%li", (long int *)res+i*sizeof(long int));
+				break;
+			case R_FLT:
+				sscanf( endptr, "%f", (float *)res+i*sizeof( float));
+				break;
+			case R_LNF:
+				assert( !qepp_sscanf_double( endptr, res+i*sizeof(double), &endptr));
+				break;
+			case R_STR:
+				if( num != 1)
+					return 1;
+				strcpy( res, endptr);
+				break;
+		}
+	}
+
+
+	return 0;
+}
+
 /*
 xmlChar ** 	qepp_libxml_get_attr( xmlNodePtr node)
 {

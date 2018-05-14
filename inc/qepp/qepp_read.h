@@ -7,6 +7,7 @@
 #include <stdlib.h>		//malloc(), realloc()
 #include <string.h>		//strstr(), strcpy(), strlen()
 #include <stdbool.h>
+#include <assert.h>
 
 #include <qepp/my_lapack.h>	//delta_k(),
 #include <qepp/qepp_err.h>	//errh, SET_ERRH(), WARN(), FAIL()

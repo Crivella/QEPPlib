@@ -415,7 +415,7 @@ int qepp_fscanf_double(FILE * read, double * res)
 	while( (c < '0' || c > '9') && c != EOF )
 	{
 		c=getc(read);
-		if( c == '.' || c == '-')
+		if( c == '.' || c == '-' || c == '+')
 		{
 			char app=c;
 			c=getc(read);
@@ -513,12 +513,11 @@ int qepp_sscanf_double2(char * str, double * res , char ** endptr)
 	while( (c < '0' || c > '9') && c != '\0' )
 	{
 		c=str[++count];
-		if( (c == '.' || c == '-') && ( '0' <= str[count+1] && str[count+1] <= '9'))
+		if( (c == '.' || c == '-' || c == '+') && ( '0' <= str[count+1] && str[count+1] <= '9'))
 			break;
 	}
 	if( c == '\0')
-		return EOF;
-
+		return 1;
 	*res = 0;
 	int negative=0, fase=0;
 	int decimal=1, exponent=0;
