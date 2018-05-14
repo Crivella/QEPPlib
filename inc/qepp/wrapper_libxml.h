@@ -3,9 +3,12 @@
 
 #ifdef __LIBXML2
 
-#include <libxml/parser.h>
+#include <string.h>		//strlen(), strcpy()
+#include <stdlib.h>		//malloc()
+#include <libxml/parser.h>	//xmlDocPtr, xmlNodePtr, xmlStrcml()
 
-xmlNodePtr qepp_libxml_find_node( char * name);
+xmlNodePtr	qepp_libxml_find_node( char * name, xmlNodePtr node);
+//xmlChar ** 	qepp_libxml_get_attr( xmlNodePtr node);
 
 
 

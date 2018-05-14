@@ -3,6 +3,7 @@
 errh * qepp_compute_cd_datafile( cd ** out_ptr, data_file * data, long int x, long int y, long int z, 
 	long int sel_kpt, int sel_bnd, int multiplier)
 {
+//QEPP_PRINT( "pointer %p \n", data);
 	if( out_ptr == NULL)
 		FAIL( NULL_OUT, " ");
 	*out_ptr = NULL;
@@ -21,9 +22,9 @@ errh * qepp_compute_cd_datafile( cd ** out_ptr, data_file * data, long int x, lo
 	vector_vector( data->a[0], data->a[1], a);
 	scalar_vector( a, data->a[2], &vol);
 
-	QEPP_PRINT( "Volume: %g %s\n", vol, data->a_n); 
+	QEPP_PRINT( "Volume: %g %s^3\n", vol, data->a_n); 
 	vol *= pow( data->a_t, 3);
-	QEPP_PRINT( "Volume: %g (m^-3)\n",vol);
+	QEPP_PRINT( "Volume: %g (m^3)\n",vol);
 
 	double coord[3]={0};
 	double delta[3]={ data->c_dim[0]*multiplier, data->c_dim[1]*multiplier, data->c_dim[2]*multiplier};
