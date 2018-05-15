@@ -622,7 +622,6 @@ int qepp_get_dat_value( void * out_ptr, FILE * read, long int pos, char * name, 
 	char needle[128];
 	sprintf( needle, "<%s ", name);
 	void * dump = malloc( dump_s);
-	//void * res  = malloc( num*size);
 
 	fseek( read, pos, SEEK_SET);
 	while( strstr( buffer, needle)==NULL && !feof( read))
@@ -638,7 +637,6 @@ int qepp_get_dat_value( void * out_ptr, FILE * read, long int pos, char * name, 
 		return 1;
 
 	free( dump);
-	//*out_ptr = res;
 	return 0;
 }
 

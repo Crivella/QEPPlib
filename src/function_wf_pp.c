@@ -3,7 +3,6 @@
 errh * qepp_compute_cd_datafile( cd ** out_ptr, data_file * data, long int x, long int y, long int z, 
 	long int sel_kpt, int sel_bnd, int multiplier)
 {
-//QEPP_PRINT( "pointer %p \n", data);
 	if( out_ptr == NULL)
 		FAIL( NULL_OUT, " ");
 	*out_ptr = NULL;
@@ -108,10 +107,8 @@ errh * qepp_compute_cd_datafile( cd ** out_ptr, data_file * data, long int x, lo
 		SET_PW_MPI( start, end);
 
 		QEPP_PRINT( "Computing kpt #%li...\n", k+1);
-#ifdef __MPI
-		QEPP_PRINT( "Process %d calculating PW from %li to %li/%li\n", mpi->world_rank, start, end,w->igwx);
+		QEPP_ALL_PRINT( "Process %d calculating PW from %li to %li/%li\n", mpi->world_rank, start, end,w->igwx);
 		QEPP_PRINT( "\n");
-#endif
 
 		double complex * c_app, * c_app2 = NULL;
 		for( int bnd=min_bnd; bnd<max_bnd; bnd++)
@@ -349,10 +346,8 @@ errh * qepp_compute_matrixelements_huge( void ** dump, data_file * data)
 		SET_PW_MPI( start, end);
 
 		QEPP_PRINT( "Computing kpt #%li...\n", i+1);
-#ifdef __MPI
 		QEPP_ALL_PRINT( "Process %d calculating PW from %li to %li/%li\n", mpi->world_rank, start, end,wfc1->igwx);
 		QEPP_PRINT("\n");
-#endif
 
 		for( int j1=start_b1; j1<n_bnd; j1++)
 		{
@@ -468,10 +463,8 @@ errh * qepp_compute_berry_phase( double complex ** out_ptr, data_file * data)
 		SET_PW_MPI( start, end);
 
 		QEPP_PRINT( "Computing kpt #%li...\n", i+1);
-#ifdef __MPI
 		QEPP_ALL_PRINT( "Process %d calculating PW from %li to %li/%li\n", mpi->world_rank, start, end,wfc1->igwx);
 		QEPP_PRINT( "\n");
-#endif
 
 		//double app1=1;
 		for( int j=0; j<n_bnd; j++)
@@ -609,10 +602,8 @@ errh * qepp_compute_berry_phase2( double complex ** out_ptr, data_file * data, l
 		SET_PW_MPI( start, end);
 
 		QEPP_PRINT( "Computing kpt #%li...\n", i+1);
-#ifdef __MPI
 		QEPP_ALL_PRINT( "Process %d calculating PW from %li to %li/%li\n", mpi->world_rank, start, end,wfc1->igwx);
 		QEPP_PRINT( "\n");
-#endif
 
 		//double app1=1;
 		for( int j=0; j<n_bnd; j++)
