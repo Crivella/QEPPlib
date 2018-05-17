@@ -12,7 +12,7 @@ gkv * initialize_gkv( long int ngkv)
 	to_init->size = sizeof( gkv);
 	
 	to_init->ngkv = ngkv;
-	to_init->index = (int *)QEPP_ALLOC( sizeof( long int), ngkv);
+	to_init->index = (long int *)QEPP_ALLOC( sizeof( long int), ngkv);
 	to_init->grid = (int **)QEPP_ALLOC( sizeof( int), ngkv, 3);
 
 	to_init->print =	&print_gkv;
@@ -47,7 +47,7 @@ void * print_gkv(gkv * to_print, FILE * write)
 
 	QEPP_OUT( write, "<INDEX>\n");
 	for( long int i=0; i<to_print->ngkv; i++)
-		QEPP_OUT( write, "%16d\n",to_print->index[i]);
+		QEPP_OUT( write, "%16li\n",to_print->index[i]);
 	QEPP_OUT( write, "</INDEX>\n");
 
 	QEPP_OUT( write, "<GRID>\n");
@@ -70,7 +70,7 @@ gkv * duplicate_gkv( gkv * to_dupl)
 	long int ngkv = to_dupl->ngkv;
 	gkv * new_s = initialize_gkv( ngkv);
 
-	new_s->index =	(int *)QEPP_DUPL( (void *)to_dupl->index);
+	new_s->index =	(long int *)QEPP_DUPL( (void *)to_dupl->index);
 	new_s->grid =	(int **)QEPP_DUPL( (void **)to_dupl->grid);
 
 	return new_s;

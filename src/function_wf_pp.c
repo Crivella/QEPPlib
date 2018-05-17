@@ -65,9 +65,11 @@ errh * qepp_compute_cd_datafile( cd ** out_ptr, data_file * data, long int x, lo
 			FAIL( FAIL, "Failed to read wavefunction from file: %s", data->wfc_link[k]);
 		if( data->n_spin == 4)
 		{
+QEPP_PRINT("SPIN!!!\n");
 			if( READ( data->wfc_link2[k], &w2) != SUCCESS)
 				FAIL( FAIL, "Failed to read wavefunction from file: %s", data->wfc_link2[k]);
 		}
+QEPP_PRINT( "%lf\n", creal(w->val[0][0]));
 		nbnd = w->nbnd;
 		n_el = ROUND( data->n_el);
 		if( n_el % 2 != 0)
@@ -97,7 +99,7 @@ errh * qepp_compute_cd_datafile( cd ** out_ptr, data_file * data, long int x, lo
 					G[j][n] += g->grid[j][n1] * data->b[n1][n] * data->b_t;
 			}
 		}
-
+QEPP_PRINT( "%4d%4d%4d  -> %g %g %g\n", g->grid[10][0], g->grid[10][1], g->grid[10][2], G[10][0], G[10][1], G[10][2]);
 
 		if( w->igwx != g->ngkv)
 			WARN( "w->igwx differ from g->ngkv!!!!\n");
@@ -113,9 +115,9 @@ errh * qepp_compute_cd_datafile( cd ** out_ptr, data_file * data, long int x, lo
 		double complex * c_app, * c_app2 = NULL;
 		for( int bnd=min_bnd; bnd<max_bnd; bnd++)
 		{
-			c_app = w->evc_vect[bnd]->val;
+			c_app = w->val[bnd];
 			if( data->n_spin == 4)
-				c_app2 = w2->evc_vect[bnd]->val;			
+				c_app2 = w2->val[bnd];			
 
 			for( long int n1=0; n1<x; n1++)
 			{
@@ -170,9 +172,9 @@ errh * qepp_compute_cd_datafile( cd ** out_ptr, data_file * data, long int x, lo
 				}
 			}
 		}
-		FREE( w);
-		FREE( w2);
-		FREE( g);
+		STRUCT_FREE( w);
+		STRUCT_FREE( w2);
+		STRUCT_FREE( g);
 	}
 	
 
@@ -365,13 +367,13 @@ errh * qepp_compute_matrixelements_huge( void ** dump, data_file * data)
 						app[dir]=0;
 					for( long int ng=start; ng<end;ng++)
 					{
-						app1 = wfc1->evc_vect[j1]->val;
-						app2 = wfc1->evc_vect[j2]->val;
+						app1 = wfc1->val[j1];
+						app2 = wfc1->val[j2];
 						app3 = conj(app1[ng]) * app2[ng];
 						if( data->n_spin == 4)
 						{
-							app1 = wfc2->evc_vect[j1]->val;
-							app2 = wfc2->evc_vect[j2]->val;
+							app1 = wfc2->val[j1];
+							app2 = wfc2->val[j2];
 							app3 += conj(app1[ng]) * app2[ng];
 						}
 						for( int dir=0; dir<3; dir++)
@@ -392,10 +394,10 @@ errh * qepp_compute_matrixelements_huge( void ** dump, data_file * data)
 			fflush( out);
 		}
 
-		FREE( wfc1);
-		FREE( wfc2);
-		FREE( egv1);
-		FREE( gkv1);
+		STRUCT_FREE( wfc1);
+		STRUCT_FREE( wfc2);
+		STRUCT_FREE( egv1);
+		STRUCT_FREE( gkv1);
 	}
 
 	QEPP_FREE( (void *)app);
@@ -479,9 +481,9 @@ errh * qepp_compute_berry_phase( double complex ** out_ptr, data_file * data)
 					if( gkv1->index[ng1] == gkv3->index[ng2])
 					{
 						ng2_app = ng2;
-						app2 += conj( wfc1->evc_vect[j]->val[ng1]) * wfc3->evc_vect[j]->val[ng2];
+						app2 += conj( wfc1->val[j][ng1]) * wfc3->val[j][ng2];
 						if( data->n_spin == 4)
-							app2 += conj( wfc2->evc_vect[j]->val[ng1]) * wfc4->evc_vect[j]->val[ng2];
+							app2 += conj( wfc2->val[j][ng1]) * wfc4->val[j][ng2];
 						break;
 					}
 					if( gkv3->index[ng2] > gkv1->index[ng1])
@@ -499,9 +501,9 @@ errh * qepp_compute_berry_phase( double complex ** out_ptr, data_file * data)
 			res[j] *= app2;
 		}
 
-		FREE( wfc1);
-		FREE( wfc2);
-		FREE( gkv1);
+		STRUCT_FREE( wfc1);
+		STRUCT_FREE( wfc2);
+		STRUCT_FREE( gkv1);
 	}
 	berry2 -= TWOPI*floor((berry2+PI)/TWOPI);
 	QEPP_OUT( out, "%g +i %g:  (clog)%g  <->  (atan)%g\n", creal(berry1), cimag(berry1), -cimag(clog(berry1)), berry2);
@@ -620,9 +622,9 @@ errh * qepp_compute_berry_phase2( double complex ** out_ptr, data_file * data, l
 					{
 						match++;
 						ng2_app = ng2;
-						app2 += conj(wfc1->evc_vect[j]->val[ng1]) * wfc3->evc_vect[j]->val[ng2];
+						app2 += conj(wfc1->val[j][ng1]) * wfc3->val[j][ng2];
 						if( data->n_spin == 4)
-							app2 += conj(wfc2->evc_vect[j]->val[ng1]) * wfc4->evc_vect[j]->val[ng2];
+							app2 += conj(wfc2->val[j][ng1]) * wfc4->val[j][ng2];
 						break;
 					}
 					if( gkv3->index[ng2] > gkv1->index[ng1])
@@ -642,9 +644,9 @@ errh * qepp_compute_berry_phase2( double complex ** out_ptr, data_file * data, l
 				res[j] *= app2;
 		}
 
-		FREE( wfc1);
-		FREE( wfc2);
-		FREE( gkv1);
+		STRUCT_FREE( wfc1);
+		STRUCT_FREE( wfc2);
+		STRUCT_FREE( gkv1);
 	}
 	berry2 -= TWOPI*floor((berry2+PI)/TWOPI);
 

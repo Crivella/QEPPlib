@@ -33,7 +33,7 @@
 
 char	* qepp_get_file(char *, char *);
 
-char 	* qepp_change_file( char *, char *);
+char 	* qepp_change_file( const char *, char *);
 
 size_t qepp_getline( char buffer[], int max_size, FILE * read);
 long int qepp_skip_comments( FILE * read, char * comments);
@@ -47,8 +47,8 @@ int qepp_get_file_columns_comm(FILE * read, char * comments, char * delimiters);
 bool qepp_strcmp_WC( char * pattern, char * candidate, int p, int c);
 #define qepp_strcmp_wc(a,b,...) qepp_strcmp_WC(a,b,0,0)
 
-bool qepp_is_file( char * filpath);
-bool qepp_is_dir( char * dirpath);
+bool qepp_is_file( const char * filpath);
+bool qepp_is_dir( const char * dirpath);
 
 
 long int qepp_find_string(char * pattern, FILE * read, long int start_pos);

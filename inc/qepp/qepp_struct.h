@@ -24,7 +24,7 @@
 #define ID_FIT_PARAMS	16
 #define ID_DATA_SET	32
 #define ID_WFC		64
-#define	ID_EVC		65
+//#define	ID_EVC		65
 #define ID_GKV		66
 #define ID_EGV		67
 #define ID_DATA_FILE	68
@@ -62,7 +62,7 @@ typedef struct pdos_data pdos_data;
 
 typedef struct data_file data_file;
 typedef struct wfc wfc;
-typedef struct evc evc;
+//typedef struct evc evc;
 typedef struct gkv gkv;
 typedef struct egv egv;
 
@@ -86,8 +86,8 @@ pdos_data	* initialize_pdos_data(long int, int, int);
 pdos_state	* initialize_pdos_state();
 ////////////////////////////////////////////////
 data_file	* initialize_data_file();
-wfc	 	* initialize_wfc( int n_evc);
-evc	 	* initialize_evc( long int nc);
+wfc	 	* initialize_wfc( );
+//evc	 	* initialize_evc( long int nc);
 gkv	 	* initialize_gkv( long int ngkv);
 egv		* initialize_egv( int n_bnd);
 cd	 	* initialize_cd( long int, long int, long int);
@@ -107,7 +107,7 @@ void * 		print_pdos_state( pdos_state *, FILE *);
 ////////////////////////////////////////////////
 void *		print_data_file( data_file *, FILE *);
 void * 		print_wfc( wfc *, FILE *);
-void * 		print_evc( evc *, FILE *);
+//void * 		print_evc( evc *, FILE *);
 void * 		print_gkv( gkv *, FILE *);
 void *		print_egv( egv *, FILE *);
 void * 		print_cd( cd *, FILE *);
@@ -127,7 +127,7 @@ pdos_state	* duplicate_pdos_state( pdos_state * to_dupl);
 ////////////////////////////////////////////////
 data_file	* duplicate_data_file( data_file * to_dupl);
 wfc		* duplicate_wfc( wfc * to_dupl);
-evc		* duplicate_evc( evc * to_dupl);
+//evc		* duplicate_evc( evc * to_dupl);
 gkv		* duplicate_gkv( gkv * to_dupl);
 egv		* duplicate_egv( egv * to_dupl);
 cd		* duplicate_cd( cd * to_dupl);
@@ -147,7 +147,7 @@ void *		free_pdos_state( pdos_state * to_free);
 ////////////////////////////////////////////////
 void *		free_data_file( data_file * to_free);
 void *		free_wfc( wfc * to_free);
-void *		free_evc( evc * to_free);
+//void *		free_evc( evc * to_free);
 void *		free_gkv( gkv * to_free);
 void *		free_egv( egv * to_free);
 void *		free_cd( cd * to_free);
@@ -161,11 +161,11 @@ size_t		totmem_m_elem(m_elem *);
 size_t		totmeme_fit_params( fit_params * to_free);
 size_t		totmem_data_set( data_set * to_free);*/
 
-#define PRINT_DATA(a,b) mpi->world_rank == ionode ? \
+#define STRUCT_PRINT(a,b) mpi->world_rank == ionode ? \
 		a->print( a, b) : \
 		0
-#define DUPLICATE(a) a!=NULL ? a->duplicate( a) : 0;
-#define FREE(a) a!=NULL ? a->free( a) : 0;
+#define STRUCT_DUPL(a) a!=NULL ? a->duplicate( a) : 0;
+#define STRUCT_FREE(a) a!=NULL ? a->free( a) : 0;
 
 void *		free_array_ptr(double **, long int);
 #define EPS_HEADERS {"E[eV]","eps_x","eps_y","eps_z","TOT"}
@@ -467,10 +467,9 @@ struct wfc
 	size_t size;
 	size_t mem;
 
-	int n_evc;		//Number of states per kpt
-	//long int * nc;
-	evc ** evc_vect;	//Vector of structs containing the dataof each state
-	//double complex ** val;
+
+	//gkv * gvect;
+	//egv * eigenvalues;
 
 	long int ngw;		//Max index for g-vect
 	long int igwx;		//Number of g-vect
@@ -482,25 +481,22 @@ struct wfc
 	int nspin;
 	double scale_factor;
 
+
+	long int max_igwx;	//Max index for g-vect
+	double kpt[3];		//Coord of kpt
+	int * index;		//Indexing of g-vects
+	int ** grid;		//Grid of miller indexes of g-vects
+
+
+	//int n_evc;		//Number of states per kpt
+	//long int * nc;
+	//evc ** evc_vect;	//Vector of structs containing the dataof each state
+	double complex ** val;
+
 	void * 		(*print)( wfc *, FILE *);
 	wfc *		(*duplicate)( wfc *);
 	void * 		(*free)( wfc *);
 	size_t		(*totmem)( wfc *);
-};
-
-struct evc
-{
-	int typeID;
-	size_t size;
-	size_t mem;
-
-	long int nc;		//Number of g-vect (size of vector val)
-	double complex * val;	//Coefficients of the expansion on plane waves
-
-	void * 		(*print)( evc *, FILE *);
-	evc *		(*duplicate)( evc *);
-	void * 		(*free)( evc *);
-	size_t		(*totmem)( evc *);
 };
 
 struct gkv
@@ -513,7 +509,7 @@ struct gkv
 	long int max_ngkv;	//Max numver of g-vect used for all kpt
 	bool gamma_only;
 	double kpt[3];		//Coord of kpt
-	int * index;		//Indexing of g-vects
+	long int * index;	//Indexing of g-vects
 	int ** grid;		//Grid of miller indexes of g-vects
 
 	void * 		(*print)( gkv *, FILE *);
@@ -548,8 +544,8 @@ struct cd
 
 	long int x,y,z;
 
-	double ****coord;
-	double ***dens;
+	double ****coord;	//mesh coord, [x][y][z][3]
+	double ***dens;		//density     [x][y][z]
 
 	void * 		(*print)( cd *, FILE *);
 	cd *		(*duplicate)( cd *);

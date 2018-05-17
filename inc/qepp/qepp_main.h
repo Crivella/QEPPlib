@@ -63,11 +63,11 @@ mpi_data * mpi = NULL;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Struct macros
-#define PRINT_DATA(a,b) mpi->world_rank == ionode ? \
+#define STRUCT_PRINT(a,b) mpi->world_rank == ionode ? \
 		a->print( a, b) : \
 		0
-#define DUPLICATE(a) a!=NULL ? a->duplicate( a) : 0;
-#define FREE(a) a!=NULL ? a->free( a) : 0;
+#define STRUCT_DUPL(a) a!=NULL ? a->duplicate( a) : 0;
+#define STRUCT_FREE(a) a!=NULL ? a->free( a) : 0;
 
 #define READ( a, b, ...) \
 	_Generic( (b), \

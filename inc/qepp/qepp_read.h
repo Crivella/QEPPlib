@@ -57,17 +57,17 @@
 
 #define dump_size 12
 
-errh * read_nscf_md(char *, nscf_md **);
-errh * read_nscf_data(char *, nscf_data **);
-errh * read_band_data(char *, band_data **);
-errh * read_band_pp(char *, band_pp **);
-errh * read_spin_data(char *, spin_data **);
-errh * read_opt_data(char *, opt_data **, char *);
-errh * read_m_elem(char *, m_elem **, char *);
-errh * read_fit_params(char *, fit_params **);
-errh * read_data_set(char *, data_set **);
-errh * read_pdos_data(char *, pdos_data **, char *);
-errh * read_pdos_state(char *, pdos_state **);
+errh * read_nscf_md(    const char *, nscf_md **);
+errh * read_nscf_data(  const char *, nscf_data **);
+errh * read_band_data(  const char *, band_data **);
+errh * read_band_pp(    const char *, band_pp **);
+errh * read_spin_data(  const char *, spin_data **);
+errh * read_opt_data(   const char *, opt_data **, char *);
+errh * read_m_elem(     const char *, m_elem **, char *);
+errh * read_fit_params( const char *, fit_params **);
+errh * read_data_set(   const char *, data_set **);
+errh * read_pdos_data(  const char *, pdos_data **, char *);
+errh * read_pdos_state( const char *, pdos_state **);
 
 errh * read_wfc( const char * filename, wfc **);
 errh * read_gkv( const char * filename, gkv **);
@@ -79,7 +79,6 @@ errh * read_gkv_xml( const char * filename, gkv **);
 errh * read_egv_xml( const char * filename, egv **);
 
 errh * read_wfc_dat( const char * filename, wfc **);
-evc  * read_evc_dat( FILE *, int);
 errh * read_gkv_dat( const char * filename, gkv **);
 
 

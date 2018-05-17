@@ -48,18 +48,21 @@ int qepp_libxml_get_node_value( void * res, xmlNodePtr node, enum gvk type, unsi
 
 	key = xmlNodeListGetString( document, node->xmlChildrenNode, 1);
 	char * endptr = (char *)key;
+
 	for( unsigned long int i=0; i<num; i++)
 	{
 		switch( type)
 		{
 			case R_INT:
-				sscanf( endptr, "%d", (int *)res+i*sizeof( int));
+				//sscanf( endptr, "%d", (int *)res+i*sizeof( int));
+				*((int *)res+i) = strtol( endptr, &endptr, 10);
 				break;
 			case R_LNT:
-				sscanf( endptr, "%li", (long int *)res+i*sizeof(long int));
+				*((long int *)res+i) = strtol( endptr, &endptr, 10);
 				break;
 			case R_FLT:
-				sscanf( endptr, "%f", (float *)res+i*sizeof( float));
+				*((float *)res+i) = strtof( endptr, &endptr);
+				//sscanf( endptr, "%f", (float *)res+i*sizeof( float));
 				break;
 			case R_LNF:
 				assert( !qepp_sscanf_double( endptr, res+i*sizeof(double), &endptr));
@@ -68,7 +71,7 @@ int qepp_libxml_get_node_value( void * res, xmlNodePtr node, enum gvk type, unsi
 				if( num != 1)
 					return 1;
 				strcpy( res, endptr);
-				break;
+				break;\
 		}
 	}
 	xmlFree( key);

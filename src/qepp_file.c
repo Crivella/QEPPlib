@@ -3,7 +3,7 @@
 //static void free_str_array( char ** ptr);
 //static char ** get_dir_content( char * dirpath);
 static long int print_str_array_num( char ** ptr, char * outname);
-static char	* get_path( char *);
+static char	* get_path( const char *);
 
 char * qepp_get_file( char * filename, char * id)
 {
@@ -65,7 +65,7 @@ char * qepp_get_file( char * filename, char * id)
 	return endres;
 }
 
-static char	* get_path( char * str)
+static char	* get_path( const char * str)
 {
 	char * res = NULL;
 	if( str == NULL)
@@ -81,7 +81,7 @@ static char	* get_path( char * str)
 	return res;
 }
 
-char 	* qepp_change_file( char * old, char * new)
+char 	* qepp_change_file( const char * old, char * new)
 {
 	char * res = NULL;
 	if( old == NULL)
@@ -265,7 +265,7 @@ char ** get_dir_content( char * dirpath)
 	return obj;
 }
 
-bool qepp_is_file( char * filpath)
+bool qepp_is_file( const char * filpath)
 {
 	struct stat path_stat;
 	stat( filpath, &path_stat);
@@ -274,7 +274,7 @@ bool qepp_is_file( char * filpath)
 	return false;
 }
 
-bool qepp_is_dir( char * dirpath)
+bool qepp_is_dir( const char * dirpath)
 {
 	struct stat path_stat;
 	stat( dirpath, &path_stat);

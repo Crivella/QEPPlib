@@ -4,19 +4,17 @@
 
 
 
-wfc * initialize_wfc( int n_evc)
+wfc * initialize_wfc( )
 {
 	wfc * to_init = malloc( sizeof( wfc));
 
 	to_init->typeID = ID_WFC;
 	to_init->size = sizeof( wfc);
 
-	to_init->n_evc = n_evc;
-	to_init->evc_vect = calloc( n_evc, sizeof( evc *));
 
-	to_init->nbnd = n_evc;
-	//for( int i=0; i<n_evc; i++)
-	//	to_init->evc_vect[i] = malloc( sizeof( evc));
+	to_init->index = NULL;
+	to_init->grid =  NULL;
+	to_init->val =   NULL;
 
 	to_init->print =	&print_wfc;
 	to_init->duplicate =	&duplicate_wfc;
@@ -31,6 +29,8 @@ void * print_wfc(wfc * to_print, FILE * write)
 		return NULL;
 	if( write == NULL)
 		return NULL;
+
+	long int igwx = to_print->igwx;
 
 	QEPP_OUT( write, "<INFO>\n");
 	QEPP_OUT( write, "%16s   =%16li\n","ngw",to_print->ngw);
@@ -49,13 +49,26 @@ void * print_wfc(wfc * to_print, FILE * write)
 	QEPP_OUT( write, "%16s   =%16lf\n","scale_factor",to_print->scale_factor);
 	QEPP_OUT( write, "</INFO>\n");
 
-	for( int i=0; i<to_print->n_evc; i++)
+	if( to_print->grid != NULL)
+	{
+		QEPP_OUT( write, "<GRID>\n");
+		for( long int i=0; i<igwx; i++)
+		{
+			int * app = to_print->grid[i]; 
+			for( int j=0; j<3; j++)
+				QEPP_OUT( write, "%11d", app[j]);
+			QEPP_OUT( write, "\n");
+		}
+		QEPP_OUT( write, "</GRID>\n");
+	}
+
+	for( int i=0; i<to_print->nbnd; i++)
 	{
 		QEPP_OUT( write, "  <evc.%d>\n",i+1);
-		evc * evc_app = to_print->evc_vect[i];
-		double complex app=evc_app->val[0];
-		for( long int i=0; i<evc_app->nc; app=evc_app->val[i++])
-			QEPP_OUT( write, "        %13.6E,%13.6E\n",creal(app),cimag(app));
+		//evc * evc_app = to_print->evc_vect[i];
+		double complex * app = to_print->val[i];
+		for( long int j=0; j<igwx; j++)
+			QEPP_OUT( write, "        %13.6E,%13.6E\n",creal(app[j]),cimag(app[j]));
 		QEPP_OUT( write, "  </evc.%d>\n",i+1);
 	}
 
@@ -67,11 +80,24 @@ wfc * duplicate_wfc( wfc * to_dupl)
 	if( to_dupl == NULL)
 		return NULL;
 
-	int n_evc = to_dupl->n_evc;
-	wfc * new_s = initialize_wfc( n_evc);
+	wfc * new_s = initialize_wfc( );
 
-	for( int i=0; i<n_evc; i++)
-		new_s->evc_vect[i] = DUPLICATE( to_dupl->evc_vect[i]);
+	new_s->ngw = to_dupl->ngw;
+	new_s->igwx = to_dupl->igwx;
+	new_s->gamma_only = to_dupl->gamma_only;
+	new_s->nbnd = to_dupl->nbnd;
+	new_s->ik = to_dupl->ik;
+	new_s->nk = to_dupl->nk;
+	new_s->ispin = to_dupl->ispin;
+	new_s->nspin = to_dupl->nspin;
+	new_s->scale_factor = to_dupl->scale_factor;
+	new_s->max_igwx = to_dupl->max_igwx;
+	for( int j=0; j<3; j++)
+		new_s->kpt[j] = to_dupl->kpt[j];
+
+	new_s->val =	QEPP_DUPL( to_dupl->val);
+	new_s->index =	QEPP_DUPL( to_dupl->index);
+	new_s->grid =	QEPP_DUPL( to_dupl->grid);
 
 	return new_s;
 }
@@ -81,11 +107,10 @@ void * free_wfc( wfc * to_free)
 	if( to_free == NULL)
 		return NULL;
 
-	int n_evc = to_free->n_evc;
-	for( int i=0; i<n_evc; i++)
-		//if( to_free->evc_vect[i] != NULL)
-		FREE( to_free->evc_vect[i]);
-	free( to_free->evc_vect);
+	QEPP_FREE( to_free->val);
+	QEPP_FREE( to_free->index);
+	QEPP_FREE( to_free->grid);
+
 	free( to_free);
 
 	return NULL;

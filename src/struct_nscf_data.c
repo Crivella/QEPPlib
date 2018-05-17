@@ -74,7 +74,7 @@ nscf_data * duplicate_nscf_data(nscf_data *to_dupl)
 
 	nscf_data * new_s=initialize_nscf_data( n_kpt, n_bnd);
 
-	new_s->md=DUPLICATE(to_dupl->md);
+	new_s->md = STRUCT_DUPL(to_dupl->md);
 
 	new_s->kpt =		(double **)QEPP_DUPL( (void **)to_dupl->kpt);
 	new_s->energies =	(double **)QEPP_DUPL( (void **)to_dupl->energies);
@@ -94,7 +94,7 @@ void * free_nscf_data(nscf_data * to_free)
 	QEPP_FREE( (void **)to_free->occup);
 	QEPP_FREE( (void *)to_free->weight);
 
-	FREE(to_free->md);
+	STRUCT_FREE(to_free->md);
 	free(to_free);
 	
 

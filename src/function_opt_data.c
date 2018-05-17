@@ -102,7 +102,7 @@ errh * calculate_opt_properties( opt_data ** out_ptr, opt_data * eps1, opt_data 
 		x = eps1->x[i];
 		if( fabs(x - eps2->x[i]) > 1.E-4)
 		{
-			FREE( new_s);
+			STRUCT_FREE( new_s);
 			FAIL( FAIL, "Mismatch between x coordinates");
 		}
 		new_s->x[i] = x;
