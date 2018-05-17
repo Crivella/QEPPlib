@@ -49,6 +49,17 @@ void * print_wfc(wfc * to_print, FILE * write)
 	QEPP_OUT( write, "%16s   =%16lf\n","scale_factor",to_print->scale_factor);
 	QEPP_OUT( write, "</INFO>\n");
 
+	if( to_print->index != NULL)
+	{
+		QEPP_OUT( write, "<INDEX>\n");
+		for( long int i=0; i<igwx; i++)
+		{
+			QEPP_OUT( write, "%11d", to_print->index[i]);
+			QEPP_OUT( write, "\n");
+		}
+		QEPP_OUT( write, "</INDEX>\n");
+	}
+
 	if( to_print->grid != NULL)
 	{
 		QEPP_OUT( write, "<GRID>\n");

@@ -15,7 +15,7 @@ errh * qepp_compute_cd_datafile( cd ** out_ptr, data_file * data, long int x, lo
 	long int n_kpt = data->n_kpt;
 
 	wfc * w = NULL, * w2 = NULL;
-	gkv * g = NULL;
+	//gkv * g = NULL;
 
 	double a[3], vol;
 	vector_vector( data->a[0], data->a[1], a);
@@ -53,6 +53,10 @@ errh * qepp_compute_cd_datafile( cd ** out_ptr, data_file * data, long int x, lo
 		fac=1;
 	int min_bnd=0, max_bnd;
 
+	bool check = false;
+	if( (data->n_spin > 1 && df->version < 6002000) || (data->n_spin == 2 && df->version >= 6002000))
+		check = true;
+
 	long int min_kpt=0, max_kpt=n_kpt;
 	if( sel_kpt > 0)
 	{
@@ -62,12 +66,12 @@ errh * qepp_compute_cd_datafile( cd ** out_ptr, data_file * data, long int x, lo
 	for( long int k=min_kpt; k<max_kpt; k++)
 	{
 		if( READ( data->wfc_link[k], &w) != SUCCESS)
-			FAIL( FAIL, "Failed to read wavefunction from file: %s", data->wfc_link[k]);
-		if( data->n_spin == 4)
+			FAIL( FAIL, "Failed to read wavefunction from file '%s'", data->wfc_link[k]);
+		if( check)
 		{
 QEPP_PRINT("SPIN!!!\n");
 			if( READ( data->wfc_link2[k], &w2) != SUCCESS)
-				FAIL( FAIL, "Failed to read wavefunction from file: %s", data->wfc_link2[k]);
+				FAIL( FAIL, "Failed to read wavefunction from file '%s'", data->wfc_link2[k]);
 		}
 QEPP_PRINT( "%lf\n", creal(w->val[0][0]));
 		nbnd = w->nbnd;
@@ -84,28 +88,30 @@ QEPP_PRINT( "%lf\n", creal(w->val[0][0]));
 			max_bnd = sel_bnd;
 		}
 		
-		if( READ( data->egvec_link[k], &g) != SUCCESS)
-			FAIL( FAIL, "Failed to read g vectors from file: %s", data->egvec_link[k]);
+		//if( READ( data->egvec_link[k], &g) != SUCCESS)
+		//	FAIL( FAIL, "Failed to read g vectors from file: %s", data->egvec_link[k]);
 
 		double KG[3];
-		double G[g->ngkv][3];
+		double G[w->igwx][3];
 		weight = data->weight[k];
-		for( long int j=0; j<g->ngkv; j++)
+		for( long int j=0; j<w->igwx; j++)
 		{
 			for( int n=0; n<3; n++)
 			{
 				G[j][n] = 0;
 				for( int n1=0; n1<3; n1++)
-					G[j][n] += g->grid[j][n1] * data->b[n1][n] * data->b_t;
+					G[j][n] += w->grid[j][n1] * data->b[n1][n] * data->b_t;
 			}
 		}
-QEPP_PRINT( "%4d%4d%4d  -> %g %g %g\n", g->grid[10][0], g->grid[10][1], g->grid[10][2], G[10][0], G[10][1], G[10][2]);
+QEPP_PRINT( "%4d%4d%4d  -> %g %g %g\n", w->grid[10][0], w->grid[10][1], w->grid[10][2], G[10][0], G[10][1], G[10][2]);
 
-		if( w->igwx != g->ngkv)
-			WARN( "w->igwx differ from g->ngkv!!!!\n");
+		//if( w->igwx != g->ngkv)
+		//	WARN( "w->igwx differ from g->ngkv!!!!\n");
 
-		long int start=0;
-		long int end=w->igwx;
+		long int start = 0;
+		long int end = w->igwx;
+		if( data->n_spin == 2 &&df->version >= 6002000)
+			end *= w->nspin;
 		SET_PW_MPI( start, end);
 
 		QEPP_PRINT( "Computing kpt #%li...\n", k+1);
@@ -116,7 +122,7 @@ QEPP_PRINT( "%4d%4d%4d  -> %g %g %g\n", g->grid[10][0], g->grid[10][1], g->grid[
 		for( int bnd=min_bnd; bnd<max_bnd; bnd++)
 		{
 			c_app = w->val[bnd];
-			if( data->n_spin == 4)
+			if( check)
 				c_app2 = w2->val[bnd];			
 
 			for( long int n1=0; n1<x; n1++)
@@ -144,7 +150,7 @@ QEPP_PRINT( "%4d%4d%4d  -> %g %g %g\n", g->grid[10][0], g->grid[10][1], g->grid[
 							}
 							exp_app = cexp( I * exponential);
 							cc += c_app[ng] * exp_app;
-							if( data->n_spin == 4)
+							if( check)
 								cc2 += c_app2[ng] * exp_app;
 						}
 						mp_sum( &cc, MPI_COMM_WORLD, 1);
@@ -157,7 +163,7 @@ QEPP_PRINT( "%4d%4d%4d  -> %g %g %g\n", g->grid[10][0], g->grid[10][1], g->grid[
 
 						integrated += creal(n_app);
 
-						if( data->n_spin == 4)
+						if( check)
 						{
 							mp_sum( &cc2, MPI_COMM_WORLD, 1);
 							n_app2 += cc2 * conj( cc2);
@@ -174,7 +180,7 @@ QEPP_PRINT( "%4d%4d%4d  -> %g %g %g\n", g->grid[10][0], g->grid[10][1], g->grid[
 		}
 		STRUCT_FREE( w);
 		STRUCT_FREE( w2);
-		STRUCT_FREE( g);
+		//STRUCT_FREE( g);
 	}
 	
 
@@ -275,8 +281,8 @@ errh * qepp_compute_matrixelements_huge( void ** dump, data_file * data)
 
 	wfc * wfc1 = NULL;
 	wfc * wfc2 = NULL;
-	gkv * gkv1 = NULL;
-	egv * egv1 = NULL;
+	//gkv * gkv1 = NULL;
+	//egv * egv1 = NULL;
 	const char * filename = "matrixelements";
 	FILE * out = NULL;
 
@@ -290,61 +296,70 @@ errh * qepp_compute_matrixelements_huge( void ** dump, data_file * data)
 		WARN( "File %s already exist... attempting restart mode\n", filename);
 		out = fopen( filename, "a+");
 		fseek( out, 0, SEEK_END);
-		char c;
-		do
+		if( ! (ftell( out) < 10))
 		{
-			fseek( out, -2, SEEK_CUR);
-			c = fgetc( out);
-		} while( c != '\n');
-		double app;
-		qepp_fscanf_double( out, &app);
-		start_k = app-1;
-		qepp_fscanf_double( out, &app);
-		start_b1 = app;
+			char c;
+			do
+			{
+				fseek( out, -2, SEEK_CUR);
+				c = fgetc( out);
+			} while( c != '\n');
+			double app;
+			qepp_fscanf_double( out, &app);
+			start_k = app-1;
+			qepp_fscanf_double( out, &app);
+			start_b1 = app;
+		}
 	}
 	else
 		out = fopen( filename, "w");
 	if( out == NULL)
 		FAIL( FAIL, "Cannout open file matrixelements for write");
 
-	double complex * app = (double complex *)QEPP_ALLOC( sizeof( double complex), 3);
+	double complex app[3];// = (double complex *)QEPP_ALLOC( sizeof( double complex), 3);
 
 	//double tpiba = 2  * PI / (data->lp);
 	double tpiba2 = pow( data->a_t, 2);
 
+	bool check = false;
+	if( (data->n_spin > 1 && df->version < 6002000) || (data->n_spin == 2 && df->version >= 6002000))
+		check = true;
+
 	for( long int i=start_k; i<n_kpt; i++)
 	{
 		if( READ( &wfc1, data->wfc_link[i]) != SUCCESS)
-			FAIL( FAIL, "Failed to read wavefunction from file: %s", data->wfc_link[i]);
-		if( data->n_spin == 4)
+			FAIL( FAIL, "Failed to read wavefunction from file '%s'", data->wfc_link[i]);
+		if( check)
 		{
 			if( READ( &wfc2, data->wfc_link2[i]) != SUCCESS)
-				FAIL( FAIL, "Failed to read wavefunction from file: %s", data->wfc_link2[i]);
+				FAIL( FAIL, "Failed to read wavefunction from file '%s'", data->wfc_link2[i]);
 		}
 
-		if( READ( data->egval_link[i], &egv1) != SUCCESS)
-			FAIL( FAIL, "Failed to read eigenvalues from file: %s", data->egval_link[i]);
+		//if( READ( data->egval_link[i], &egv1) != SUCCESS)
+		//	FAIL( FAIL, "Failed to read eigenvalues from file: %s", data->egval_link[i]);
 
-		if( READ( data->egvec_link[i], &gkv1) != SUCCESS)
-			FAIL( FAIL, "Failed to read eigenvectors from file: %s", data->egvec_link[i]);
+		//if( READ( data->egvec_link[i], &gkv1) != SUCCESS)
+		//	FAIL( FAIL, "Failed to read eigenvectors from file: %s", data->egvec_link[i]);
 
 		double KG;
-		double G[gkv1->ngkv][3];
+		double G[wfc1->igwx][3];
 		//double weight = data->weight[i];
 
 		//Change G from cryst to cart
-		for( long int j=0; j<gkv1->ngkv; j++)
+		for( long int j=0; j<wfc1->igwx; j++)
 		{
 			for( int n=0; n<3; n++)
 			{
 				G[j][n] = 0;
 				for( int n1=0; n1<3; n1++)
-					G[j][n] += gkv1->grid[j][n1] * data->b[n1][n] * data->b_t;
+					G[j][n] += wfc1->grid[j][n1] * data->b[n1][n] * data->b_t;
 			}
 		}
 
-		long int start=0;
-		long int end=wfc1->igwx;
+		long int start = 0;
+		long int end = wfc1->igwx;
+		if( data->n_spin == 2 &&df->version >= 6002000)
+			end *= wfc1->nspin;
 		SET_PW_MPI( start, end);
 
 		QEPP_PRINT( "Computing kpt #%li...\n", i+1);
@@ -356,8 +371,8 @@ errh * qepp_compute_matrixelements_huge( void ** dump, data_file * data)
 			start_b1=0;
 			for( int j2=j1+1; j2<n_bnd; j2++)
 			{
-				double gap = (egv1->val[j2] - egv1->val[j1]) * egv1->e_t;
-				double occ = 2*(egv1->occ[j1] - egv1->occ[j2]);
+				double gap = (data->egv[j2] - data->egv[j1]) * data->e_t;
+				double occ = 2*(data->occ[j1] - data->occ[j2]);
 
 				if( occ > 1.E-4)
 				{
@@ -370,7 +385,7 @@ errh * qepp_compute_matrixelements_huge( void ** dump, data_file * data)
 						app1 = wfc1->val[j1];
 						app2 = wfc1->val[j2];
 						app3 = conj(app1[ng]) * app2[ng];
-						if( data->n_spin == 4)
+						if( check)
 						{
 							app1 = wfc2->val[j1];
 							app2 = wfc2->val[j2];
@@ -396,15 +411,16 @@ errh * qepp_compute_matrixelements_huge( void ** dump, data_file * data)
 
 		STRUCT_FREE( wfc1);
 		STRUCT_FREE( wfc2);
-		STRUCT_FREE( egv1);
-		STRUCT_FREE( gkv1);
+		//STRUCT_FREE( egv1);
+		//STRUCT_FREE( gkv1);
 	}
 
-	QEPP_FREE( (void *)app);
+	//QEPP_FREE( (void *)app);
 
 	fclose( out);	
 	SUCCESS();
 }
+
 
 errh * qepp_compute_berry_phase( double complex ** out_ptr, data_file * data)
 {
@@ -414,8 +430,8 @@ errh * qepp_compute_berry_phase( double complex ** out_ptr, data_file * data)
 	wfc * wfc2 = NULL;
 	wfc * wfc3 = NULL;
 	wfc * wfc4 = NULL;
-	gkv * gkv1 = NULL;
-	gkv * gkv3 = NULL;
+	//gkv * gkv1 = NULL;
+	//gkv * gkv3 = NULL;
 	double complex * res = NULL;
 	if( out_ptr == NULL)
 		FAIL( NULL_OUT, " ");
@@ -430,16 +446,20 @@ errh * qepp_compute_berry_phase( double complex ** out_ptr, data_file * data)
 	for( int i=0; i<n_bnd; i++)
 		res[i] = 1;
 
+	bool check = false;
+	if( (data->n_spin > 1 && df->version < 6002000) || (data->n_spin == 2 && df->version >= 6002000))
+		check = true;
+
 
 	if( READ( &wfc3, data->wfc_link[0]) != SUCCESS)
 		FAIL( FAIL, "Failed to read wavefunction from file: %s", data->wfc_link[0]);
-	if( data->n_spin == 4)
+	if( check)
 	{
 		if( READ( &wfc4, data->wfc_link2[0]) != SUCCESS)
 			FAIL( FAIL, "Failed to read wavefunction from file: %s", data->wfc_link2[0]);
 	}
-	if( READ( &gkv3, data->egvec_link[0]) != SUCCESS)
-		FAIL( FAIL, "Failed to read g vectors from file: %s", data->egvec_link[0]);
+	//if( READ( &gkv3, data->egvec_link[0]) != SUCCESS)
+	//	FAIL( FAIL, "Failed to read g vectors from file: %s", data->egvec_link[0]);
 
 	FILE * out = fopen( "qepp_berry.dat", "w");
 	double complex berry1 = 1;
@@ -448,20 +468,22 @@ errh * qepp_compute_berry_phase( double complex ** out_ptr, data_file * data)
 	{
 		wfc1 = wfc3;
 		wfc2 = wfc4;
-		gkv1 = gkv3;
+		//gkv1 = gkv3;
 
 		if( READ( &wfc3, data->wfc_link[(i+1)%n_kpt]) != SUCCESS)
 			FAIL( FAIL, "Failed to read wavefunction from file: %s", data->wfc_link[(i+1)%n_kpt]);
-		if( data->n_spin == 4)
+		if( check)
 		{
 			if( READ( &wfc4, data->wfc_link2[(i+1)%n_kpt]) != SUCCESS)
 				FAIL( FAIL, "Failed to read wavefunction from file: %s", data->wfc_link2[(i+1)%n_kpt]);
 		}
-		if( READ( &gkv3, data->egvec_link[(i+1)%n_kpt]) != SUCCESS)
-			FAIL( FAIL, "Failed to read g vectors from file: %s", data->egvec_link[(i+1)%n_kpt]);	
+		//if( READ( &gkv3, data->egvec_link[(i+1)%n_kpt]) != SUCCESS)
+		//	FAIL( FAIL, "Failed to read g vectors from file: %s", data->egvec_link[(i+1)%n_kpt]);	
 
-		long int start=0;
-		long int end=wfc1->igwx;
+		long int start = 0;
+		long int end = wfc1->igwx;
+		if( data->n_spin == 2 &&df->version >= 6002000)
+			end *= wfc1->nspin;
 		SET_PW_MPI( start, end);
 
 		QEPP_PRINT( "Computing kpt #%li...\n", i+1);
@@ -478,16 +500,18 @@ errh * qepp_compute_berry_phase( double complex ** out_ptr, data_file * data)
 			{
 				for( ng2=ng2_app; ng2<wfc3->igwx; ng2++)
 				{
+/*
 					if( gkv1->index[ng1] == gkv3->index[ng2])
 					{
 						ng2_app = ng2;
 						app2 += conj( wfc1->val[j][ng1]) * wfc3->val[j][ng2];
-						if( data->n_spin == 4)
+						if( check)
 							app2 += conj( wfc2->val[j][ng1]) * wfc4->val[j][ng2];
 						break;
 					}
 					if( gkv3->index[ng2] > gkv1->index[ng1])
 						break;
+*/
 				}
 			}
 			mp_sum( &app2, MPI_COMM_WORLD, 1);
@@ -503,7 +527,7 @@ errh * qepp_compute_berry_phase( double complex ** out_ptr, data_file * data)
 
 		STRUCT_FREE( wfc1);
 		STRUCT_FREE( wfc2);
-		STRUCT_FREE( gkv1);
+		//STRUCT_FREE( gkv1);
 	}
 	berry2 -= TWOPI*floor((berry2+PI)/TWOPI);
 	QEPP_OUT( out, "%g +i %g:  (clog)%g  <->  (atan)%g\n", creal(berry1), cimag(berry1), -cimag(clog(berry1)), berry2);
@@ -521,8 +545,8 @@ errh * qepp_compute_berry_phase2( double complex ** out_ptr, data_file * data, l
 	wfc * wfc2 = NULL;
 	wfc * wfc3 = NULL;
 	wfc * wfc4 = NULL;
-	gkv * gkv1 = NULL;
-	gkv * gkv3 = NULL;
+	//gkv * gkv1 = NULL;
+	//gkv * gkv3 = NULL;
 	double complex * res = NULL;
 	if( out_ptr == NULL)
 		FAIL( NULL_OUT, " ");
@@ -546,16 +570,20 @@ errh * qepp_compute_berry_phase2( double complex ** out_ptr, data_file * data, l
 		if( isnan( creal(res[i]))) QEPP_PRINT( "%lf\n", data->kpt[n_kpt+1000000][0]);
 	}
 
+	bool check = false;
+	if( (data->n_spin > 1 && df->version < 6002000) || (data->n_spin == 2 && df->version >= 6002000))
+		check = true;
+
 
 	if( READ( &wfc3, data->wfc_link[0]) != SUCCESS)
 		FAIL( FAIL, "Failed to read wavefunction from file: %s", data->wfc_link[0]);
-	if( data->n_spin == 4)
+	if( check)
 	{
 		if( READ( &wfc4, data->wfc_link2[0]) != SUCCESS)
 			FAIL( FAIL, "Failed to read wavefunction from file: %s", data->wfc_link2[0]);
 	}
-	if( READ( &gkv3, data->egvec_link[0]) != SUCCESS)
-		FAIL( FAIL, "Failed to read g vectors from file: %s", data->egvec_link[0]);
+	//if( READ( &gkv3, data->egvec_link[0]) != SUCCESS)
+	//	FAIL( FAIL, "Failed to read g vectors from file: %s", data->egvec_link[0]);
 
 	long int k3;
 
@@ -566,17 +594,17 @@ errh * qepp_compute_berry_phase2( double complex ** out_ptr, data_file * data, l
 		k3=klist[(i+1)%n_kpt];
 		wfc1 = wfc3;
 		wfc2 = wfc4;
-		gkv1 = gkv3;
+		//gkv1 = gkv3;
 
 		if( READ( &wfc3, data->wfc_link[k3]) != SUCCESS)
 			FAIL( FAIL, "Failed to read wavefunction from file: %s", data->wfc_link[k3]);
-		if( data->n_spin == 4)
+		if( check)
 		{
 			if( READ( &wfc4, data->wfc_link2[k3]) != SUCCESS)
 				FAIL( FAIL, "Failed to read wavefunction from file: %s", data->wfc_link2[k3]);
 		}
-		if( READ( &gkv3, data->egvec_link[k3]) != SUCCESS)
-			FAIL( FAIL, "Failed to read g vectors from file: %s", data->egvec_link[k3]);		
+		//if( READ( &gkv3, data->egvec_link[k3]) != SUCCESS)
+		//	FAIL( FAIL, "Failed to read g vectors from file: %s", data->egvec_link[k3]);		
 
 		/*double G1[gkv1->ngkv][3];
 		for( long int j=0; j<gkv1->ngkv; j++)
@@ -599,8 +627,10 @@ errh * qepp_compute_berry_phase2( double complex ** out_ptr, data_file * data, l
 			}
 		}*/
 
-		long int start=0;
-		long int end=wfc1->igwx;
+		long int start = 0;
+		long int end = wfc1->igwx;
+		if( data->n_spin == 2 &&df->version >= 6002000)
+			end *= wfc1->nspin;
 		SET_PW_MPI( start, end);
 
 		QEPP_PRINT( "Computing kpt #%li...\n", i+1);
@@ -618,17 +648,19 @@ errh * qepp_compute_berry_phase2( double complex ** out_ptr, data_file * data, l
 			{
 				for( ng2=ng2_app; ng2<wfc3->igwx; ng2++)
 				{
+/*
 					if( gkv1->index[ng1] == gkv3->index[ng2])
 					{
 						match++;
 						ng2_app = ng2;
 						app2 += conj(wfc1->val[j][ng1]) * wfc3->val[j][ng2];
-						if( data->n_spin == 4)
+						if( check)
 							app2 += conj(wfc2->val[j][ng1]) * wfc4->val[j][ng2];
 						break;
 					}
 					if( gkv3->index[ng2] > gkv1->index[ng1])
 						break;
+*/
 				}
 			}
 			mp_sum( &app2, MPI_COMM_WORLD, 1);
@@ -646,7 +678,7 @@ errh * qepp_compute_berry_phase2( double complex ** out_ptr, data_file * data, l
 
 		STRUCT_FREE( wfc1);
 		STRUCT_FREE( wfc2);
-		STRUCT_FREE( gkv1);
+		//STRUCT_FREE( gkv1);
 	}
 	berry2 -= TWOPI*floor((berry2+PI)/TWOPI);
 
@@ -664,7 +696,6 @@ errh * qepp_compute_berry_phase2( double complex ** out_ptr, data_file * data, l
 	*out_ptr = res;
 	SUCCESS();
 }
-
 
 
 

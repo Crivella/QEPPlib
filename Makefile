@@ -44,7 +44,6 @@ struct_data_file.o \
 struct_data_set.o \
 struct_egv.o \
 struct_fit_params.o \
-struct_gkv.o \
 struct_m_elem.o \
 struct_mpi_data.o \
 struct_nscf_data.o \

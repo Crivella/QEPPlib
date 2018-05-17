@@ -656,7 +656,7 @@ char * get_tmp_path()
 				if( qepp_strcmp_wc( "*.save", app2[j]))
 				{
 					res = malloc( 1024);
-					sprintf( res, "./%s/%s", app1[i], app2[j]);
+					sprintf( res, "./%s/%s/", app1[i], app2[j]);
 					free_str_array( app1);
 					free_str_array( app2);
 					return res;
