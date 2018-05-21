@@ -21,7 +21,7 @@
 #include <qepp/qepp_constants.h>
 #include <qepp/qepp_function.h>
 //#include <qepp/qepp_read.h>
-#include <qepp/qepp_mem.h>	//QEPP_ALLOC/2/3/4(), QEPP_DUPL/2/3/4(), QEPP_FREE/2/3/4()
+#include <qepp/qepp_mem.h>	//AllocateLinearMem1/2/3/4(), DuplicateLinearMem1/2/3/4(), FreeLinearMem1/2/3/4()
 #include <qepp/qepp_io.h>	//OPEN_IO_ENV(), CLOSE_IO_ENV(), QEPP_PRINT(), QEPP_ALL_PRINT(), QEPP_OUT()
 #include <qepp/qepp_mpi.h>	//mb_bcast(), mp_sum(), SET_PW_MPI()
 
@@ -63,11 +63,11 @@ mpi_data * mpi = NULL;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Struct macros
-#define PRINT_DATA(a,b) mpi->world_rank == ionode ? \
+#define STRUCT_PRINT(a,b) mpi->world_rank == ionode ? \
 		a->print( a, b) : \
 		0
-#define DUPLICATE(a) a!=NULL ? a->duplicate( a) : 0;
-#define FREE(a) a!=NULL ? a->free( a) : 0;
+#define STRUCT_DUPL(a) a!=NULL ? a->duplicate( a) : 0;
+#define STRUCT_FREE(a) a!=NULL ? a->free( a) : 0;
 
 #define READ( a, b, ...) \
 	_Generic( (b), \
@@ -84,8 +84,6 @@ mpi_data * mpi = NULL;
 		pdos_state **:	parse_errh(read_pdos_state( (char *)a, (pdos_state **)b)), \
 		data_file **:	parse_errh(read_data_file(  (char *)a, (data_file **)b)), \
 		wfc **:		parse_errh(read_wfc(        (char *)a, (wfc **)b)), \
-		gkv **:		parse_errh(read_gkv(        (char *)a, (gkv **)b)), \
-		egv **:		parse_errh(read_egv(        (char *)a, (egv **)b)), \
 		char *:		_Generic( (a), \
 			nscf_data **:	parse_errh(read_nscf_data(  (char *)b, (nscf_data **)a)), \
 			band_data **:	parse_errh(read_band_data(  (char *)b, (band_data **)a)), \
@@ -100,8 +98,6 @@ mpi_data * mpi = NULL;
 			pdos_state **:	parse_errh(read_pdos_state( (char *)b, (pdos_state **)a)), \
 			data_file **:	parse_errh(read_data_file(  (char *)b, (data_file **)a)), \
 			wfc **:		parse_errh(read_wfc(        (char *)b, (wfc **)a)), \
-			gkv **:		parse_errh(read_gkv(        (char *)b, (gkv **)a)), \
-			egv **:		parse_errh(read_egv(        (char *)b, (egv **)a)), \
 			default:	parse_errh( set_errh( WARNING, __func__, "Calling macro READ type not implemented...\n")) \
 		), \
 		default: 	parse_errh( set_errh( WARNING, __func__, "Calling macro READ type not implemented...\n")) \

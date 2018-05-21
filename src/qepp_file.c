@@ -3,9 +3,9 @@
 //static void free_str_array( char ** ptr);
 //static char ** get_dir_content( char * dirpath);
 static long int print_str_array_num( char ** ptr, char * outname);
-static char	* get_path( char *);
+static char	* get_path( const char *);
 
-char * get_file( char * filename, char * id)
+char * qepp_get_file( char * filename, char * id)
 {
 	char * endres=NULL;
 	if( qepp_is_file( filename))
@@ -43,7 +43,7 @@ char * get_file( char * filename, char * id)
 	res[n] = 0;
 
 	if( res[0] == NULL)
-		fprintf( stderr, "WARNING get_fileout(): No valid output found...\n");
+		fprintf( stderr, "WARNING qepp_get_file(): No valid output found...\n");
 	else
 	{
 		printf("Choose the nscf output among the list:\n");
@@ -65,7 +65,7 @@ char * get_file( char * filename, char * id)
 	return endres;
 }
 
-static char	* get_path( char * str)
+static char	* get_path( const char * str)
 {
 	char * res = NULL;
 	if( str == NULL)
@@ -81,7 +81,7 @@ static char	* get_path( char * str)
 	return res;
 }
 
-char 	* qepp_change_file( char * old, char * new)
+char 	* qepp_change_file( const char * old, char * new)
 {
 	char * res = NULL;
 	if( old == NULL)
@@ -265,7 +265,7 @@ char ** get_dir_content( char * dirpath)
 	return obj;
 }
 
-bool qepp_is_file( char * filpath)
+bool qepp_is_file( const char * filpath)
 {
 	struct stat path_stat;
 	stat( filpath, &path_stat);
@@ -274,7 +274,7 @@ bool qepp_is_file( char * filpath)
 	return false;
 }
 
-bool qepp_is_dir( char * dirpath)
+bool qepp_is_dir( const char * dirpath)
 {
 	struct stat path_stat;
 	stat( dirpath, &path_stat);
@@ -415,7 +415,7 @@ int qepp_fscanf_double(FILE * read, double * res)
 	while( (c < '0' || c > '9') && c != EOF )
 	{
 		c=getc(read);
-		if( c == '.' || c == '-')
+		if( c == '.' || c == '-' || c == '+')
 		{
 			char app=c;
 			c=getc(read);
@@ -513,12 +513,11 @@ int qepp_sscanf_double2(char * str, double * res , char ** endptr)
 	while( (c < '0' || c > '9') && c != '\0' )
 	{
 		c=str[++count];
-		if( (c == '.' || c == '-') && ( '0' <= str[count+1] && str[count+1] <= '9'))
+		if( (c == '.' || c == '-' || c == '+') && ( '0' <= str[count+1] && str[count+1] <= '9'))
 			break;
 	}
 	if( c == '\0')
-		return EOF;
-
+		return 1;
 	*res = 0;
 	int negative=0, fase=0;
 	int decimal=1, exponent=0;
@@ -590,7 +589,7 @@ int qepp_sscanf_double2(char * str, double * res , char ** endptr)
 	return 0;
 }
 
-int qepp_get_xml_param( double * out_ptr, FILE * read, long int pos, char * name, char * key)
+int qepp_get_dat_attr( double * out_ptr, FILE * read, long int pos, char * name, char * key)
 {
 	if( out_ptr == NULL)
 		return 1;
@@ -615,7 +614,7 @@ int qepp_get_xml_param( double * out_ptr, FILE * read, long int pos, char * name
 	return 0;
 }
 
-int qepp_get_xml_value( void ** out_ptr, FILE * read, long int pos, char * name, long int num, int size, int dump_s)
+int qepp_get_dat_value( void * out_ptr, FILE * read, long int pos, char * name, long int num, int size, int dump_s)
 {
 	if( out_ptr == NULL)
 		return 1;
@@ -623,7 +622,6 @@ int qepp_get_xml_value( void ** out_ptr, FILE * read, long int pos, char * name,
 	char needle[128];
 	sprintf( needle, "<%s ", name);
 	void * dump = malloc( dump_s);
-	void * res  = malloc( num*size);
 
 	fseek( read, pos, SEEK_SET);
 	while( strstr( buffer, needle)==NULL && !feof( read))
@@ -635,11 +633,10 @@ int qepp_get_xml_value( void ** out_ptr, FILE * read, long int pos, char * name,
 		if( fread( dump, dump_s, 1, read) < 1)
 			return 1;
 
-	if( fread( res, size, num, read) < num)
+	if( fread( out_ptr, size, num, read) < num)
 		return 1;
 
 	free( dump);
-	*out_ptr = res;
 	return 0;
 }
 
@@ -659,7 +656,7 @@ char * get_tmp_path()
 				if( qepp_strcmp_wc( "*.save", app2[j]))
 				{
 					res = malloc( 1024);
-					sprintf( res, "./%s/%s", app1[i], app2[j]);
+					sprintf( res, "./%s/%s/", app1[i], app2[j]);
 					free_str_array( app1);
 					free_str_array( app2);
 					return res;

@@ -16,7 +16,7 @@ errh * calculate_eps( opt_data ** out_ptr, opt_data * data, double max_range, lo
 	char * filename="nscf_1.out";
 	if( !qepp_is_file( filename) && (v_cell == 0 || !qepp_is_file( "k.dat")))
 	{
-		filename = get_file( filename, ".out");
+		filename = qepp_get_file( filename, ".out");
 	}
 
 	if( max_range == 0 || n_pt == 0)
@@ -49,7 +49,7 @@ errh * calculate_eps( opt_data ** out_ptr, opt_data * data, double max_range, lo
 		tot_w = app->tot_weight/2;
 		weight = (double *)QEPP_ALLOC( sizeof( double), n_kpt);//malloc( n_kpt * sizeof( double));
 		memcpy(weight, app->weight, app->n_kpt * sizeof( double));
-		FREE(app);
+		STRUCT_FREE(app);
 	}
 	else
 	{
@@ -104,7 +104,7 @@ errh * calculate_eps( opt_data ** out_ptr, opt_data * data, double max_range, lo
 			WARN ("Spinorbit calculation detected");
 		}
 
-	FREE( app);
+	STRUCT_FREE( app);
 //Trasform pp in eps_2[k][x->en][i/j/k]
 	for( long int i=0; i<n_kpt; i++)
 		for( long int i1=1; i1<n_pt; i1++)
@@ -140,7 +140,7 @@ errh * calculate_eps( opt_data ** out_ptr, opt_data * data, double max_range, lo
 	eps->values=app2;
 
 //Free all unused variables
-	FREE(k_pt);
+	STRUCT_FREE(k_pt);
 	QEPP_FREE( (void *)weight);
 	QEPP_FREE( (void ***)pp);
 
@@ -163,7 +163,7 @@ errh * calculate_eps_huge_files( opt_data ** out_ptr, char * mname, double max_r
 	double fact=1;
 	char *filename="nscf_1.out";
 	if( !qepp_is_file( filename) && (v_cell == 0 || !qepp_is_file( "k.dat")))
-		filename = get_file( filename, ".out");
+		filename = qepp_get_file( filename, ".out");
 
 	if( max_range == 0 || n_pt == 0)
 		FAIL( FAIL, "Invalid input parameters");
@@ -195,7 +195,7 @@ errh * calculate_eps_huge_files( opt_data ** out_ptr, char * mname, double max_r
 		tot_w = app->tot_weight/2;
 		weight = (double *)QEPP_ALLOC( sizeof( double), n_kpt);//malloc( n_kpt * sizeof( double));
 		memcpy(weight, app->weight, app->n_kpt * sizeof( double));
-		FREE(app);
+		STRUCT_FREE(app);
 	}
 	else
 	{
@@ -271,7 +271,7 @@ errh * calculate_eps_huge_files( opt_data ** out_ptr, char * mname, double max_r
 			prefact/=2;
 			QEPP_PRINT( "Spinorbit calculation detected\n");
 		}
-	FREE( app);
+	STRUCT_FREE( app);
 //Trasform pp in eps_2[k][x->en][i/j/k]
 	for( long int i=0; i<n_kpt; i++)
 		for( long int i1=1; i1<n_pt; i1++)
@@ -308,7 +308,7 @@ errh * calculate_eps_huge_files( opt_data ** out_ptr, char * mname, double max_r
 	eps->values=app2;
 
 //Free all unused variables
-	FREE(k_pt);
+	STRUCT_FREE(k_pt);
 	QEPP_FREE( (void *)weight);
 	QEPP_FREE( (void ***)pp);
 
@@ -364,7 +364,7 @@ errh * calculate_eps_mod(opt_data * data, double max_range, long int n_pt, doubl
 		tot_w = app->tot_weight/2;
 		weight = (double *)QEPP_ALLOC( sizeof( double), n_kpt);//malloc( n_kpt * sizeof( double));
 		memcpy(weight, app->weight, app->n_kpt * sizeof( double));
-		FREE(app);
+		STRUCT_FREE(app);
 	}
 	else
 	{
@@ -473,8 +473,8 @@ NbP	15.2998		15.5891		15.285 + 0.056
 			prefact/=2;
 			QEPP_PRINT( "Spinorbit calculation detected\n");
 		}
-	FREE( app);
-	FREE( app22);
+	STRUCT_FREE( app);
+	STRUCT_FREE( app22);
 //Trasform pp in eps_2[k][x->en][i/j/k]
 	for( long int i=0; i<n_kpt; i++)
 		for( long int i1=1; i1<n_pt; i1++)
@@ -511,7 +511,7 @@ NbP	15.2998		15.5891		15.285 + 0.056
 	eps->values=app2;
 
 //Free all unused variables
-	FREE(k_pt);
+	STRUCT_FREE(k_pt);
 	QEPP_FREE( (void *)weight);
 	QEPP_FREE( (void ***)pp);
 	QEPP_PRINT( "End eps_mod calculation\n");
@@ -534,7 +534,7 @@ errh * calculate_eps_mod_huge_files( opt_data ** out_ptr, char * mname, double m
 	double fact=1;
 	char *filename="nscf_1.out";
 	if( !qepp_is_file( filename) && (v_cell == 0 || !qepp_is_file( "k.dat")))
-		filename = get_file( filename, ".out");
+		filename = qepp_get_file( filename, ".out");
 
 	if( max_range == 0 || n_pt == 0)
 		FAIL( FAIL, "Invalid input parameters");
@@ -567,7 +567,7 @@ errh * calculate_eps_mod_huge_files( opt_data ** out_ptr, char * mname, double m
 		tot_w = app11->tot_weight/2;
 		weight = (double *)QEPP_ALLOC( sizeof( double), n_kpt);//malloc( n_kpt * sizeof( double));
 		memcpy(weight, app11->weight, app11->n_kpt * sizeof( double));
-		FREE(app11);
+		STRUCT_FREE(app11);
 	}
 	else
 	{
@@ -891,7 +891,7 @@ NbP	15.2998		15.5891		15.285 + 0.056 = 15.341
 			prefact/=2.;
 			WARN( "Spinorbit calculation detected");
 		}
-	FREE( app);
+	STRUCT_FREE( app);
 
 //Trasform pp in eps_2[k][x->en][i/j/k]
 	for( long int i=0; i<n_kpt; i++)
@@ -938,7 +938,7 @@ NbP	15.2998		15.5891		15.285 + 0.056 = 15.341
 	eps->values=app2;
 
 //Free all unused variables
-	FREE(k_pt);
+	STRUCT_FREE(k_pt);
 	QEPP_FREE( (void *)weight);
 	QEPP_FREE( (void ***)pp);
 
@@ -960,7 +960,7 @@ errh * calculate_jdos_huge_files( opt_data ** out_ptr, char * mname, double max_
 	double fact=1;
 	char *filename="nscf_1.out";
 	if( !qepp_is_file( filename) && (v_cell == 0 || !qepp_is_file( "k.dat")))
-		filename = get_file( filename, ".out");
+		filename = qepp_get_file( filename, ".out");
 
 	if( max_range == 0 || n_pt == 0)
 		FAIL( FAIL, "Invalid input parameters");
@@ -992,7 +992,7 @@ errh * calculate_jdos_huge_files( opt_data ** out_ptr, char * mname, double max_
 		tot_w = app->tot_weight/2;
 		weight = (double *)QEPP_ALLOC( sizeof( double), n_kpt);//malloc( n_kpt * sizeof( double));
 		memcpy(weight, app->weight, app->n_kpt * sizeof( double));
-		FREE(app);
+		STRUCT_FREE(app);
 	}
 	else
 	{
@@ -1067,7 +1067,7 @@ errh * calculate_jdos_huge_files( opt_data ** out_ptr, char * mname, double max_
 			prefact/=2;
 			QEPP_PRINT( "Spinorbit calculation detected\n");
 		}
-	FREE( app);
+	STRUCT_FREE( app);
 //Trasform pp in eps_2[k][x->en][i/j/k]
 	for( long int i=0; i<n_kpt; i++)
 		for( long int i1=1; i1<n_pt; i1++)
@@ -1096,7 +1096,7 @@ errh * calculate_jdos_huge_files( opt_data ** out_ptr, char * mname, double max_
 	eps->values=app2;
 
 //Free all unused variables
-	FREE(k_pt);
+	STRUCT_FREE(k_pt);
 	QEPP_FREE( (void *)weight);
 	QEPP_FREE( (void **)pp);
 

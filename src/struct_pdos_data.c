@@ -67,9 +67,9 @@ void * free_pdos_data(pdos_data * to_free)
 	QEPP_FREE( (void ***)to_free->pdos);
 
 	for( int i=0; i<to_free->n_states; i++)
-		FREE( to_free->states[i]);
+		STRUCT_FREE( to_free->states[i]);
 
-	FREE( to_free->nscf);
+	STRUCT_FREE( to_free->nscf);
 
 	free( to_free);
 
