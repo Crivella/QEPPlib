@@ -23,7 +23,7 @@ xmlNodePtr qepp_libxml_find_node( char * name, xmlNodePtr root, unsigned long in
 		{
 			if( strcmp( ptr, name))
 			{
-				res = qepp_libxml_find_node( ptr+strlen(ptr)+1, node);
+				res = qepp_libxml_find_node( ptr+strlen(ptr)+1, node, skip);
 			}
 			else
 			{
