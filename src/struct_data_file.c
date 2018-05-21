@@ -16,7 +16,7 @@ data_file * initialize_data_file()
 	to_init->egv = NULL;
 	to_init->occ = NULL;
 
-	to_init->egvec_link = 	NULL;
+	//to_init->egvec_link = 	NULL;
 	to_init->wfc_link = 	NULL;
 	to_init->wfc_link2 = NULL;
 
@@ -51,7 +51,7 @@ data_file * duplicate_data_file( data_file * to_dupl)
 	new_s->kpt =		(double **)QEPP_DUPL( (void **)to_dupl->kpt);
 	new_s->weight =		(double *)QEPP_DUPL( (void *)to_dupl->weight);
 	//new_s-> egval_link =	(char **)QEPP_DUPL( (void **)to_dupl->egval_link);
-	new_s-> egvec_link =	(char **)QEPP_DUPL( (void **)to_dupl->egvec_link);
+	//new_s-> egvec_link =	(char **)QEPP_DUPL( (void **)to_dupl->egvec_link);
 	new_s-> wfc_link =	(char **)QEPP_DUPL( (void **)to_dupl->wfc_link);
 
 	return new_s;
@@ -68,7 +68,7 @@ void * free_data_file( data_file * to_free)
 	QEPP_FREE( (void **)to_free->occ);
 	//QEPP_FREE( (void **)to_free->egval_link);
 	//QEPP_FREE( (void **)to_free->egval_link2);
-	QEPP_FREE( (void **)to_free->egvec_link);
+	//QEPP_FREE( (void **)to_free->egvec_link);
 	QEPP_FREE( (void **)to_free->wfc_link);
 	QEPP_FREE( (void **)to_free->wfc_link2);
 

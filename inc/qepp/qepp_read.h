@@ -6,6 +6,7 @@
 #include <stdio.h>		//fopen(), fprintf(), printf(), scanf()
 #include <stdlib.h>		//malloc(), realloc()
 #include <string.h>		//strstr(), strcpy(), strlen()
+#include <math.h>		//pow()
 #include <stdbool.h>
 #include <assert.h>
 
@@ -66,16 +67,11 @@ errh * read_pdos_data(  const char *, pdos_data **, char *);
 errh * read_pdos_state( const char *, pdos_state **);
 
 errh * read_wfc( const char * filename, wfc **);
-//errh * read_gkv( const char * filename, gkv **);
-//errh * read_egv( const char * filename, egv **);
 errh * read_data_file( const char * filename, data_file **);
 
 errh * read_wfc_xml( const char * filename, wfc **);
-//errh * read_gkv_xml( const char * filename, gkv **);
-//errh * read_egv_xml( const char * filename, egv **);
 
 errh * read_wfc_dat( const char * filename, wfc **);
-//errh * read_gkv_dat( const char * filename, gkv **);
 
 
 

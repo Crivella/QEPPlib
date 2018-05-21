@@ -42,7 +42,6 @@ struct_bands_pp.o \
 struct_cd.o \
 struct_data_file.o \
 struct_data_set.o \
-struct_egv.o \
 struct_fit_params.o \
 struct_m_elem.o \
 struct_mpi_data.o \

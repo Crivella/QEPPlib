@@ -84,7 +84,6 @@ mpi_data * mpi = NULL;
 		pdos_state **:	parse_errh(read_pdos_state( (char *)a, (pdos_state **)b)), \
 		data_file **:	parse_errh(read_data_file(  (char *)a, (data_file **)b)), \
 		wfc **:		parse_errh(read_wfc(        (char *)a, (wfc **)b)), \
-		gkv **:		parse_errh(read_gkv(        (char *)a, (gkv **)b)), \
 		char *:		_Generic( (a), \
 			nscf_data **:	parse_errh(read_nscf_data(  (char *)b, (nscf_data **)a)), \
 			band_data **:	parse_errh(read_band_data(  (char *)b, (band_data **)a)), \
@@ -99,7 +98,6 @@ mpi_data * mpi = NULL;
 			pdos_state **:	parse_errh(read_pdos_state( (char *)b, (pdos_state **)a)), \
 			data_file **:	parse_errh(read_data_file(  (char *)b, (data_file **)a)), \
 			wfc **:		parse_errh(read_wfc(        (char *)b, (wfc **)a)), \
-			gkv **:		parse_errh(read_gkv(        (char *)b, (gkv **)a)), \
 			default:	parse_errh( set_errh( WARNING, __func__, "Calling macro READ type not implemented...\n")) \
 		), \
 		default: 	parse_errh( set_errh( WARNING, __func__, "Calling macro READ type not implemented...\n")) \

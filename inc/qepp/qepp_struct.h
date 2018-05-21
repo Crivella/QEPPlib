@@ -26,7 +26,7 @@
 #define ID_WFC		64
 //#define	ID_EVC		65
 //#define ID_GKV		66
-#define ID_EGV		67
+//#define ID_EGV		67
 #define ID_DATA_FILE	68
 #define ID_PDOS_DATA	128
 #define ID_PDOS_STATE	129
@@ -64,7 +64,7 @@ typedef struct data_file data_file;
 typedef struct wfc wfc;
 //typedef struct evc evc;
 //typedef struct gkv gkv;
-typedef struct egv egv;
+//typedef struct egv egv;
 
 typedef struct cd cd;
 
@@ -87,8 +87,6 @@ pdos_state	* initialize_pdos_state();
 ////////////////////////////////////////////////
 data_file	* initialize_data_file();
 wfc	 	* initialize_wfc( );
-//gkv	 	* initialize_gkv( long int ngkv);
-egv		* initialize_egv( int n_bnd);
 cd	 	* initialize_cd( long int, long int, long int);
 
 void * 		print_nscf_data(nscf_data *, FILE *);
@@ -106,8 +104,6 @@ void * 		print_pdos_state( pdos_state *, FILE *);
 ////////////////////////////////////////////////
 void *		print_data_file( data_file *, FILE *);
 void * 		print_wfc( wfc *, FILE *);
-//void * 		print_gkv( gkv *, FILE *);
-void *		print_egv( egv *, FILE *);
 void * 		print_cd( cd *, FILE *);
 
 nscf_md		* duplicate_nscf_md( nscf_md *);
@@ -125,8 +121,6 @@ pdos_state	* duplicate_pdos_state( pdos_state * to_dupl);
 ////////////////////////////////////////////////
 data_file	* duplicate_data_file( data_file * to_dupl);
 wfc		* duplicate_wfc( wfc * to_dupl);
-//gkv		* duplicate_gkv( gkv * to_dupl);
-egv		* duplicate_egv( egv * to_dupl);
 cd		* duplicate_cd( cd * to_dupl);
 
 void * 		free_nscf_md(nscf_md *);
@@ -144,8 +138,6 @@ void *		free_pdos_state( pdos_state * to_free);
 ////////////////////////////////////////////////
 void *		free_data_file( data_file * to_free);
 void *		free_wfc( wfc * to_free);
-//void *		free_gkv( gkv * to_free);
-void *		free_egv( egv * to_free);
 void *		free_cd( cd * to_free);
 
 /*size_t		totmem_nscf_md(nscf_md *);
@@ -452,7 +444,7 @@ struct data_file
 
 	//char ** egval_link;	//Link to file containing the eigenvalues data for each k_point
 	//char ** egval_link2;	//Link to file containing the eigenvalues data for each k_point
-	char ** egvec_link;	//Link to file containing the eigenvector data for each k_point
+	//char ** egvec_link;	//Link to file containing the eigenvector data for each k_point
 	char **	wfc_link;	//Link to file containing the coefficient of the for each k_point
 	char ** wfc_link2;	//(in case of spin-orbit)Link to file containing the coefficient of the for each k_point with other spin
 
@@ -492,51 +484,12 @@ struct wfc
 	//int n_evc;		//Number of states per kpt
 	//long int * nc;
 	//evc ** evc_vect;	//Vector of structs containing the dataof each state
-	double complex ** val;
+	double complex ** val;	//Coefficients of the plane wave expansion
 
 	void * 		(*print)( wfc *, FILE *);
 	wfc *		(*duplicate)( wfc *);
 	void * 		(*free)( wfc *);
 	size_t		(*totmem)( wfc *);
-};
-
-/*
-struct gkv
-{
-	int typeID;
-	size_t size;
-	size_t mem;
-
-	long int ngkv;		//Number of g-vect used for current kpt
-	long int max_ngkv;	//Max numver of g-vect used for all kpt
-	bool gamma_only;
-	double kpt[3];		//Coord of kpt
-	long int * index;	//Indexing of g-vects
-	int ** grid;		//Grid of miller indexes of g-vects
-
-	void * 		(*print)( gkv *, FILE *);
-	gkv *		(*duplicate)( gkv *);
-	void * 		(*free)( gkv *);
-	size_t		(*totmem)( gkv *);
-};
-*/
-
-struct egv
-{
-	int typeID;
-	size_t size;
-	size_t mem;
-
-	int n_bnd;	//Number of bands
-	double e_t;	//Coversion val units to eV
-	
-	double * val;	//Vector energy[ band]
-	double * occ;	//Vector occupation[ band]
-
-	void * 		(*print)( egv *, FILE *);
-	egv *		(*duplicate)( egv *);
-	void * 		(*free)( egv *);
-	size_t		(*totmem)( egv *);
 };
 
 struct cd

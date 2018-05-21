@@ -1,7 +1,7 @@
 #include <qepp/wrapper_libxml.h>
 
-
-xmlNodePtr qepp_libxml_find_node( char * name, xmlNodePtr root)
+#ifdef __LIBXML2
+xmlNodePtr qepp_libxml_find_node( char * name, xmlNodePtr root, unsigned long int skip)
 {
 	if( name == NULL)
 		return NULL;
@@ -22,11 +22,18 @@ xmlNodePtr qepp_libxml_find_node( char * name, xmlNodePtr root)
 		if( !xmlStrcmp( node->name, (const xmlChar *)ptr))
 		{
 			if( strcmp( ptr, name))
+			{
 				res = qepp_libxml_find_node( ptr+strlen(ptr)+1, node);
+			}
 			else
 			{
-				res = node;
-				break;
+				if( skip > 0)
+					skip--;
+				else
+				{
+					res = node;
+					break;
+				}
 			}
 		}
 	}	
@@ -149,6 +156,8 @@ xmlChar ** 	qepp_libxml_get_attr( xmlNodePtr node)
 }
 */
 
+
+#endif //__LIBXML2
 
 
 
