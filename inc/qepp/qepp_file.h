@@ -31,9 +31,9 @@
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-char	* get_file(char *, char *);
+char	* qepp_get_file(char *, char *);
 
-char 	* qepp_change_file( char *, char *);
+char 	* qepp_change_file( const char *, char *);
 
 size_t qepp_getline( char buffer[], int max_size, FILE * read);
 long int qepp_skip_comments( FILE * read, char * comments);
@@ -47,12 +47,15 @@ int qepp_get_file_columns_comm(FILE * read, char * comments, char * delimiters);
 bool qepp_strcmp_WC( char * pattern, char * candidate, int p, int c);
 #define qepp_strcmp_wc(a,b,...) qepp_strcmp_WC(a,b,0,0)
 
-bool qepp_is_file( char * filpath);
-bool qepp_is_dir( char * dirpath);
+bool qepp_is_file( const char * filpath);
+bool qepp_is_dir( const char * dirpath);
 
 
 long int qepp_find_string(char * pattern, FILE * read, long int start_pos);
+#ifndef R_gvk
+#define R_gvk
 enum gvk { R_INT, R_FLT, R_STR, R_LNT, R_LNF}; //get_value_kind
+#endif //R_gvk
 int qepp_get_value( char * pattern, FILE * read, char * delim, long int start_pos, enum gvk gvk_e, void * res);
 
 int qepp_fscanf_double(FILE * to_read, double * res);
@@ -68,7 +71,7 @@ char ** get_dir_content( char * dirpath);
 
 /*-------------------------------------------------------------------------*/
 /**
-  @name     qepp_get_xml_param
+  @name     qepp_get_dat_attr
   @brief    Get the value of a param from an xml file
 
   @param    out_ptr: Address to a pointer where the data will be stored
@@ -85,11 +88,11 @@ char ** get_dir_content( char * dirpath);
   return 0 if successfull or 1 if failed
  */
 /*-------------------------------------------------------------------------*/
-int qepp_get_xml_param( double * out_ptr, FILE * read, long int pos, char * name, char * key);
+int qepp_get_dat_attr( double * out_ptr, FILE * read, long int pos, char * name, char * key);
 
 /*-------------------------------------------------------------------------*/
 /**
-  @name     qepp_get_xml_value
+  @name     qepp_get_dat_value
   @brief    Get the binary value stored in a class of an xml file
 
   @param    out_ptr: Address to a pointer where the data will be stored
@@ -109,7 +112,7 @@ int qepp_get_xml_param( double * out_ptr, FILE * read, long int pos, char * name
   return 0 if successfull or 1 if failed
  */
 /*-------------------------------------------------------------------------*/
-int qepp_get_xml_value( void * out_ptr, FILE * read, long int pos, char * name, long int num, int size, int dump_s);
+int qepp_get_dat_value( void * out_ptr, FILE * read, long int pos, char * name, long int num, int size, int dump_s);
 
 char * get_tmp_path();
 
