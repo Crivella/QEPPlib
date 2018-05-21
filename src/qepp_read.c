@@ -807,50 +807,7 @@ static errh * read_data_file_new( xmlNodePtr root, char * path, data_file * res)
 		assert( !qepp_libxml_get_node_value( res->occ[i], node, R_LNF, res->n_bnd));
 	}
 
-
-
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////
-	//Read EIGENVALUES
-	/*app = qepp_libxml_find_node( "EIGENVALUES", root);
-
-	for( long int i=0; i<res->n_kpt; i++)
-	{
-		sprintf( buffer, "K-POINT.%li/K-POINT_COORDS", i+1);
-		node = qepp_libxml_find_node( buffer, app);
-		double a[3];
-		assert( !qepp_libxml_get_node_value( &a[0], node, R_LNF, 3));
-		for( int n=0; n<3; n++)
-			if( a[n] != res->kpt[i][n])
-				WARN( "kpt coordinates in eigenvalue list differ from BZ list");
-
-		if( res->n_spin != 2)
-		{
-			sprintf( buffer, "K-POINT.%li/DATAFILE", i+1);
-			node = qepp_libxml_find_node( buffer, app);
-			assert( !qepp_libxml_get_node_attr( &buffer, "iotk_link", node, R_STR, 1));
-			char name[256];
-			//sprintf( res->egval_link[i], "%s%s", path, buffer);
-			sprintf( name, "%s%s", path, buffer);
-			read_egv_xml( name, res);
-		}
-		else
-		{	
-			sprintf( buffer, "K-POINT.%li/DATAFILE.1", i+1);
-			node = qepp_libxml_find_node( buffer, app);
-			assert( !qepp_libxml_get_node_attr( &buffer, "iotk_link", node, R_STR, 1));
-			//sprintf( res->egval_link[i], "%s%s", path, buffer);
-			char name[256];
-			sprintf( name, "%s%s", path, buffer);
-			read_egv_xml( name, res);
-
-			sprintf( buffer, "K-POINT.%li/DATAFILE.2", i+1);
-			node = qepp_libxml_find_node( buffer, app);
-			assert( !qepp_libxml_get_node_attr( &buffer, "iotk_link", node, R_STR, 1));
-			//sprintf( res->egval_link2[i], "%s%s", path, buffer);
-		}
-	}*/
-
+	//Implementare meglio lettura di conti con lsda
 	SUCCESS();
 }
 

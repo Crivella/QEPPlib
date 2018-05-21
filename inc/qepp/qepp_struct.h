@@ -8,7 +8,6 @@
 #include <complex.h>
 
 #include <qepp/qepp_constants.h>
-//#include <qepp/qepp_io.h>
 #include <qepp/qepp_err.h>	//errh, SET_ERRH(), MSG(), WARN()
 #include <qepp/qepp_mem.h>	//QEPP_ALLOC(), QEPP_DUPL(), QEPP_FREE()
 
@@ -24,9 +23,6 @@
 #define ID_FIT_PARAMS	16
 #define ID_DATA_SET	32
 #define ID_WFC		64
-//#define	ID_EVC		65
-//#define ID_GKV		66
-//#define ID_EGV		67
 #define ID_DATA_FILE	68
 #define ID_PDOS_DATA	128
 #define ID_PDOS_STATE	129
@@ -62,14 +58,10 @@ typedef struct pdos_data pdos_data;
 
 typedef struct data_file data_file;
 typedef struct wfc wfc;
-//typedef struct evc evc;
-//typedef struct gkv gkv;
-//typedef struct egv egv;
 
 typedef struct cd cd;
 
 extern data_file * df;
-//#include <qepp/qepp_read.h>	//READ()
 
 
 nscf_md		* initialize_nscf_md();
@@ -140,15 +132,6 @@ void *		free_data_file( data_file * to_free);
 void *		free_wfc( wfc * to_free);
 void *		free_cd( cd * to_free);
 
-/*size_t		totmem_nscf_md(nscf_md *);
-size_t		totmem_band_data( band_data *);
-size_t		totmem_nscf_data(nscf_data *);
-size_t		totmem_opt_data(opt_data *);
-size_t		totmem_col_data(col_data *);
-size_t		totmem_m_elem(m_elem *);
-size_t		totmeme_fit_params( fit_params * to_free);
-size_t		totmem_data_set( data_set * to_free);*/
-
 #define STRUCT_PRINT(a,b) mpi->world_rank == ionode ? \
 		a->print( a, b) : \
 		0
@@ -179,7 +162,6 @@ struct nscf_data
 {
 	int typeID;
 	size_t size;
-	//size_t mem;
 
 	nscf_md * md;
 	long int n_kpt;
@@ -194,14 +176,12 @@ struct nscf_data
 	void * 		(*print)( nscf_data *, FILE *);
 	nscf_data *	(*duplicate)( nscf_data *);
 	void * 		(*free)( nscf_data *);
-	//size_t		(*totmem)( nscf_data *);
 };
 
 struct band_data
 {
 	int typeID;
 	size_t size;
-	//size_t mem;
 
 	long int n_kpt;
 	int n_bnd;
@@ -212,14 +192,12 @@ struct band_data
 	void * 		(*print)( band_data *, FILE *);
 	band_data *	(*duplicate)( band_data *);
 	void * 		(*free)( band_data *);
-	//size_t		(*totmem)( band_data *);
 };
 
 struct band_pp
 {
 	int typeID;
 	size_t size;
-	//size_t mem;
 
 	long int n_kpt;
 	int n_bnd;
@@ -231,14 +209,12 @@ struct band_pp
 	void * 		(*print)( band_pp *, FILE *);
 	band_pp *	(*duplicate)( band_pp *);
 	void * 		(*free)( band_pp *);
-	//size_t		(*totmem)( band_data *);
 };
 
 struct spin_data
 {
 	int typeID;
 	size_t size;
-	//size_t mem;
 
 	long int n_kpt;
 	int n_bnd;
@@ -253,17 +229,14 @@ struct spin_data
 	void * 		(*print)( spin_data *, FILE *);
 	spin_data *	(*duplicate)( spin_data *);
 	void * 		(*free)( spin_data *);
-	//size_t		(*totmem)( band_data *);
 };
 
 struct nscf_metadata
 {
 	int typeID;
 	size_t size;
-	//size_t mem;
 
 	long int lines;
-	//long int *lines_pos;
 
 	char formula[128];
 	long int n_kpt;
@@ -277,14 +250,12 @@ struct nscf_metadata
 	void * 		(*print)( nscf_md *, FILE *);
 	nscf_md *	(*duplicate)( nscf_md *);
 	void * 		(*free)( nscf_md *);
-	//size_t		(*totmem)( nscf_md *);
 };
 
 struct opt_data
 {
 	int typeID;
 	size_t size;
-	//size_t mem;
 
 	int n_col;
 	long int n_pt;
@@ -296,7 +267,6 @@ struct opt_data
 	void * 		(*print)( opt_data *, FILE *);
 	opt_data *	(*duplicate)( opt_data *);
 	void * 		(*free)( opt_data *);
-	//size_t		(*totmem)( opt_data *);
 };
 ///////////////////////////////////da implementare
 struct col_data
@@ -308,7 +278,6 @@ struct col_data
 	void * 		(*print)( col_data *, FILE *);
 	col_data *	(*duplicate)( col_data *);
 	void * 		(*free)( col_data *);
-	size_t		(*totmem)( col_data *);
 };/////////////////////////////////////////////////////////////////
 
 struct m_elem
@@ -328,7 +297,6 @@ struct m_elem
 	void * 		(*print)( m_elem *, FILE *);
 	m_elem *	(*duplicate)( m_elem *);
 	void * 		(*free)( m_elem *);
-	size_t		(*totmem)( m_elem *);
 };
 
 struct fit_params
@@ -349,7 +317,6 @@ struct fit_params
 	void * 		(*print)( fit_params *, FILE *);
 	fit_params *	(*duplicate)( fit_params *);
 	void * 		(*free)( fit_params *);
-	size_t		(*totmem)( fit_params *);
 };
 
 struct data_set
@@ -365,7 +332,6 @@ struct data_set
 	void * 		(*print)( data_set *, FILE *);
 	data_set *	(*duplicate)( data_set *);
 	void * 		(*free)( data_set *);
-	size_t		(*totmem)( data_set *);
 };
 
 struct pdos_data
@@ -386,7 +352,6 @@ struct pdos_data
 	void * 		(*print)( pdos_data *, FILE *);
 	pdos_data *	(*duplicate)( pdos_data *);
 	void * 		(*free)( pdos_data *);
-	size_t		(*totmem)( pdos_data *);
 };
 
 struct pdos_state
@@ -405,7 +370,6 @@ struct pdos_state
 	void * 		(*print)( pdos_state *, FILE *);
 	pdos_state *		(*duplicate)( pdos_state *);
 	void * 		(*free)( pdos_state *);
-	size_t		(*totmem)( pdos_state *);
 };
 
 struct data_file
@@ -451,7 +415,6 @@ struct data_file
 	void * 		(*print)( data_file *, FILE *);
 	data_file *	(*duplicate)( data_file *);
 	void * 		(*free)( data_file *);
-	size_t		(*totmem)( data_file *);
 };
 
 struct wfc
@@ -489,7 +452,6 @@ struct wfc
 	void * 		(*print)( wfc *, FILE *);
 	wfc *		(*duplicate)( wfc *);
 	void * 		(*free)( wfc *);
-	size_t		(*totmem)( wfc *);
 };
 
 struct cd
@@ -506,7 +468,6 @@ struct cd
 	void * 		(*print)( cd *, FILE *);
 	cd *		(*duplicate)( cd *);
 	void * 		(*free)( cd *);
-	size_t		(*totmem)( cd *);
 };
 
 
