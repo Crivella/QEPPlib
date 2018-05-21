@@ -21,7 +21,7 @@
 #include <qepp/qepp_constants.h>
 #include <qepp/qepp_function.h>
 //#include <qepp/qepp_read.h>
-#include <qepp/qepp_mem.h>	//QEPP_ALLOC/2/3/4(), QEPP_DUPL/2/3/4(), QEPP_FREE/2/3/4()
+#include <qepp/qepp_mem.h>	//AllocateLinearMem1/2/3/4(), DuplicateLinearMem1/2/3/4(), FreeLinearMem1/2/3/4()
 #include <qepp/qepp_io.h>	//OPEN_IO_ENV(), CLOSE_IO_ENV(), QEPP_PRINT(), QEPP_ALL_PRINT(), QEPP_OUT()
 #include <qepp/qepp_mpi.h>	//mb_bcast(), mp_sum(), SET_PW_MPI()
 

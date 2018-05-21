@@ -45,7 +45,7 @@ int qepp_get_file_columns_comm(FILE * read, char * comments, char * delimiters);
 #define QEPP_GET_FILE_COL(...) qepp_get_file_columns_comm(JUST3(__VA_ARGS__,0,0,0))
 
 bool qepp_strcmp_WC( char * pattern, char * candidate, int p, int c);
-#define qepp_strcmp_wc(a,b,...) qepp_strcmp_WC(a,b,0,0)
+#define qepp_strcmp_wc(a,b,...) qepp_strcmp_WC( a, b, 0, 0)
 
 bool qepp_is_file( const char * filpath);
 bool qepp_is_dir( const char * dirpath);
