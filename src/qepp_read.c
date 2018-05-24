@@ -1541,12 +1541,12 @@ errh * read_pseudo( const char * filename, pseudo ** out_ptr)
 
 		for( unsigned int i=0; i<n_beta; i++)
 		{
-			sprintf( buffer, "PP_BETA.%d", i+1);
+			sprintf( buffer, "PP_BETA.%u", i+1);
 			node = qepp_libxml_find_node( buffer, app);
-			assert( !qepp_libxml_get_node_attr( &res->kkbeta[i], "size", node, R_LNT, 1));
-			assert( !qepp_libxml_get_node_attr( &res->lll[i],    "size", node, R_INT, 1));
-			assert( !qepp_libxml_get_node_attr( &res->cri[i],    "cutoff_radius_index", node, R_INT, 1));
-			assert( !qepp_libxml_get_node_attr( &res->cut_rad[i],"cutoff_radius", node, R_LNF, 1));
+			assert( !qepp_libxml_get_node_attr( &res->kkbeta[i],  "size", node, R_LNT, 1));
+			assert( !qepp_libxml_get_node_attr( &res->lll[i],     "size", node, R_INT, 1));
+			assert( !qepp_libxml_get_node_attr( &res->cri[i],     "cutoff_radius_index", node, R_INT, 1));
+			assert( !qepp_libxml_get_node_attr( &res->cut_rad[i], "cutoff_radius", node, R_LNF, 1));
 			assert( !qepp_libxml_get_node_value( res->beta[i], node, R_LNF, mesh));
 		}
 		node = qepp_libxml_find_node( "PP_DIJ", app);
@@ -1566,6 +1566,14 @@ errh * read_pseudo( const char * filename, pseudo ** out_ptr)
 		res->chi      = QEPP_ALLOC( sizeof( double), natwf, mesh);
 
 		app = qepp_libxml_find_node( "PP_PSWFC", root);
+		for( unsigned int i=0; i<natwf; i++)
+		{
+			sprintf( buffer, "PP_CHI.%u", i+1);
+			node = qepp_libxml_find_node( buffer, app);
+			assert( !qepp_libxml_get_node_attr( &res->lchi[i], "l", node, R_INT, 1));
+			assert( !qepp_libxml_get_node_attr( &res->occ[i],  "occupation", node, R_LNF, 1));
+			assert( !qepp_libxml_get_node_value( res->chi[i], node, R_LNF, mesh));
+		}
 	}
 
 
@@ -1573,7 +1581,8 @@ errh * read_pseudo( const char * filename, pseudo ** out_ptr)
 	//PP_RHOATOM
 	res->rho_at   = QEPP_ALLOC( sizeof( double), mesh);
 
-	app = qepp_libxml_find_node( "PP_RHOATOM", root);
+	node = qepp_libxml_find_node( "PP_RHOATOM", root);
+	assert( !qepp_libxml_get_node_value( qepp_mem_get_base( res->rho_at), node, R_LNF, mesh));
 
 	
 	xmlFreeDoc( document);
