@@ -41,9 +41,7 @@ FILE * in_f;
 FILE * errf = NULL;
 FILE * outf = NULL;
 
-char * err_func[256];
-char * err_msg[1024];
-
+char io_buff[1024];
 char outdir[1024];
 char prefix[128];
 char workdir[1024];
@@ -84,6 +82,7 @@ mpi_data * mpi = NULL;
 		pdos_state **:	parse_errh(read_pdos_state( (char *)a, (pdos_state **)b)), \
 		data_file **:	parse_errh(read_data_file(  (char *)a, (data_file **)b)), \
 		wfc **:		parse_errh(read_wfc(        (char *)a, (wfc **)b)), \
+		pseudo **:	parse_errh(read_pseudo(     (char *)a, (pseudo **)b)), \
 		char *:		_Generic( (a), \
 			nscf_data **:	parse_errh(read_nscf_data(  (char *)b, (nscf_data **)a)), \
 			band_data **:	parse_errh(read_band_data(  (char *)b, (band_data **)a)), \
@@ -98,6 +97,7 @@ mpi_data * mpi = NULL;
 			pdos_state **:	parse_errh(read_pdos_state( (char *)b, (pdos_state **)a)), \
 			data_file **:	parse_errh(read_data_file(  (char *)b, (data_file **)a)), \
 			wfc **:		parse_errh(read_wfc(        (char *)b, (wfc **)a)), \
+			pseudo **:	parse_errh(read_pseudo(     (char *)b, (pseudo **)a)), \
 			default:	parse_errh( set_errh( WARNING, __func__, "Calling macro READ type not implemented...\n")) \
 		), \
 		default: 	parse_errh( set_errh( WARNING, __func__, "Calling macro READ type not implemented...\n")) \
@@ -106,28 +106,32 @@ mpi_data * mpi = NULL;
 //I/O macros
 #define OPEN_IO_ENV( n, m, v) \
 	open_io_env( n, m, v)
+#define QEPP_ALL_PRINT( d, ...) \
+	do { \
+		if( verbosity >= 1) { \
+			sprintf( io_buff, d, ##__VA_ARGS__); \
+			qepp_print( -1, io_buff, NULL); \
+		} \
+	} while(0)
 #define QEPP_PRINT( d, ...) \
 	do { \
 		if( verbosity >= 1) { \
-			char buff[256]; \
-			sprintf( buff, d, ##__VA_ARGS__); \
-			qepp_print( ionode, buff, NULL); \
+			sprintf( io_buff, d, ##__VA_ARGS__); \
+			qepp_print( ionode, io_buff, NULL); \
+		} \
+	} while(0)
+#define QEPP_ALL_OUT( w, d, ...) \
+	do { \
+		if( verbosity >= 0) { \
+			sprintf( io_buff, d, ##__VA_ARGS__); \
+			qepp_print( -1, io_buff, w); \
 		} \
 	} while(0)
 #define QEPP_OUT( w, d, ...) \
 	do { \
 		if( verbosity >= 0) { \
-			char buff[256]; \
-			sprintf( buff, d, ##__VA_ARGS__); \
-			qepp_print( ionode, buff, w); \
-		} \
-	} while(0)
-#define QEPP_ALL_PRINT( d, ...) \
-	do { \
-		if( verbosity >= 1) { \
-			char buff[256]; \
-			sprintf( buff, d, ##__VA_ARGS__); \
-			qepp_print( -1, buff, NULL); \
+			sprintf( io_buff, d, ##__VA_ARGS__); \
+			qepp_print( ionode, io_buff, w); \
 		} \
 	} while(0)
 #define CLOSE_IO_ENV() \

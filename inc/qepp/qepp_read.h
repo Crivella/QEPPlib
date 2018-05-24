@@ -33,6 +33,7 @@
 		pdos_state **:	parse_errh(read_pdos_state( (char *)a, (pdos_state **)b)), \
 		data_file **:	parse_errh(read_data_file(  (char *)a, (data_file **)b)), \
 		wfc **:		parse_errh(read_wfc(        (char *)a, (wfc **)b)), \
+		pseudo **:	parse_errh(read_pseudo(     (char *)a, (pseudo **)b)), \
 		char *:		_Generic( (a), \
 			nscf_data **:	parse_errh(read_nscf_data(  (char *)b, (nscf_data **)a)), \
 			band_data **:	parse_errh(read_band_data(  (char *)b, (band_data **)a)), \
@@ -47,6 +48,7 @@
 			pdos_state **:	parse_errh(read_pdos_state( (char *)b, (pdos_state **)a)), \
 			data_file **:	parse_errh(read_data_file(  (char *)b, (data_file **)a)), \
 			wfc **:		parse_errh(read_wfc(        (char *)b, (wfc **)a)), \
+			pseudo **:	parse_errh(read_pseudo(     (char *)b, (pseudo **)a)), \
 			default:	parse_errh( set_errh( WARNING, __func__, "Calling macro READ type not implemented...\n")) \
 		), \
 		default: 	parse_errh( set_errh( WARNING, __func__, "Calling macro READ type not implemented...\n")) \
@@ -66,12 +68,16 @@ errh * read_data_set(   const char *, data_set **);
 errh * read_pdos_data(  const char *, pdos_data **, char *);
 errh * read_pdos_state( const char *, pdos_state **);
 
+errh * read_pseudo(     const char *, pseudo **);
+
 errh * read_wfc( const char * filename, wfc **);
 errh * read_data_file( const char * filename, data_file **);
 
 errh * read_wfc_xml( const char * filename, wfc **);
 
 errh * read_wfc_dat( const char * filename, wfc **);
+
+errh * read_pseudo( const char * filename, pseudo **);
 
 
 

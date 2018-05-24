@@ -11,6 +11,7 @@
 #include <qepp/qepp_file.h>
 //#include <qepp/qepp_struct.h>
 
+extern char io_buff[1024];
 extern char outdir[1024];
 extern char prefix[128];
 extern char workdir[1024];
@@ -33,33 +34,29 @@ void close_io_env();
 #define QEPP_ALL_PRINT( d, ...) \
 	do { \
 		if( verbosity >= 1) { \
-			char buff[256]; \
-			sprintf( buff, d, ##__VA_ARGS__); \
-			qepp_print( -1, buff, NULL); \
+			sprintf( io_buff, d, ##__VA_ARGS__); \
+			qepp_print( -1, io_buff, NULL); \
 		} \
 	} while(0)
 #define QEPP_PRINT( d, ...) \
 	do { \
 		if( verbosity >= 1) { \
-			char buff[256]; \
-			sprintf( buff, d, ##__VA_ARGS__); \
-			qepp_print( ionode, buff, NULL); \
+			sprintf( io_buff, d, ##__VA_ARGS__); \
+			qepp_print( ionode, io_buff, NULL); \
 		} \
 	} while(0)
 #define QEPP_ALL_OUT( w, d, ...) \
 	do { \
 		if( verbosity >= 0) { \
-			char buff[256]; \
-			sprintf( buff, d, ##__VA_ARGS__); \
-			qepp_print( -1, buff, w); \
+			sprintf( io_buff, d, ##__VA_ARGS__); \
+			qepp_print( -1, io_buff, w); \
 		} \
 	} while(0)
 #define QEPP_OUT( w, d, ...) \
 	do { \
 		if( verbosity >= 0) { \
-			char buff[256]; \
-			sprintf( buff, d, ##__VA_ARGS__); \
-			qepp_print( ionode, buff, w); \
+			sprintf( io_buff, d, ##__VA_ARGS__); \
+			qepp_print( ionode, io_buff, w); \
 		} \
 	} while(0)
 void qepp_print( int proc, void * data, FILE * w);
