@@ -50,6 +50,7 @@ struct_nscf_md.o \
 struct_opt_data.o \
 struct_pdos_data.o \
 struct_pdos_state.o \
+struct_pseudo.o \
 struct_spin_data.o \
 struct_wfc.o \
 wrapper_libxml.o
