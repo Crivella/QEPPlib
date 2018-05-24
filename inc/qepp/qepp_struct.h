@@ -499,7 +499,7 @@ struct pseudo
 
 	//PSWFC
 	unsigned int natwf;		//number of atomic wfc
-	double ** chi;			//chi(mesh,i): chi_i(r), i-th radial atomic (pseudo-)orbital 
+	double ** chi;			//chi(i,mesh): chi_i(r), i-th radial atomic (pseudo-)orbital 
 					//(radial part of the KS equation, multiplied by r)
 	unsigned int * els;		//n of thw wfc
 	unsigned int * lchi;		//angular momentum of the wfc

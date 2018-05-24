@@ -46,24 +46,26 @@ void * print_pseudo( pseudo * to_print, FILE * write)
 
 	unsigned long int mesh = to_print->mesh;
 	unsigned int n_beta    = to_print->n_beta;
-	//unsigned int natwf     = to_print->natwf;
+	unsigned int natwf     = to_print->natwf;
 
-	QEPP_OUT( write, "%6s%9s%9s%9s", "index", "grid", "rab", "vloc");
+	QEPP_OUT( write, "%6s%11s%11s%11s", "index", "grid", "rab", "vloc");
 	for( unsigned int i=0; i<n_beta; i++)
-	{
-		QEPP_OUT( write, "%5s(%2u)", "beta", i);
-	}
+		QEPP_OUT( write, "%7s(%2u)", "beta", i+1);
+	for( unsigned int i=0; i<natwf; i++)
+		QEPP_OUT( write, "%7s(%2u)", "chi", i+1);
 	QEPP_OUT( write, "\n");
+
 	for( unsigned long int i=0; i<mesh; i++)
 	{
 		QEPP_OUT( write, "%6lu", i);
-		QEPP_OUT( write, "%9.4lf", to_print->grid[i]);
-		QEPP_OUT( write, "%9.4lf", to_print->rab[i]);
-		QEPP_OUT( write, "%9.4lf", to_print->vloc[i]);
+		QEPP_OUT( write, "%11.6lf", to_print->grid[i]);
+		QEPP_OUT( write, "%11.6lf", to_print->rab[i]);
+		QEPP_OUT( write, "%11.6lf", to_print->vloc[i]);
 		for( unsigned int j=0; j<n_beta; j++)
-		{
-			QEPP_OUT( write, "%9.4lf", to_print->beta[j][i]);
-		}
+			QEPP_OUT( write, "%11.6lf", to_print->beta[j][i]);
+		if( natwf > 0)
+			for( unsigned int j=0; j<natwf; j++)
+				QEPP_OUT( write, "%11.6lf", to_print->chi[j][i]);
 
 		QEPP_OUT( write, "\n");
 	}
