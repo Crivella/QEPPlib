@@ -128,6 +128,12 @@ errh * read_nscf_data( const char * filename, nscf_data ** out_ptr)
 		if(pos == -1)
 			FAIL( FAIL, "Can't identify start of band data in file");
 	}
+	long int pos_app = pos;
+	while( pos_app != -1)
+	{
+		pos = pos_app;
+		pos_app = qepp_find_string("End of self-consistent calculation",read,pos+20);
+	}
 	fseek(read,pos,SEEK_SET);
 	qepp_getline(buffer,256,read);
 	while(!feof(read) && count < data->n_kpt)
