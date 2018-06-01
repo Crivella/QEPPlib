@@ -5,9 +5,9 @@
 int ylmr( int lm, double * K, double ** res)
 {
 	double cost, sint;
-	double cosf, sinf;
 	int lmax;
-	double k_mod, k_xy;
+	double k_mod;
+	double fi;
 	double N;
 
 	double ** Q;
@@ -42,22 +42,19 @@ int ylmr( int lm, double * K, double ** res)
 		k_mod += pow( K[i], 2);
 	k_mod = sqrt( k_mod);
 
-	k_xy = 0;
-	for( int i=0; i<2; i++)
-		k_xy += pow( K[i], 2);
-	k_xy = sqrt( k_xy);
 
 	cost = K[2] / k_mod;
+	if( ! isnormal( cost))
+		cost = 0.;
 	sint = sqrt( 1 - pow( cost, 2));
-	cosf = K[0] / k_xy;
-	sinf = K[1] / k_xy;
 
-	if( ! isnormal( cosf))
-	{
-		cosf = 1.;
-		sinf = 0.;
-	}
-
+	fi = atan( K[1] / K[0]);
+	if( ! isnormal( fi))
+		fi = 0.;
+	if( fi < 0)
+		fi += PI;
+	if( K[1] < 0)
+		fi += PI;
 
 	Q[0][0] = 1.;
 	Q[1][0] = cost;
@@ -69,9 +66,7 @@ int ylmr( int lm, double * K, double ** res)
 	{
 		int lim=l-2;
 		for( int m=0; m<=lim; m++)
-		{
 			Q[l][m] = 1./sqrt( l*l - m*m) * ( (2*l-1) * cost * Q[l-1][m] - sqrt( (l-1)*(l-1) - m*m) * Q[l-2][m]);
-		}
 		Q[l][l-1] = cost * sqrt( 2*l-1) * Q[l-1][l-1];
 		Q[l][l]   = sqrt( 2*l-1) / sqrt( 2*l) * sint * Q[l-1][l-1];
 	}
@@ -83,8 +78,8 @@ int ylmr( int lm, double * K, double ** res)
 		ylm[ l2] = N * Q[l][0];
 		for( int m=1; m<=lmax; m++)
 		{
-			ylm[l2 + 2*m]   = N * sq2 * Q[l][m] * sinf;
-			ylm[l2 + 2*m-1] = N * sq2 * Q[l][m] * cosf;
+			ylm[l2 + 2*m-1] = N * sq2 * Q[l][m] * cos( m*fi);
+			ylm[l2 + 2*m]   = N * sq2 * Q[l][m] * sin( m*fi);
 		}
 	}
 	
