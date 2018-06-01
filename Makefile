@@ -53,7 +53,8 @@ struct_pdos_state.o \
 struct_pseudo.o \
 struct_spin_data.o \
 struct_wfc.o \
-wrapper_libxml.o
+wrapper_libxml.o \
+ylmr.o
   
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
