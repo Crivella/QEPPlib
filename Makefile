@@ -61,10 +61,10 @@ OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 .PHONY : clean veryclean install uninstall
 
 $(TARGET) : $(OBJ)
-	$(CC) -shared $(CFLAGS) $(CPPFLAGS) -o $@ $(OBJ)
+	$(CC) -o $@ -shared $(CFLAGS) $(CPPFLAGS) $(OBJ)
 
 $(ODIR)/%.o : $(SDIR)/%.c $(DEPS)
-	$(CC) -c -o $@ $< $(CFLAGS) $(CPPFLAGS)
+	$(CC) -o $@ -c $< $(CFLAGS) $(CPPFLAGS)
 
 install : $(TARGET)
 	@mkdir -p $(LDIR); \
