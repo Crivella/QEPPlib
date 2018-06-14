@@ -61,10 +61,10 @@ OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 .PHONY : clean veryclean install uninstall
 
 $(TARGET) : $(OBJ)
-	$(MPICC) -shared $(CFLAGS) -o $@ $(OBJ)
+	$(CC) -shared $(CFLAGS) $(CPPFLAGS) -o $@ $(OBJ)
 
 $(ODIR)/%.o : $(SDIR)/%.c $(DEPS)
-	$(MPICC) -c -o $@ $< $(CFLAGS)
+	$(CC) -c -o $@ $< $(CFLAGS) $(CPPFLAGS)
 
 install : $(TARGET)
 	@mkdir -p $(LDIR); \
@@ -96,7 +96,7 @@ fold :
 	(exit 1) ; fi \
 
 clean :
-	rm -f $(ODIR)/*.o *~ core $(INC)/*~ 
+	rm -f $(ODIR)/*.o *~ core $(INC)/*~ $(SDIR)/*~
 
 veryclean : clean uninstall
-	rm -f *.so
+	rm -f *.so make.inc
