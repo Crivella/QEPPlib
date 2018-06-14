@@ -770,7 +770,7 @@ static errh * read_data_file_new( xmlNodePtr root, char * path, data_file * res)
 	node = qepp_libxml_find_node( "nelec", app);
 	assert( !qepp_libxml_get_node_value( &res->n_el, node, R_LNF, 1));
 
-	node = qepp_libxml_find_node( "starting_k_points/nk", app);
+	node = qepp_libxml_find_node( "nks", app);
 	assert( !qepp_libxml_get_node_value( &res->n_kpt, node, R_LNT, 1));
 
 
