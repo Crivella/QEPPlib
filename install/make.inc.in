@@ -1,0 +1,18 @@
+#Library env variables
+
+PREFIX   =    @prefix@
+
+INC =./inc
+SDIR=./src
+ODIR=./obj
+CURDIR=$(shell pwd)
+LDIR=$(PREFIX)/lib
+IDIR=$(PREFIX)/include
+
+LD_FLAGS  =   @LDFLAGS@
+LIBS      =   @LIBS@
+
+CC        =   @CC@
+MPICC     =   @MPICC@
+CFLAGS    =   @CFLAGS@
+CPPFLAGS  =   @CPPFLAGS@
