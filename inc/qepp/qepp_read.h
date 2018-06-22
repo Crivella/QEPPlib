@@ -56,6 +56,8 @@
 
 #define dump_size 12
 
+//__attribute__ ((visibility ("default")))
+
 errh * read_nscf_md(    const char *, nscf_md **);
 errh * read_nscf_data(  const char *, nscf_data **);
 errh * read_band_data(  const char *, band_data **);

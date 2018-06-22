@@ -11,6 +11,7 @@ If this libraries are not included, some functions will be disabled
 
 
   CC:        @CC@
+  CFLAGS:    @CFLAGS@
   CPPFLAGS:  @CPPFLAGS@
   LDFLAGS:   @LDFLAGS@
   LIBS:      @LIBS@

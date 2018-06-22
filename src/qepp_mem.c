@@ -1,5 +1,7 @@
 #include <qepp/qepp_mem.h>
 
+unsigned long int TOT_MEM;
+
 long int qepp_mem_get_size( void * a)
 {
 	if( a == NULL)

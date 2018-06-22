@@ -3088,14 +3088,14 @@ else
 
 fi
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether C compiler accepts -fpic" >&5
-$as_echo_n "checking whether C compiler accepts -fpic... " >&6; }
-if ${ax_cv_check_cflags___fpic+:} false; then :
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether C compiler accepts -fPIC" >&5
+$as_echo_n "checking whether C compiler accepts -fPIC... " >&6; }
+if ${ax_cv_check_cflags___fPIC+:} false; then :
   $as_echo_n "(cached) " >&6
 else
 
   ax_check_save_flags=$CFLAGS
-  CFLAGS="$CFLAGS  -fpic"
+  CFLAGS="$CFLAGS  -fPIC"
   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -3108,22 +3108,57 @@ main ()
 }
 _ACEOF
 if ac_fn_c_try_compile "$LINENO"; then :
-  ax_cv_check_cflags___fpic=yes
+  ax_cv_check_cflags___fPIC=yes
 else
-  ax_cv_check_cflags___fpic=no
+  ax_cv_check_cflags___fPIC=no
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
   CFLAGS=$ax_check_save_flags
 fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ax_cv_check_cflags___fpic" >&5
-$as_echo "$ax_cv_check_cflags___fpic" >&6; }
-if test "x$ax_cv_check_cflags___fpic" = xyes; then :
-  CFLAGS+=" -fpic"
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ax_cv_check_cflags___fPIC" >&5
+$as_echo "$ax_cv_check_cflags___fPIC" >&6; }
+if test "x$ax_cv_check_cflags___fPIC" = xyes; then :
+  CFLAGS+=" -fPIC"
 else
   as_fn_error $? "C compiler does not accept fpic flag" "$LINENO" 5
 
 fi
 
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether C compiler accepts -Wl,--no-as-needed" >&5
+$as_echo_n "checking whether C compiler accepts -Wl,--no-as-needed... " >&6; }
+if ${ax_cv_check_cflags___Wl___no_as_needed+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+
+  ax_check_save_flags=$CFLAGS
+  CFLAGS="$CFLAGS  -Wl,--no-as-needed"
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  ax_cv_check_cflags___Wl___no_as_needed=yes
+else
+  ax_cv_check_cflags___Wl___no_as_needed=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+  CFLAGS=$ax_check_save_flags
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ax_cv_check_cflags___Wl___no_as_needed" >&5
+$as_echo "$ax_cv_check_cflags___Wl___no_as_needed" >&6; }
+if test "x$ax_cv_check_cflags___Wl___no_as_needed" = xyes; then :
+  CFLAGS+=" -Wl,--no-as-needed"
+else
+  as_fn_error --no-as-needed flag "C compiler does not accept -Wl" "$LINENO" 5
+
+fi
 
 
 # External default

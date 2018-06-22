@@ -1,6 +1,8 @@
 #include <qepp/qepp_struct.h>
 #include <qepp/qepp_read.h>
 
+data_file * df;
+
 void * free_array_ptr(double  **to_free, long int size)
 {
 	if( to_free == NULL)
