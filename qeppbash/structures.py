@@ -1,4 +1,4 @@
-from qeppbash.loader import *
+from .loader import *
 
 __all__ = [ "READ", "PRINT", "DUPLICATE", "FREE", "nscf_md_ptr", "nscf_data_ptr", "opt_data_ptr", "m_elem_ptr",
             "pdos_state_ptr", "pdos_data_ptr", "data_file_ptr", "wfc_ptr", "cd_ptr", "pseudo_ptr" ]
@@ -101,7 +101,7 @@ _duplicate_opt_data.restype   = opt_data_ptr
 _free_opt_data                = qepp.free_opt_data
 _free_opt_data.argtype        = [ opt_data_ptr]
 _read_opt_data                = qepp.read_opt_data
-_read_opt_data.argtypes       = [ c_char_p, POINTER( opt_data_ptr)]
+_read_opt_data.argtypes       = [ c_char_p, POINTER( opt_data_ptr), c_char_p]
 _read_opt_data.restype        = errh_ptr
 ####################################################################################################
 
@@ -411,8 +411,11 @@ switchREAD= {	nscf_md_ptr:    _read_nscf_md,
 		data_file_ptr:  _read_data_file,
 		wfc_ptr:        _read_wfc,
 		pseudo_ptr:     _read_pseudo   }
-def READ( name, ptr):
-	app1 = switchREAD[type(ptr)]( name.encode('utf-8'), byref(ptr))
+def READ( name, ptr, opt = None):
+	if( not opt):
+		app1 = switchREAD[type(ptr)]( name.encode('utf-8'), byref(ptr))
+	else:
+		app1 = switchREAD[type(ptr)]( name.encode('utf-8'), byref(ptr), opt.encode('utf-8'))
 	app = parse_errh( app1)
 	return app
 

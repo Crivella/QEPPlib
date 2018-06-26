@@ -1,9 +1,10 @@
 #__all__ = [ "main", "structures", "utils" ]
 
-from qeppbash.structures	import *
-from qeppbash.functions		import *
-from qeppbash.tools		import *
-from qeppbash.utils		import using
+from .structures	import *
+from .functions		import *	
+from .utils		import using
+
+import qeppbash.tools	
 
 import atexit
 

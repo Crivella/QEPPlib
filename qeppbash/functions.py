@@ -1,4 +1,4 @@
-from qeppbash.loader import *
+from .loader import *
 
 __all__ = [ "open_io_env", "close_io_env"]
 
