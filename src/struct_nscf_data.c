@@ -41,6 +41,7 @@ void * print_nscf_data(nscf_data * to_print, FILE * write)
 		for( int i2=0; i2<3; i2++)
 			QEPP_OUT(write,"%.4f ",to_print->kpt[i][i2]);
 		QEPP_OUT(write,"\n\n");
+
 		for( int i2=0; i2 < to_print->n_bnd; i2++)
 		{
 			QEPP_OUT(write,"%.4f",to_print->energies[i][i2]);

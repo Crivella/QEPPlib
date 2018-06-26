@@ -131,7 +131,7 @@ errh * find_smallest_gap2( long int * out_ptr, nscf_data * data, double * center
 	double min = 1.E5;
 	int vb=0;
 	if( !data->md->spin_orbit)
-		vb = ceil(data->md->n_el/2);
+		vb = ceil(data->md->n_el/2)-1;
 	else
 		vb = data->md->n_el-1;
 	int cb = vb+2;

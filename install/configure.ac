@@ -21,11 +21,14 @@ AX_CHECK_COMPILE_FLAG([-Wall],
   [CFLAGS+=" -Wall"], 
   [AC_MSG_ERROR(C compiler does not accept Wall flag)]
 )
-AX_CHECK_COMPILE_FLAG([-fpic], 
-  [CFLAGS+=" -fpic"], 
+AX_CHECK_COMPILE_FLAG([-fPIC], 
+  [CFLAGS+=" -fPIC"], 
   [AC_MSG_ERROR(C compiler does not accept fpic flag)]
 )
-
+AX_CHECK_COMPILE_FLAG([-Wl,--no-as-needed],
+  [CFLAGS+=" -Wl,--no-as-needed"],
+  [AC_MSG_ERROR(C compiler does not accept -Wl,--no-as-needed flag)]
+)
 
 # External default
 def_with_mpi="no"

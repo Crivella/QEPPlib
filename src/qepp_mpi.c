@@ -2,6 +2,8 @@
 
 extern unsigned int ionode;
 
+mpi_data * mpi;
+
 #ifdef __MPI
 
 /*long int mpi_get_size( void * a)
