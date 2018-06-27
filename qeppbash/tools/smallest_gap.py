@@ -1,17 +1,27 @@
-from ..structures	import *
-from ..loader		import *
+import sys
+
+if "qeppbash" in sys.modules:
+	from ..structures	import *
+	from ..loader		import *
+else:
+	from qeppbash.structures import *
+	from qeppbash.loader	 import *
+
+#from ..structures	import *
+#from ..loader		import *
 from ctypes import cast
 import numpy as np
 
 def smallest_gap( data=0, radius=0., comp_point=[0.,0.,0.]):
 	#data = nscf_data_ptr()
+	print( "SMALLEST_GAP: data={}, radius={}, comp_point={}".format( data, radius, comp_point)) 
 	
 	if( radius < 0):
 		print( "Invalid negative 'radius'")
 		return 1
 	if( len(comp_point) != 0):
 		if( len(comp_point) != 3):
-			print( "'comp_point' should be an [x,y,z] vector")
+			print( "'comp_point' should be an [x,y,z] vector {}".format( comp_point))
 			return 1
 		for x in comp_point:
 			try:
@@ -69,15 +79,21 @@ def smallest_gap( data=0, radius=0., comp_point=[0.,0.,0.]):
 		lg2.append( energies[i][cb+1] - energies[i][vb])
 		lg3.append( energies[i][cb+1] - energies[i][cb])
 
-	m1 = max( lvb)
+	print( "\nFound {} points with the given criteria.".format( len( l)))
+	try:
+		m1 = max( lvb)
+	except ValueError:
+		print( "\nWARNING: No kpt found for the given file/conditions")
+		return 1
+
 	mg1 = l[ lvb.index( m1)]
 	print( "\nMax_vb_energy: vb= %lf eV" % m1);
-	print("\tat %f %f %f (2pi/a) (# %li) " % (kpt[mg1][0], kpt[mg1][1], kpt[mg1][2], mg1+1));
+	print("\tat {0[0]:.6f} {0[1]:.6f} {0[2]:.6f} (2pi/a) (# {1}) ".format( kpt[mg1][0:3], mg1+1));
 
 	m2 = min( lcb)
 	mg2 = l[ lcb.index( m2)]
 	print( "\nMin_cb_energy: cb= %lf eV" % m2);
-	print("\tat %f %f %f (2pi/a) (# %li) " % (kpt[mg2][0], kpt[mg2][1], kpt[mg2][2], mg2+1));
+	print("\tat {0[0]:.6f} {0[1]:.6f} {0[2]:.6f} (2pi/a) (# {1}) ".format( kpt[mg2][0:3], mg2+1));
 
 	if( mg1 == mg2):
 		print( "DIRECT GAP %lf eV" % (m2 - m1))
@@ -90,27 +106,27 @@ def smallest_gap( data=0, radius=0., comp_point=[0.,0.,0.]):
 	if( ef == ef):
 		m = min( i for i in lg1 if lvb[ lg1.index( i)] < ef < lcb[ lg1.index(i )])
 		mog = l[ lg1.index( m)]
-		print("\nMin_opt_gap: %lf eV\n\tat   %lf %lf %lf (2pi/a) (# %li)" % (m, kpt[mog][0], kpt[mog][1], kpt[mog][2], mog+1))
+		print("\nMin_opt_gap: {0:.5f} eV\n\tat   {1[0]:.6f} {1[1]:.6f} {1[2]:.6f} (2pi/a) (# {2})".format( m, kpt[mog][0:3], mog+1))
 		print("\t%lf -> %lf   Ef: %lf eV" % (energies[mog][vb], energies[mog][vb+1], ef))		
 	else:
 		print( "\nCannot calculate min_opt_gap with invalid fermi energy")
 
 	m = min( lg1)
 	mg = l[ lg1.index( m)]
-	print("\nMin gap energy: %lf eV" % m);
-	print("\tat %f %f %f (2pi/a) (# %li) " % (kpt[mg][0], kpt[mg][1], kpt[mg][2], mg+1));
+	print("\nMin gap energy(vb->cb): %lf eV" % m);
+	print("\tat {0[0]:.6f} {0[1]:.6f} {0[2]:.6f} (2pi/a) (# {1}) ".format( kpt[mg][0:3], mg+1));
 	print("\t%lf -> %lf   Ef: %lf eV" % (energies[mg][vb], energies[mg][vb+1], ef));
 
 	m = min( lg2)
 	mg = l[ lg2.index( m)]
 	print("\nMin gap energy(vb->cb+1): %lf eV" % m);
-	print("\tat %f %f %f (2pi/a) (# %li)" % (kpt[mg][0], kpt[mg][1], kpt[mg][2], mg+1));
+	print("\tat {0[0]:.6f} {0[1]:.6f} {0[2]:.6f} (2pi/a) (# {1}) ".format( kpt[mg][0:3], mg+1));
 	print("\t%lf -> %lf   Ef: %lf eV" % (energies[mg][vb], energies[mg][vb+2], ef));
 
 	m = min( lg3)
 	mg = l[ lg3.index( m)]
 	print("\nMin gap energy(cb->cb+1): %lf eV" % m);
-	print("\tat %f %f %f (2pi/a) (# %li)" % (kpt[mg][0], kpt[mg][1], kpt[mg][2], mg+1));
+	print("\tat {0[0]:.6f} {0[1]:.6f} {0[2]:.6f} (2pi/a) (# {1}) ".format( kpt[mg][0:3], mg+1));
 	print("\t%lf -> %lf   Ef: %lf eV" % (energies[mg][cb], energies[mg][vb+2], ef));
 
 	if ( type( data) != nscf_data_ptr()):
@@ -186,6 +202,23 @@ def smallest_gap( data=0, radius=0., comp_point=[0.,0.,0.]):
 
 
 #def find_min_cb():
+
+if __name__ == "__main__":
+	import sys
+	import ast
+	argc = len( sys.argv)
+	if( not 2<=argc<=4):
+		print("Incorrect use. Pleas pass arguments:"
+			"\n\t'filename\t()',"
+			"\n\t'radius\t(optional)',"
+			"\n\t'comp_point\t(optional)'")
+		exit()
+	if( argc==2):
+		smallest_gap( sys.argv[1])
+	if( argc==3):
+		smallest_gap( sys.argv[1], float(sys.argv[2]))
+	if( argc==4):
+		smallest_gap( sys.argv[1], float(sys.argv[2]), ast.literal_eval( sys.argv[3]))
 
 
 

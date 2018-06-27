@@ -1,86 +1,110 @@
-from ..structures	import *
-from ..loader		import *
-
-from os import listdir
+from os      import listdir
 from os.path import isfile, join
-import re
-import numpy as np
+from re      import split
+from numpy   import array, zeros, loadtxt, savetxt
+
+
 
 orb_types = ( 's', 'p', 'd', 'f') 
 max_orb = len( orb_types)
 
-def sum_pdos( atom="", mypath="."):
-	if( not atom):
-		print( "Passing empty name for 'atom'")
+def sum_pdos( atoms="", mypath=".", plot=False, pfile=True):
+	if( not atoms):
+		print( "Passing empty name for 'atoms'")
 		return 1
-
-	atom = "(%s)" % atom
-	#filelist = [f for f in listdir(mypath) if isfile(join(mypath, f))]
-	app     = opt_data_ptr()
-	res_x   = []
-	res_wfc = []
-	res_orb = []
-
-	m = []
-	for f in listdir( mypath):
-		if( "pdos_atm#" in f and atom in f):
-			l = list(filter( None, re.split( ".+atm#|\(.+#|\(|\)|\_j", f)))
-			m.append( int( l[1]))
-	max_wfc = max( m)
-	print( m, max_wfc)
 
 	check = False
 	n_pt = 0
-	for f in listdir( mypath):
-		if( "pdos_atm#" in f and atom in f):
-			READ( join( mypath, f), app, "#")
-			data = app.contents
-			n_pt = data.n_pt
-			if( not check):
-				check = True
-				res_x   = np.array( data.x[0:n_pt])
-				res_wfc = np.zeros(( n_pt, max_wfc))
-				res_orb = np.zeros(( n_pt, max_orb))
-			l = list(filter( None, re.split( ".+atm#|\(.+#|\(|\)|\_j", f)))
-			atm_n = int( l[0])
-			wfc_n = int( l[1])-1
-			try:
-				orb_n = int( orb_types.index( l[2]))
-			except ValueError:
-				print( "Non recognize orbital type {}".format( l[2]))
-				return 1
+	atoms_l = atoms.split(",")
+	max_atm = len( atoms_l)
 
-			for i in range( n_pt):
-				res_wfc[i][wfc_n] += data.values[i][0]
-				res_orb[i][orb_n] += data.values[i][0]
+	for atom, j in zip( atoms_l, range( len( atoms_l))):
+		for f in listdir( mypath):
+			if( "pdos_atm#" in f and "({})".format( atom) in f):
+				name = join( mypath, f)
+				print( "READING: {}".format( name))
+				data = loadtxt( fname=name, comments="#")
 
-			FREE( app)
+				n_pt = len( data)
+				if( not check):
+					check = True
+					#res_x   = data[:,0]
+					res_orb = zeros(( max_atm, n_pt, max_orb+1))
+					res_orb[0:max_atm,:,0] = data[:,0]
+				l = list(filter( None, split( ".+atm#|\(.+#|\(|\)|\_j", f)))
+				atm_n = j
+				wfc_n = int( l[1])-1
+				try:
+					orb_n = int( orb_types.index( l[2]))
+				except ValueError:
+					print( "Non recognize orbital type {}".format( l[2]))
+					return 1
 
-	atom = atom.strip("()")
-	fout1 = open( "{}_total_pdos_wfc.dat".format( atom), "w")
-	fout2 = open( "{}_total_pdos_orb.dat".format( atom), "w")
-	fout1.write( "#%12s" % "Energy(eV)")
-	fout2.write( "#%12s" % "Energy(eV)")
-	for i in range( max_wfc):
-		fout1.write( "%11s"  % ("wfc_%d" % i))
-	for i in range( max_orb):
-		fout2.write( "%11s"  % orb_types[i])
-	fout1.write( "\n")
-	fout2.write( "\n")
-	for i in range( n_pt):
-		fout1.write( "%13.8f" % res_x[i])
-		fout2.write( "%13.8f" % res_x[i])
-		for item in res_wfc[i][0:max_wfc]:
-			fout1.write( "%11g"  % item)
-		for item in res_orb[i][0:max_orb]:
-			fout2.write( "%11g" % item)
-		fout1.write( "\n")
-		fout2.write( "\n")
-	fout1.close()
-	fout2.close()
+				res_orb[atm_n,:,orb_n+1] += data[:,1]
+
+	if( check):
+		if( pfile):
+			for atom, j in zip( atoms_l, range( len( atoms_l))):
+				fname = "{}_total_pdos_orb.dat".format( atom)
+				head = "{:>11}".format( "Energy(eV)") + \
+					"".join('{:>12}_{{}}'.format(atom) * max_orb).format( *orb_types)
+				savetxt( fname=fname, X=res_orb[j,:,:], fmt="%13.8f"+"".join('%14g'*max_orb), header=head)
+
+
+		if plot:
+			import matplotlib.pyplot as plt
+			from matplotlib.ticker import AutoMinorLocator as AML
+			fig, ax = plt.subplots()
+			for atom, j in zip( atoms_l, range( len( atoms_l))):
+				for y, label in zip( res_orb[j,:,1:max_orb+1].transpose(), orb_types):
+					plt.plot( res_orb[j,:,0], y, label="{}_{}".format( atom, label))
+			plt.ylabel( "PDOS arb. units")
+			plt.xlabel( "Energy( eV)")
+			ml1 = AML(5)
+			ml2 = AML(5)
+			ax.yaxis.set_minor_locator(ml1)
+			ax.yaxis.set_tick_params(which='both', right = True)
+			ax.xaxis.set_minor_locator(ml2)
+			ax.xaxis.set_tick_params(which='both', top = True)
+			plt.legend()
+			plt.show()
 		
 	return 0
 
+'''
+		for atom, j in zip( atoms_l, range( len( atoms_l))):
+			fout2 = open( "{}_total_pdos_orb.dat".format( atom), "w")
+			fout2.write( "#{:>12}".format( "Energy(eV)"))
+			for i in range( max_orb):
+				fout2.write( "{:>12}_{}".format( atom, orb_types[i]))
+			fout2.write( "\n")
+			for i in range( n_pt):
+				fout2.write( "{:13.8f}".format( res_x[i]))
+				for item in res_orb[j,i,:]:
+					fout2.write( "{:14g}".format( item))
+				fout2.write( "\n")
+			fout2.close()
+'''
+
+
+if __name__ == "__main__":
+	import sys
+	argc = len( sys.argv)
+	if( not 2<=argc<=5):
+		print("Incorrect use. Please pass arguments:"
+			"\n\t'atom_list\t(comma separated)',"
+			"\n\t'path\t\t(default = \".\")',"
+			"\n\t'plot\t\t(default = False)'"
+			"\n\t'pfile\t\t(default = True) (print output file)")
+		exit()
+	if( argc==2):
+		sum_pdos( sys.argv[1])
+	if( argc==3):
+		sum_pdos( sys.argv[1], sys.argv[2])
+	if( argc==4):
+		sum_pdos( sys.argv[1], sys.argv[2], sys.argv[3])
+	if( argc==5):
+		sum_pdos( sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4])
 
 
 
