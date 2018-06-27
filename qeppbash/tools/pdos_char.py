@@ -2,15 +2,7 @@ import sys
 import os.path
 import re
 
-
-if "qeppbash" in sys.modules:
-	from ..structures	import *
-	from ..loader		import *
-else:
-	from qeppbash.structures import *
-	from qeppbash.loader	 import *
-
-def pdos_char( fname="", kpt_list=[], bnd_list=""):
+def pdos_char( fname="", kpt_list=[], bnd_list=[], thr=0):
 	if( not os.path.isfile(fname)):
 		print( "ERROR: File '{}' does not exist.".format( fname))
 		return 1
@@ -21,32 +13,58 @@ def pdos_char( fname="", kpt_list=[], bnd_list=""):
 		kl = list( map( int, kpt_list.split(",")))
 	if( isinstance( kpt_list, list)):
 		kl = kpt_list
-	
-	fkl     = []
+	if( isinstance( bnd_list, str)):
+		bl = list( map( int, bnd_list.split(",")))
+	if( isinstance( bnd_list, list)):
+		bl = bnd_list
+	if( len( bl) > 0):
+		cb = True
+
 	state_l = []
 
-	c = -1
-	check = False
+	k = -1
+	b = -1
+	ck = False
+	ce = False
+	cp = False
+	cb = False
+	if( len( bl) > 0):
+		cb = True
 	for line in open( fname):
 		line = line.rstrip()
 		if( " state #" in line):
-			state_l.append( line)
-		if( " k = " in line or check):
-			#print( line)
+			state_l.append( line.split(":")[1])
+		if( " k = " in line or ck):
 			if( " k = " in line):
-				fkl.append( list( map( float, list( filter( None, line.split( " ")))[2:5])))
-				print( fkl)
-				return 0
-				if( c>0):
-					print( fkl[c])
-					return 0
-				fkl.append( line)
-				c+=1
-			#if( not check):
-			#	fkl.append( line)
-			else:
-				fkl[c] += line
-			check = True
+				k+=1
+				b=-1
+				kpt = list( map( float, list( filter( None, line.split( " ")))[2:5]))
+				ck = True
+				ce = False
+				if( k+1 not in kl):
+					ck = False
+				else:
+					print( "KPT (#{:5d}):\t{}".format( k+1, kpt))
+			if( ck and " e(" in line):
+				ce = True
+				b+=1
+				
+				el = float( list( filter( None, line.split( " ")))[4])
+				if( cb and b+1 not in bl):
+					ce = False
+				else:
+					print("\tBND (#{:3d}):\t{} eV".format( b+1, el))
+					
+			if( cp and " |psi|^2" in line):
+				cp = False
+			if( ce and (" psi = " in line or cp)):
+				cp = True
+				l = list( filter( None, re.split( " +psi = | +\+|\*\[#|\]\+", line)))
+				for s, wf in zip( l[1::2], l[0::2]):
+					wf=float(wf)
+					if( wf>thr):
+						print( "\t\t{}:\t{:7.3f}%".format( state_l[int(s)-1], wf*100))
+
 
 	return 0
 
@@ -55,11 +73,12 @@ def pdos_char( fname="", kpt_list=[], bnd_list=""):
 if __name__ == "__main__":
 	import sys
 	argc = len( sys.argv)
-	if( not 2<=argc<=4):
+	if( not 2<=argc<=5):
 		print("Incorrect use. Pleas pass arguments:"
 			"\n\t'fname',"
 			"\n\t'kpt_list\t(comma separated)',"
-			"\n\t'bnd_list\t(optional) (comma separated)'")
+			"\n\t'bnd_list\t(optional) (comma separated)'"
+			"\n\t'thr\t(optional) (threshold for printing percantages)'")
 		exit()
 	if( argc==2):
 		pdos_char( sys.argv[1])
@@ -67,6 +86,8 @@ if __name__ == "__main__":
 		pdos_char( sys.argv[1], sys.argv[2])
 	if( argc==4):
 		pdos_char( sys.argv[1], sys.argv[2], sys.argv[3])
+	if( argc==5):
+		pdos_char( sys.argv[1], sys.argv[2], sys.argv[3], float(sys.argv[4]))
 
 
 
