@@ -91,7 +91,7 @@ if __name__ == "__main__":
 	import sys
 	argc = len( sys.argv)
 	if( not 2<=argc<=5):
-		print("Incorrect use. Pleas pass arguments:"
+		print("Incorrect use. Please pass arguments:"
 			"\n\t'atom_list\t(comma separated)',"
 			"\n\t'path\t\t(default = \".\")',"
 			"\n\t'plot\t\t(default = False)'"
