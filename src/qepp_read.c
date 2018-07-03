@@ -128,6 +128,12 @@ errh * read_nscf_data( const char * filename, nscf_data ** out_ptr)
 		if(pos == -1)
 			FAIL( FAIL, "Can't identify start of band data in file");
 	}
+	long int pos_app = pos;
+	while( pos_app != -1)
+	{
+		pos = pos_app;
+		pos_app = qepp_find_string("End of self-consistent calculation",read,pos+20);
+	}
 	fseek(read,pos,SEEK_SET);
 	qepp_getline(buffer,256,read);
 	while(!feof(read) && count < data->n_kpt)
@@ -679,12 +685,12 @@ errh * read_data_file( const char * filename, data_file ** out_ptr)
 	//Check espresso version
 	if( res->version < 6*1E6 + 2*1E3 + 0*1E0)
 	{
-		if( parse_errh( read_data_file_old( root, path, res)) == FAIL)
+		if( parse_errh( read_data_file_old( root, path, res)) != SUCCESS)
 			check = 1;
 	}
 	else //if( xmlStrcmp( root->name, (const xmlChar *)"Root"))
 	{
-		if( parse_errh( read_data_file_new( root, path, res)) == FAIL)
+		if( parse_errh( read_data_file_new( root, path, res)) != SUCCESS)
 			check = 1;
 	}
 
@@ -764,7 +770,7 @@ static errh * read_data_file_new( xmlNodePtr root, char * path, data_file * res)
 	node = qepp_libxml_find_node( "nelec", app);
 	assert( !qepp_libxml_get_node_value( &res->n_el, node, R_LNF, 1));
 
-	node = qepp_libxml_find_node( "starting_k_points/nk", app);
+	node = qepp_libxml_find_node( "nks", app);
 	assert( !qepp_libxml_get_node_value( &res->n_kpt, node, R_LNT, 1));
 
 
@@ -1444,6 +1450,156 @@ static errh * read_egv_xml( const char * filename, data_file * res)
 	SUCCESS();
 }
 #endif //__LIBXML2
+
+
+#ifdef __LIBXML2
+errh * read_pseudo( const char * filename, pseudo ** out_ptr)
+{
+	pseudo * res = NULL;
+	TEST_ARGS();
+	fclose( read);
+
+	//res = initialize_pseudo( );
+
+	xmlDocPtr	document;
+	xmlNodePtr	root, node, app;
+	document = xmlReadFile( filename, NULL, 0);
+	root = xmlDocGetRootElement( document);
+
+	char buffer[256];
+
+	unsigned long int mesh;
+	unsigned int n_beta, natwf;
+
+	//--------------------------------------------------------------
+	//PP_HEADER
+	node = qepp_libxml_find_node( "PP_HEADER", root);
+	assert( !qepp_libxml_get_node_attr( &mesh,   "mesh_size", node, R_LNT, 1));
+	assert( !qepp_libxml_get_node_attr( &n_beta, "number_of_proj", node, R_INT, 1));
+	assert( !qepp_libxml_get_node_attr( &natwf,  "number_of_wfc", node, R_INT, 1));
+
+	res = initialize_pseudo( );
+	if( natwf > 0)
+	{
+		res->els      = QEPP_ALLOC( sizeof( double), natwf);
+		res->lchi     = QEPP_ALLOC( sizeof( double), natwf);
+		res->occ      = QEPP_ALLOC( sizeof( double), natwf);
+	}
+	else
+		WARN( "Atomic projectors are not present in this pseudopotential");
+
+	
+
+	//--------------------------------------------------------------
+	//PP_MESH
+	app = qepp_libxml_find_node( "PP_MESH", root);
+
+	if( app != NULL)
+	{
+		res->mesh     = mesh;
+		res->grid     = QEPP_ALLOC( sizeof( double), mesh);
+		res->rab      = QEPP_ALLOC( sizeof( double), mesh);
+	
+		node = qepp_libxml_find_node( "PP_R", app);
+		assert( !qepp_libxml_get_node_value( qepp_mem_get_base( res->grid), node, R_LNF, mesh));
+		node = qepp_libxml_find_node( "PP_RAB", app);
+		assert( !qepp_libxml_get_node_value( qepp_mem_get_base( res->rab), node, R_LNF, mesh));
+	}
+	else
+		FAIL( FAIL, "Failed to read radial grid of the pseudopotential");
+
+	//--------------------------------------------------------------
+	//PP_NLCC
+	node = qepp_libxml_find_node( "PP_NLCC", root);
+	if( node != NULL)
+	{
+		res->rho_atc  = QEPP_ALLOC( sizeof( double), mesh);
+		assert( !qepp_libxml_get_node_value( qepp_mem_get_base( res->rho_atc), node, R_LNF, mesh));
+	}
+	else
+		WARN( "Pseudopotential does not have non-linear core correction");
+
+
+	//--------------------------------------------------------------
+	//PP_LOCAL
+	node = qepp_libxml_find_node( "PP_LOCAL", root);
+	if( node != NULL)
+	{
+		res->vloc     = QEPP_ALLOC( sizeof( double), mesh);
+		assert( !qepp_libxml_get_node_value( qepp_mem_get_base( res->vloc), node, R_LNF, mesh));
+	}
+	else
+		FAIL( FAIL, "Failed to read local part of the pseudopotential");
+
+
+	//--------------------------------------------------------------
+	//PP_NONLOCAL
+	app = qepp_libxml_find_node( "PP_NONLOCAL", root);
+	if( app != NULL)
+	{
+		res->n_beta = n_beta,
+		res->kkbeta   = QEPP_ALLOC( sizeof( unsigned long int), n_beta);
+		res->beta     = QEPP_ALLOC( sizeof( double), n_beta, mesh);
+		res->lll      = QEPP_ALLOC( sizeof( unsigned int ), n_beta);
+		res->cri      = QEPP_ALLOC( sizeof( unsigned long int), n_beta);
+		res->cut_rad  = QEPP_ALLOC( sizeof( double), n_beta);
+		res->dij      = QEPP_ALLOC( sizeof( double), n_beta, n_beta);
+
+		for( unsigned int i=0; i<n_beta; i++)
+		{
+			sprintf( buffer, "PP_BETA.%u", i+1);
+			node = qepp_libxml_find_node( buffer, app);
+			assert( !qepp_libxml_get_node_attr( &res->kkbeta[i],  "size", node, R_LNT, 1));
+			assert( !qepp_libxml_get_node_attr( &res->lll[i],     "size", node, R_INT, 1));
+			assert( !qepp_libxml_get_node_attr( &res->cri[i],     "cutoff_radius_index", node, R_INT, 1));
+			assert( !qepp_libxml_get_node_attr( &res->cut_rad[i], "cutoff_radius", node, R_LNF, 1));
+			assert( !qepp_libxml_get_node_value( res->beta[i], node, R_LNF, mesh));
+		}
+		node = qepp_libxml_find_node( "PP_DIJ", app);
+		assert( !qepp_libxml_get_node_value( qepp_mem_get_base( res->dij), node, R_LNF, n_beta*n_beta));
+	}
+	else
+		FAIL( FAIL, "Failed to read non-local part of the pseudopotential");
+
+	
+
+
+	//--------------------------------------------------------------
+	//PP_PSWFC
+	res->natwf = natwf;
+	if( natwf > 0)
+	{
+		res->chi      = QEPP_ALLOC( sizeof( double), natwf, mesh);
+
+		app = qepp_libxml_find_node( "PP_PSWFC", root);
+		for( unsigned int i=0; i<natwf; i++)
+		{
+			sprintf( buffer, "PP_CHI.%u", i+1);
+			node = qepp_libxml_find_node( buffer, app);
+			assert( !qepp_libxml_get_node_attr( &res->lchi[i], "l", node, R_INT, 1));
+			assert( !qepp_libxml_get_node_attr( &res->occ[i],  "occupation", node, R_LNF, 1));
+			assert( !qepp_libxml_get_node_value( res->chi[i], node, R_LNF, mesh));
+		}
+	}
+
+
+	//--------------------------------------------------------------
+	//PP_RHOATOM
+	res->rho_at   = QEPP_ALLOC( sizeof( double), mesh);
+
+	node = qepp_libxml_find_node( "PP_RHOATOM", root);
+	assert( !qepp_libxml_get_node_value( qepp_mem_get_base( res->rho_at), node, R_LNF, mesh));
+
+	
+	xmlFreeDoc( document);
+
+	*out_ptr = res;
+	SUCCESS();
+}
+
+#else //__LIBXML
+errh * read_pseudo( const char * filename, pseudo ** a) {FAIL( FAIL, "Only available with libxml2 compilation\n");}
+#endif //__LIBXML
 
 
 

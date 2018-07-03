@@ -27,6 +27,7 @@
 #define ID_PDOS_DATA	128
 #define ID_PDOS_STATE	129
 #define ID_CD		256
+#define ID_PSEUDO	512
 
 #define MAX_H_SIZE 64
 
@@ -61,6 +62,8 @@ typedef struct wfc wfc;
 
 typedef struct cd cd;
 
+typedef struct pseudo pseudo;
+
 extern data_file * df;
 
 
@@ -80,6 +83,7 @@ pdos_state	* initialize_pdos_state();
 data_file	* initialize_data_file();
 wfc	 	* initialize_wfc( );
 cd	 	* initialize_cd( long int, long int, long int);
+pseudo	 	* initialize_pseudo( );
 
 void * 		print_nscf_data(nscf_data *, FILE *);
 void *		print_band_data(band_data *, FILE *);
@@ -97,6 +101,7 @@ void * 		print_pdos_state( pdos_state *, FILE *);
 void *		print_data_file( data_file *, FILE *);
 void * 		print_wfc( wfc *, FILE *);
 void * 		print_cd( cd *, FILE *);
+void * 		print_pseudo( pseudo *, FILE *);
 
 nscf_md		* duplicate_nscf_md( nscf_md *);
 band_data	* duplicate_band_data( band_data *);
@@ -114,6 +119,7 @@ pdos_state	* duplicate_pdos_state( pdos_state * to_dupl);
 data_file	* duplicate_data_file( data_file * to_dupl);
 wfc		* duplicate_wfc( wfc * to_dupl);
 cd		* duplicate_cd( cd * to_dupl);
+pseudo		* duplicate_pseudo( pseudo * to_dupl);
 
 void * 		free_nscf_md(nscf_md *);
 void *		free_band_data( band_data *);
@@ -131,6 +137,7 @@ void *		free_pdos_state( pdos_state * to_free);
 void *		free_data_file( data_file * to_free);
 void *		free_wfc( wfc * to_free);
 void *		free_cd( cd * to_free);
+void *		free_pseudo( pseudo * to_free);
 
 #define STRUCT_PRINT(a,b) mpi->world_rank == ionode ? \
 		a->print( a, b) : \
@@ -284,7 +291,6 @@ struct m_elem
 {
 	int typeID;
 	size_t size;
-	size_t mem;
 
 	long int n_kpt;
 	int n_bnd;
@@ -323,7 +329,6 @@ struct data_set
 {
 	int typeID;
 	size_t size;
-	size_t mem;
 
 	int n_pt;
 	double * x;
@@ -338,7 +343,6 @@ struct pdos_data
 {
 	int typeID;
 	size_t size;
-	size_t mem;
 
 	long int n_kpt;
 	int n_bnd;
@@ -358,7 +362,6 @@ struct pdos_state
 {
 	int typeID;
 	size_t size;
-	size_t mem;
 
 	char name[64];
 	int atom_n;
@@ -376,7 +379,6 @@ struct data_file
 {
 	int typeID;
 	size_t size;
-	size_t mem;
 
 	long int version;	//QE version xxx.nnn.aaa -> xxxnnnaaa
 
@@ -421,8 +423,6 @@ struct wfc
 {
 	int typeID;
 	size_t size;
-	size_t mem;
-
 
 	//gkv * gvect;
 	//egv * eigenvalues;
@@ -458,7 +458,6 @@ struct cd
 {
 	int typeID;
 	size_t size;
-	size_t mem;
 
 	long int x,y,z;
 
@@ -468,6 +467,54 @@ struct cd
 	void * 		(*print)( cd *, FILE *);
 	cd *		(*duplicate)( cd *);
 	void * 		(*free)( cd *);
+};
+
+struct pseudo
+{
+	int typeID;
+	size_t size;
+
+	//GRID
+	unsigned long int mesh;
+	double dx, xmin, rmax, zmesh;
+	double * grid;		        //Radial grid[1:mesh] r(i) = exmin+i*dx/Zmesh 
+					//                    r(i) = (exmin+i*dx-1)/Zmesh, with r(mesh)=rmax
+	double * rab;			//rab[1:mesh] factor required for discrete integration: ∫ f(r) dr =∑_i(f[i] rab[i]).
+
+	//NLCC
+	double * rho_atc;		//rho_atc(mesh) : core charge for nonlinear core correction 
+					//(true charge, not multiplied by 4πr2)
+
+	//LOCAL
+	double * vloc;			//vloc(mesh) : local potential (Ry a.u.) sampled on the radial grid
+
+	//NONLOCAL
+	unsigned int n_beta;
+	unsigned long int * kkbeta;	//number of mesh points for projector i (must be ≤ mesh )
+	double ** beta;			//projector r_i β(r_i) (note the factor r !!!!)
+	unsigned int * lll;		//angular momentum of projector i
+	unsigned long int * cri;	//cut radius index:  grid[i] =~ r_c
+	double * cut_rad;		//cut off radius r_c of projector i
+	double ** dij;			//the D_{ij} factors of the nonlocal PP: VNL = ∑_{i,j} D_{i,j} |β_i><β_j|
+
+	//PSWFC
+	unsigned int natwf;		//number of atomic wfc
+	double ** chi;			//chi(i,mesh): chi_i(r), i-th radial atomic (pseudo-)orbital 
+					//(radial part of the KS equation, multiplied by r)
+	unsigned int * els;		//n of thw wfc
+	unsigned int * lchi;		//angular momentum of the wfc
+	double * occ;			//occupation of wfc
+
+	//RHOATOM
+	double * rho_at;		//rho_at(mesh): radial atomic (pseudo-)charge .This is 4π r2 times the true charge.
+
+
+	
+
+
+	void * 		(*print)( pseudo *, FILE *);
+	pseudo *	(*duplicate)( pseudo *);
+	void * 		(*free)( pseudo *);
 };
 
 

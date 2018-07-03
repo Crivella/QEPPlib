@@ -1,5 +1,16 @@
 #include <qepp/qepp_io.h>
 
+char io_buff[1024];
+char outdir[1024];
+char prefix[128];
+char workdir[1024];
+char datafile_path[1024];
+FILE * in_f;
+FILE * errf;
+FILE * outf;
+unsigned int ionode;
+int verbosity;
+
 void open_io_env( int node, int mode, int verb)
 {
 	struct pollfd fds[1];

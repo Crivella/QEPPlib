@@ -50,5 +50,13 @@ obj
 .tmp_versions/
 modules.order
 Module.symvers
+
+#My
 Mkfile.old
 dkms.conf
+make.inc
+*.cache*
+*.log
+config.status
+configure.msg
+*.pyc

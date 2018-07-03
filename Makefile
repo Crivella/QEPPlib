@@ -50,19 +50,21 @@ struct_nscf_md.o \
 struct_opt_data.o \
 struct_pdos_data.o \
 struct_pdos_state.o \
+struct_pseudo.o \
 struct_spin_data.o \
 struct_wfc.o \
-wrapper_libxml.o
+wrapper_libxml.o \
+ylmr.o
   
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 .PHONY : clean veryclean install uninstall
 
 $(TARGET) : $(OBJ)
-	$(MPICC) -shared $(CFLAGS) -o $@ $(OBJ)
+	$(CC) -o $@ -shared $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) $(LIBS) $(OBJ)
 
 $(ODIR)/%.o : $(SDIR)/%.c $(DEPS)
-	$(MPICC) -c -o $@ $< $(CFLAGS)
+	$(CC) -o $@ -c $< $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) $(LIBS)
 
 install : $(TARGET)
 	@mkdir -p $(LDIR); \
@@ -94,7 +96,7 @@ fold :
 	(exit 1) ; fi \
 
 clean :
-	rm -f $(ODIR)/*.o *~ core $(INC)/*~ 
+	rm -f $(ODIR)/*.o *~ core $(INC)/*~ $(SDIR)/*~
 
 veryclean : clean uninstall
-	rm -f *.so
+	rm -f *.so make.inc
