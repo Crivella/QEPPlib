@@ -368,7 +368,7 @@ struct pdos_state
 	int wfc_n;
 
 	double j, m_j;
-	int l;
+	int l,m;
 
 	void * 		(*print)( pdos_state *, FILE *);
 	pdos_state *		(*duplicate)( pdos_state *);

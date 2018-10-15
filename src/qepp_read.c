@@ -508,15 +508,28 @@ errh * read_pdos_data( const char * filename, pdos_data ** out_ptr, char * comme
 		while( (c = buffer[cc++]) != 'c') {}
 		app *= sscanf( buffer+cc, "%d", &p_app->wfc_n);
 //QEPP_PRINT( "%s   %d\n", buffer+cc, p_app->wfc_n);
-		while( (c = buffer[cc++]) != '=') {}
-		app *= sscanf( buffer+cc, "%lf", &p_app->j);
+		while( (c = buffer[cc++]) != '(') {}
+		if( buffer[cc++] == 'j')
+		{
+			while( (c = buffer[cc++]) != '=') {}
+			app *= sscanf( buffer+cc, "%lf", &p_app->j);
 //QEPP_PRINT( "%s   %.1lf\n", buffer+cc, p_app->j);
-		while( (c = buffer[cc++]) != '=') {}
-		app *= sscanf( buffer+cc, "%d", &p_app->l);
+			while( (c = buffer[cc++]) != '=') {}
+			app *= sscanf( buffer+cc, "%d", &p_app->l);
 //QEPP_PRINT( "%s   %d\n", buffer+cc, p_app->l);
-		while( (c = buffer[cc++]) != '=') {}
-		app *= sscanf( buffer+cc, "%lf", &p_app->m_j);
+			while( (c = buffer[cc++]) != '=') {}
+			app *= sscanf( buffer+cc, "%lf", &p_app->m_j);
 //QEPP_PRINT( "%s   %.1lf\n", buffer+cc, p_app->m_j);
+		}
+		else
+		{
+			while( (c = buffer[cc++]) != '=') {}
+			app *= sscanf( buffer+cc, "%d", &p_app->l);
+//QEPP_PRINT( "%s   %d\n", buffer+cc, p_app->l);
+			while( (c = buffer[cc++]) != '=') {}
+			app *= sscanf( buffer+cc, "%d", &p_app->m);
+		}
+		
 		if( app == 0)
 		{
 			STRUCT_FREE( data);
