@@ -367,6 +367,7 @@ struct pdos_state
 	int atom_n;
 	int wfc_n;
 
+	int isj;
 	double j, m_j;
 	int l,m;
 

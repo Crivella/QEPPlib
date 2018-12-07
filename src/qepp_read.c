@@ -50,7 +50,13 @@ errh * read_nscf_md( const char * filename, nscf_md ** out_ptr)
 		FAIL( FAIL, "Cannot read n_kpt");
 	if( qepp_get_value( "number of Kohn-Sham states", read, "=", 0, R_INT, &n_bnd))
 		FAIL( FAIL, "Cannot read n_bnd");
-	if( qepp_get_value( "Fermi energy", read, 0 , /*md->lines_pos[md->lines-200]*/0, R_FLT, &e_fermi))
+	long int pos=0, pos_app = 0;
+	while( pos_app != -1)
+	{
+		pos = pos_app;
+		pos_app = qepp_find_string("Fermi energy",read,pos+20);
+	}
+	if( qepp_get_value( "Fermi energy", read, 0 , /*md->lines_pos[md->lines-200]*/pos, R_FLT, &e_fermi))
 	{
 		int check = 1;
 		char * buffer = qepp_change_file( filename, "scf_1.out");
@@ -511,6 +517,7 @@ errh * read_pdos_data( const char * filename, pdos_data ** out_ptr, char * comme
 		while( (c = buffer[cc++]) != '(') {}
 		if( buffer[cc++] == 'j')
 		{
+			p_app->isj = 1;
 			while( (c = buffer[cc++]) != '=') {}
 			app *= sscanf( buffer+cc, "%lf", &p_app->j);
 //QEPP_PRINT( "%s   %.1lf\n", buffer+cc, p_app->j);
@@ -523,6 +530,7 @@ errh * read_pdos_data( const char * filename, pdos_data ** out_ptr, char * comme
 		}
 		else
 		{
+			p_app->isj = 0;
 			while( (c = buffer[cc++]) != '=') {}
 			app *= sscanf( buffer+cc, "%d", &p_app->l);
 //QEPP_PRINT( "%s   %d\n", buffer+cc, p_app->l);
@@ -559,14 +567,20 @@ errh * read_pdos_data( const char * filename, pdos_data ** out_ptr, char * comme
 		b_app=0;
 		while( b_app < nscf->n_bnd)
 		{
-			while( fgetc(read) != '(' && !feof(read)) {}
-			app *= fscanf( read, "%d", &b_app_r); b_app_r--;
+			do {
+				c = fgetc( read);
+			} while( c != '(' && c != '=' && !feof(read));
+			if( c == '(')
+			{
+				app *= fscanf( read, "%d", &b_app_r);
+				b_app_r--;
+			}
 			qepp_fscanf_double( read, &en_app);
 			qepp_getline( buffer, 256, read);
 			if( fabs( en_app - nscf->energies[k_app][b_app]) > 2.E-3)
 			{
 				STRUCT_FREE( data);
-				FAIL( FAIL, "Mismatch between pdos and nscf file for k_pt #%li enrgies at band #%d...\n", k_app, b_app);
+				FAIL( FAIL, "Mismatch between pdos and nscf file for k_pt #%li enrgies at band #%d... %.4lf vs %.4lf\n", k_app, b_app, en_app, nscf->energies[k_app][b_app]);
 			}
 			n_c = 0;
 			long int pos_app = ftell(read);
@@ -588,6 +602,10 @@ errh * read_pdos_data( const char * filename, pdos_data ** out_ptr, char * comme
 			}
 			
 			b_app++;
+			if( b_app < nscf->n_bnd)
+				do {
+					c = fgetc( read);
+				} while( c != 'e' && !feof(read));
 		}
 		k_app++;
 	}

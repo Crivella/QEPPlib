@@ -12,6 +12,8 @@ pdos_state * initialize_pdos_state()
 	to_init->typeID = ID_PDOS_STATE;
 	to_init->size = sizeof( pdos_state);
 
+	to_init->isj = 0;
+
 	to_init->print =	&print_pdos_state;
 	to_init->duplicate =	&duplicate_pdos_state;
 	to_init->free = 	&free_pdos_state;
@@ -26,8 +28,12 @@ void * print_pdos_state(pdos_state * to_print, FILE * write)
 	if( write == NULL)
 		return NULL;
 
-	QEPP_OUT( write, "atom   %d (%s), wfc  %d (j=%.1lf l=%d m_j= %.1lf)\n", 
+	if( to_print->isj)
+		QEPP_OUT( write, "atom   %d (%s), wfc  %d (j=%.1lf l=%d m_j= %.1lf)\n", 
 			to_print->atom_n, to_print->name, to_print->wfc_n, to_print->j, to_print->l, to_print->m_j);
+	else
+		QEPP_OUT( write, "atom   %d (%s), wfc  %d (l=%d m= %d)\n", 
+			to_print->atom_n, to_print->name, to_print->wfc_n, to_print->l, to_print->m);
 	//to fill------------------------------------------------------------
 
 	return NULL;
