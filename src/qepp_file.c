@@ -146,11 +146,11 @@ long int qepp_get_file_lines_comm(FILE * read, char * comments)
 {
 	long int pos = ftell(read);
 	long int lines=0;
-	char buffer[256];
+	char buffer[1024];
 	rewind(read);
 	while(!feof(read))
 	{
-		qepp_getline(buffer,256,read);
+		qepp_getline(buffer,1024,read);
 		if(comments != NULL)
 		{
 			if(strchr(comments,buffer[0]) == NULL) //If line is not a comment
@@ -169,8 +169,8 @@ long int qepp_get_file_lines_comm(FILE * read, char * comments)
 int qepp_get_file_columns_comm(FILE * read, char * comments, char * delimiters)
 {
 	int col=0;
-	char buffer[256];
-	char delim[64];
+	char buffer[1024];
+	char delim[16];
 	char * default_delim=" \t";
 	long int pos = ftell(read);
 	int flag_num=0;
@@ -180,11 +180,11 @@ int qepp_get_file_columns_comm(FILE * read, char * comments, char * delimiters)
 		strcpy(delim,delimiters);
 
 	rewind(read);
-	qepp_getline(buffer,256,read);
+	qepp_getline(buffer,1024,read);
 	if(comments != NULL)
 	{
 		while( strchr(comments,buffer[0]) != NULL && !feof(read))
-			qepp_getline(buffer,256,read);
+			qepp_getline(buffer,1024,read);
 	}
 	for( int i=0; buffer[i] != 0; i++)
 	{

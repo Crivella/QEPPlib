@@ -60,3 +60,4 @@ make.inc
 config.status
 configure.msg
 *.pyc
+*.sublime*

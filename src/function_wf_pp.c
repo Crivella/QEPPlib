@@ -351,8 +351,8 @@ errh * qepp_compute_matrixelements_huge( void ** dump, data_file * data)
 			start_b1=0;
 			for( int j2=j1+1; j2<n_bnd; j2++)
 			{
-				double gap = (data->egv[j2] - data->egv[j1]) * data->e_t;
-				double occ = 2*(data->occ[j1] - data->occ[j2]);
+				double gap = (data->egv[i][j2] - data->egv[i][j1]) * data->e_t;
+				double occ = 2*(data->occ[i][j1] - data->occ[i][j2]);
 
 				if( occ > 1.E-4)
 				{

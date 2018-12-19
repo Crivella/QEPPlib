@@ -367,8 +367,9 @@ struct pdos_state
 	int atom_n;
 	int wfc_n;
 
+	int isj;
 	double j, m_j;
-	int l;
+	int l,m;
 
 	void * 		(*print)( pdos_state *, FILE *);
 	pdos_state *		(*duplicate)( pdos_state *);

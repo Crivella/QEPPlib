@@ -71,7 +71,7 @@ void open_io_env( int node, int mode, int verb)
 		}
 		else //stdin contains data
 		{
-			check=1;
+			/*check=1;
 			char buff[4096];
 			char * ptr;
 			if( fread( buff, 1, sizeof( buff), stdin) ) {}
@@ -107,7 +107,7 @@ void open_io_env( int node, int mode, int verb)
 				exit(1);
 			}
 			printf( "df = %s\n", datafile_path);
-
+*/
 			//QEPP_ALL_PRINT("sono %d\n", mpi->world_rank);
 
 			//READ( &df, datafile_path);
